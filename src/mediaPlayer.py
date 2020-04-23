@@ -150,7 +150,7 @@ class MovieWidget(QWidget):
 # openFile()
 #-------------------------------------------------------------------------------
     def openFile(self):
-        fileName, _ = QFileDialog.getOpenFileName(self, "Open Media", QDir.homePath(), "All Files (*);;Movies (*.avi *.mp4);;Music (*.mp3 *.ogg)")
+        fileName, _ = QFileDialog.getOpenFileName(self, "Open Media", QDir.homePath(), "All Files (*);;Movies (*.avi *.mp4);;Music (*.mp3 *.ogg)", options = QFileDialog.DontUseNativeDialog)
         if fileName != '':
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))
             self.errorLabel.setText(os.path.splitext(os.path.basename(fileName))[0])

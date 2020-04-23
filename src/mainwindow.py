@@ -1612,7 +1612,7 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
     def outputExport(self):
         home = expanduser("~")
-        fileName = QFileDialog.getSaveFileName(self, 'Export Output', home, filter='*.txt')
+        fileName = QFileDialog.getSaveFileName(self, 'Export Output', home, filter='*.txt', options = QFileDialog.DontUseNativeDialog)
         if fileName[0]:
             with open(fileName[0], "w") as fOutput:
                 fOutput.write(self.txtOutput.toPlainText())    
