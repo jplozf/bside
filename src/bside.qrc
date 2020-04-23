@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="pix">
+    <file>pix/bside.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,241 @@
+# Light Theme
+["#efefef","#000000","#ffffff","#f7f7f7","#ffffdc","#000000","#000000","#efefef","#000000","#ffffff","#0000ff","#308cc6","#ffffff"]
+
+# Dark theme
+["#353535","#ffffff","#191919","#353535","#ffffff","#ffffff","#ffffff","#353535","#ffffff","#ff0000","#2a82da","#2a82da","#000000"]
+
+base=os.path.basename('/root/dir/sub/file.ext')
+>>> base
+'file.ext'
+>>> os.path.splitext(base)
+('file', '.ext')
+>>> os.path.splitext(base)[0]
+'file'
+
+EFE3D9  Background
+FFA8A8  80
+0066F6  Bleu
+E8AF30  String
+969696  Gris Comments
+E9E8E2  Goutière N° Lignes
+
+#program created by mohit
+#offical website L4wisdom.com
+# email-id  mohitraj.cs@gmail.com
+import os
+import re
+import sys
+from threading import  Thread
+from datetime import datetime
+import subprocess
+import cPickle
+dict1 = {}
+
+def get_drives():
+	response = os.popen("wmic logicaldisk get caption")
+	list1 = []
+	total_file = []
+	t1= datetime.now()
+	for line in response.readlines():
+		line = line.strip("\n")
+		line = line.strip("\r")
+		line = line.strip(" ")
+		if (line == "Caption" or line == ""):
+			continue
+		list1.append(line)
+	return list1
+	
+def search1(drive):
+	for root, dir, files in os.walk(drive, topdown = True):
+		for file in files:
+			file= file.lower()
+			if file in dict1:
+				file = file+"_1"
+				dict1[file]= root
+			else :
+				dict1[file]= root
+				
+def create(): 
+	t1= datetime.now()
+	list2 = []   # empty list is created	
+	list1 = get_drives()
+	print list1			
+	for each in list1:
+		process1 = Thread(target=search1, args=(each,))
+		process1.start()
+		list2.append(process1)
+		  
+	for t in list2:
+		t.join() # Terminate the threads
+
+	pickle_file = open("finder_data","w") 
+	cPickle.dump(dict1,pickle_file) 
+	pickle_file.close()
+	t2= datetime.now()
+	total =t2-t1
+	print "Time taken to create " , total
+	print "Thanks for using L4wisdom.com"
+
+if len(sys.argv) < 2 or len(sys.argv) > 2:
+	print "Please use proper format"
+	print "Use <finder -c >  to create database file"
+	print "Use <finder file-name> to search file"
+	print "Thanks for using L4wisdom.com"
+
+elif sys.argv[1] == '-c':
+	create()	
+	
+else:
+	t1= datetime.now()
+	try:
+		pickle_file  = open("finder_data", "r")
+		file_dict = cPickle.load(pickle_file)  
+		pickle_file.close()
+	except IOError:
+		create()
+	except Exception as e :
+		print e 
+		sys.exit()
+	file_to_be_searched = sys.argv[1].lower()
+	list1= []
+	print "Path \t\t: File-name"
+	for key in file_dict:
+		if re.search(file_to_be_searched, key):
+			str1 =  file_dict[key]+" : "+key
+			list1.append(str1)
+	list1.sort()
+	for each in list1:
+		print each
+		print "---------------------------------"
+	t2= datetime.now()
+	total =t2-t1
+	print "Total files are", len(list1)
+	print "Time taken to search " , total
+	print "Thanks for using L4wisdom.com"
+	print "Email id mohitraj.cs@gmail.com"
+	print "URL: http://l4wisdom.com/finder_go.php"
+	
+		
+import PySimpleGUI as sg
+import subprocess
+from shutil import copyfile
+import shutil
+import os
+import sys
+
+def Launcher():
+    sg.ChangeLookAndFeel('LightGreen')
+
+    layout =  [[sg.T('PyInstaller EXE Creator', font='Any 15')],
+                [sg.T('Source Python File'), sg.In(key='_sourcefile_', size=(45,1)), sg.FileBrowse(file_types=(("Python Files", "*.py"),))],
+                [sg.T('Icon File'), sg.In(key='_iconfile_', size=(45,1)), sg.FileBrowse(file_types=(("Icon Files", "*.ico"),))],
+                [sg.Frame('Output', font='Any 15',layout= [[sg.Output(size=(85, 15), font='Courier 10')]])],
+                [sg.ReadFormButton('Make EXE',bind_return_key=True),
+                 sg.SimpleButton('Quit', button_color=('white','firebrick3')),]]
+
+    window = sg.Window('PySimpleGUI EXE Maker',
+                       auto_size_text=False,
+                       auto_size_buttons=False,
+                       default_element_size=(20,1),
+                       text_justification='right')
+
+    window.Layout(layout)
+
+    # ---===--- Loop taking in user input --- #
+    while True:
+        (button, values) = window.Read()
+        if button is 'Quit' or button is None:
+            break           # exit button clicked
+
+        source_file = values['_sourcefile_']
+        icon_file = values['_iconfile_']
+
+        icon_option = '-i "{}"'.format(icon_file) if icon_file else ''
+        source_path, source_filename = os.path.split(source_file)
+        workpath_option = '--workpath "{}"'.format(source_path)
+        dispath_option = '--distpath "{}"'.format(source_path)
+        specpath_option = '--specpath "{}"'.format(source_path)
+        folder_to_remove = os.path.join(source_path,source_filename[:-3])
+        file_to_remove = os.path.join(source_path, source_filename[:-3]+'.spec')
+        command_line = 'pyinstaller -wF "{}" {} {} {} {}'.format(source_file, icon_option, workpath_option, dispath_option, specpath_option)
+
+        if button is 'Make EXE':
+            out=''
+
+            try:
+                print(command_line)
+                print('Making EXE... this will take a while.. the program has NOT locked up...')
+                window.Refresh()
+                # print('Running command {}'.format(command_line))
+                out, err = runCommand(command_line, window=window)
+                shutil.rmtree(folder_to_remove)
+                os.remove(file_to_remove)
+                print('**** DONE ****')
+            except:
+                sg.PopupError('Something went wrong', 'close this window and copy command line from text printed out in main window','Here is the output from the run', out)
+                print('Copy and paste this line into the command prompt to manually run PyInstaller:\n\n', command_line)
+
+
+def runCommand(cmd, timeout=None, window=None):
+    """ run shell command
+
+	@param cmd: command to execute
+	@param timeout: timeout for command execution
+
+	@return: (return code from command, command output)
+	"""
+
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    output = ''
+    for line in p.stdout:
+        line = line.decode(errors='replace' if (sys.version_info) < (3, 5)
+                           else 'backslashreplace').rstrip()
+        output += line
+        print(line)
+        if window:
+            window.Refresh()
+
+    retval = p.wait(timeout)
+
+    return (retval, output)
+
+
+def runCommand2(cmd, timeout=None):
+    """ run shell command
+
+	@param cmd: command to execute
+	@param timeout: timeout for command execution
+
+	@return: (return code from command, command output)
+	"""
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    output = ''
+
+    out, err = p.communicate()
+    p.wait(timeout)
+
+    return (out, err)
+
+if __name__ == '__main__':
+    Launcher()
+
+
+from datetime import date
+
+today = date.today()
+
+# dd/mm/YY
+d1 = today.strftime("%d/%m/%Y")
+print("d1 =", d1)
+
+# Textual month, day and year	
+d2 = today.strftime("%B %d, %Y")
+print("d2 =", d2)
+
+# mm/dd/y
+d3 = today.strftime("%m/%d/%y")
+print("d3 =", d3)
+
+# Month abbreviation, day and year	
+d4 = today.strftime("%b-%d-%Y")
+print("d4 =", d4)

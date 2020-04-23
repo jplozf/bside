@@ -1,0 +1,15 @@
+/src/__pycache__/
+/src/dox/
+/src/python370.chm
+/src/backup.db
+/src/coolbox.db
+/src/coolbox.py
+/src/coolbox.ui
+/src/txsearch.py
+/src/SQLite-3.7.17.chm
+/src/Qt-5.7.0.chm
+/src/TXSearch.datas
+/src/.google-cookie
+/src/build/
+/src/dist/
+/zz/

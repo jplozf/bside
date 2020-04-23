@@ -1,0 +1,1 @@
+start /wait c:\Windows\system32\cmd.exe /k dir
