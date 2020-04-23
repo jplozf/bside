@@ -48,7 +48,7 @@ def initFormEXE(mw):
 # doClickForPath()
 #-------------------------------------------------------------------------------
 def doClickForPath(event, widget):   
-    path = QFileDialog.getExistingDirectory(widget, "Open a folder", ".", QFileDialog.ShowDirsOnly)
+    path = QFileDialog.getExistingDirectory(widget, "Open a folder", ".", options = QFileDialog.DontUseNativeDialog | QFileDialog.ShowDirsOnly)
     if path:
         widget.setText(path)
 
@@ -181,7 +181,7 @@ def buildCommand(mw):
 # browseMainFile()
 #-------------------------------------------------------------------------------
 def browseMainFile(mw):
-    filename = QFileDialog.getOpenFileName(mw, 'Open main file', '', 'Python sources (*.py);;All files (*.*)')[0]
+    filename = QFileDialog.getOpenFileName(mw, 'Open main file', '', 'Python sources (*.py);;All files (*.*)', options = QFileDialog.DontUseNativeDialog)[0]
     if filename != None:
         mw.txtMainFile.setText(filename)
 
