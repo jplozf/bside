@@ -61,13 +61,14 @@ class TodoManager():
         selmodel = self.mw.tvwTODO.selectionModel()
         selmodel.selectionChanged.connect(self.handleTODOSelection)
         self.mw.tvwTODO.itemChanged.connect(self.handleTODOChecked)
+        self.mw.tvwTODO.setHeaderHidden(True)
         
-        self.db = sqlite3.connect("todo.db")
+        self.db = sqlite3.connect(os.path.join(self.mw.appDir, "todo.db"))
         self.db.execute(
         """
         CREATE TABLE IF NOT EXISTS TODOs (
 	idTODO INTEGER PRIMARY KEY,
-	dteTODO INTEGER,
+	lblTODO TEXT,
 	ordTODO INTEGER DEFAULT 10,
 	txtTODO TEXT,
 	txtNOTE TEXT,
@@ -94,30 +95,30 @@ class TodoManager():
             sDate = str(dlg.tplTODO[0])
             sText = str(dlg.tplTODO[1])
             sNote = str(dlg.tplTODO[2])
-            iTODO = self.getNextOrder(utils.dateStringToTimeStamp(sDate))
+            iTODO = self.getNextOrder(sDate)
             print("NEXT = %d" % iTODO)
-            self.addDBTODO(utils.dateStringToTimeStamp(sDate), sText, ordTODO=iTODO, txtNOTE=sNote)
+            self.addDBTODO(sDate, sText, ordTODO=iTODO, txtNOTE=sNote)
             self.mw.showMessage("Add")
             
 #-------------------------------------------------------------------------------
 # addDBTODO()
 #-------------------------------------------------------------------------------
-    def addDBTODO(self, dteTODO, txtTODO, ordTODO=10, txtNOTE="", chkTODO=0):
+    def addDBTODO(self, lblTODO, txtTODO, ordTODO=10, txtNOTE="", chkTODO=0):
         cur = self.db.cursor()
-        data = (dteTODO, txtTODO, ordTODO, txtNOTE, chkTODO)
+        data = (lblTODO, txtTODO, ordTODO, txtNOTE, chkTODO)
         print(data)
-        cur.execute("insert into TODOs(dteTODO, txtTODO, ordTODO, txtNOTE, chkTODO) values (?, ?, ?, ?, ?)", data)
+        cur.execute("insert into TODOs(lblTODO, txtTODO, ordTODO, txtNOTE, chkTODO) values (?, ?, ?, ?, ?)", data)
         cur.close      
         self.db.commit()
         self.displayTODOs()
-        self.setTODOFocus(dteTODO, txtTODO)
+        self.setTODOFocus(lblTODO, txtTODO)
         
 #-------------------------------------------------------------------------------
 # getNextOrder()
 #-------------------------------------------------------------------------------
-    def getNextOrder(self, dteTODO):
+    def getNextOrder(self, lblTODO):
         cur = self.db.cursor()
-        cur.execute("select max(ordTODO)+10 from TODOs where dteTODO = :dte", {"dte": dteTODO})
+        cur.execute("select max(ordTODO)+10 from TODOs where lblTODO = :label", {"label": lblTODO})
         nxt = cur.fetchone()[0]
         if nxt is None:
             nxt = 10
@@ -151,16 +152,16 @@ class TodoManager():
 #-------------------------------------------------------------------------------
 # setTODOFocus()
 #-------------------------------------------------------------------------------
-    def setTODOFocus(self, dte, txt):
+    def setTODOFocus(self, lbl, txt):
         found = False
         root = self.mw.tvwTODO.invisibleRootItem()
         children = root.childCount()
         for i in range(children):
-            itmDte = root.child(i)
-            if itmDte.text(0) == utils.timeStampToDateString(dte):
-                jChildren = itmDte.childCount()
+            itmLabel = root.child(i)
+            if itmLabel.text(0) == lbl:
+                jChildren = itmLabel.childCount()
                 for j in range(jChildren):
-                    itmTxt = itmDte.child(j)
+                    itmTxt = itmLabel.child(j)
                     if itmTxt.text(0) == txt:
                         found = True
                         break
@@ -172,13 +173,13 @@ class TodoManager():
 #-------------------------------------------------------------------------------
     def displayTODOs(self):
         cur = self.db.cursor()
-        cur.execute("select idTODO, dteTODO, ordTODO, txtTODO, txtNOTE, chkTODO from TODOs order by dteTODO, ordTODO")
+        cur.execute("select idTODO, lblTODO, ordTODO, txtTODO, txtNOTE, chkTODO from TODOs order by lblTODO, ordTODO")
         rows = cur.fetchall() 
         self.clearQTreeWidget(self.mw.tvwTODO)
         self.mw.tvwTODO.blockSignals(True)
         for row in rows:
             idTODO = row[0]
-            dteTODO = utils.timeStampToDateString(row[1])
+            lblTODO = row[1]
             ordTODO = row[2]
             txtTODO = row[3]
             txtNOTE = row[4]
@@ -189,17 +190,17 @@ class TodoManager():
             children = root.childCount()
             for i in range(children):
                 itm = root.child(i)
-                if itm.text(0) == dteTODO:
+                if itm.text(0) == lblTODO:
                     found = True
                     break
             if found == False:
-                itmDate = QTreeWidgetItem(self.mw.tvwTODO)
+                itmLabel = QTreeWidgetItem(self.mw.tvwTODO)
                 font = QFont()
                 font.setWeight(QFont.Bold)
-                itmDate.setFont(0, font)
-                itmDate.setText(0, dteTODO)
+                itmLabel.setFont(0, font)
+                itmLabel.setText(0, lblTODO)
 
-                itmText = QTreeWidgetItem(itmDate)
+                itmText = QTreeWidgetItem(itmLabel)
                 itmText.setText(0, txtTODO)
                 itmText.setText(1, str(idTODO))
                 itmText.setFlags(itmText.flags() | Qt.ItemIsUserCheckable)
@@ -235,13 +236,15 @@ class TodoManager():
             item = self.mw.tvwTODO.itemFromIndex(index)
             try:
                 self.mw.txtNote.setPlainText(self.getNote(int(item.text(1))))
-                if self.mw.txtNote.toPlainText() == "":
-                    self.resizeSplitter(self.mw.splitter, 0, 90)
-                else:
-                    self.resizeSplitter(self.mw.splitter, 0, 50)
+                if settings.db["TODO_AUTORESIZE_NOTE"]:
+                    if self.mw.txtNote.toPlainText() == "":
+                        self.resizeSplitter(self.mw.splitter, 0, 90)
+                    else:
+                        self.resizeSplitter(self.mw.splitter, 0, 50)
             except:
                 self.mw.txtNote.setPlainText("")
-                self.resizeSplitter(self.mw.splitter, 0, 90)
+                if settings.db["TODO_AUTORESIZE_NOTE"]:
+                    self.resizeSplitter(self.mw.splitter, 0, 90)
                 
 #-------------------------------------------------------------------------------
 # handleTODOChecked()

@@ -18,6 +18,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import platform
 import os
+from datetime import date
 
 #-------------------------------------------------------------------------------
 # class DlgProperties
@@ -252,6 +253,123 @@ class DlgAddTODO(QDialog):
         
         formLayout = QFormLayout(self)
         
+        self.hBox = QHBoxLayout()        
+        
+        self.lblTODO = QLineEdit(date.today().strftime("%d/%m/%Y"))
+        self.lblTODO.selectAll()
+        self.btnPickDate = QPushButton()
+        icoPickDate = QIcon("pix/16x16/Clock.png")
+        self.btnPickDate.setIcon(icoPickDate)
+        self.btnPickDate.clicked.connect(self.pickDate)
+        self.hBox.addWidget(self.lblTODO)
+        self.hBox.addWidget(self.btnPickDate)
+        
+        formLayout.addRow("Label", self.hBox)        
+        
+        self.txtTODO = QLineEdit()
+        formLayout.addRow("TODO", self.txtTODO)
+        
+        self.txtNote = QPlainTextEdit()
+        formLayout.addRow("Notes", self.txtNote)
+
+        boxLayout = QHBoxLayout(self)
+        btnRun = QPushButton()
+        icoRun = QIcon("pix/16x16/Ok.png")
+        btnRun.setIcon(icoRun)
+        btnCancel = QPushButton()
+        icoCancel = QIcon("pix/16x16/Cancel.png")
+        btnCancel.setIcon(icoCancel)
+        
+        btnRun.clicked.connect(self.itsOK)
+        btnCancel.clicked.connect(self.close)
+
+        boxLayout.addStretch(1)
+        boxLayout.addWidget(btnRun)
+        boxLayout.addWidget(btnCancel)
+
+        mainLayout.addLayout(formLayout)
+        mainLayout.addLayout(boxLayout)
+    
+#-------------------------------------------------------------------------------
+# itsOK()
+#-------------------------------------------------------------------------------
+    def itsOK(self):
+        if self.txtTODO.text() != "":
+            self.tplTODO =  (self.lblTODO.text(), self.txtTODO.text(), self.txtNote.toPlainText())
+            self.accept()
+        else:
+            self.reject()
+            
+#-------------------------------------------------------------------------------
+# pickDate()
+#-------------------------------------------------------------------------------
+    def pickDate(self):
+        dlg = DlgCalendar(self)
+        result = dlg.exec()
+        if result == QDialog.Accepted:
+            self.lblTODO.setText(str(dlg.selectedDate))
+    
+#-------------------------------------------------------------------------------
+# Class DlgCalendar
+#-------------------------------------------------------------------------------
+class DlgCalendar(QDialog):
+#-------------------------------------------------------------------------------
+# __init__()
+#-------------------------------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__(parent)    
+        self.setWindowTitle("Pick up a date")  
+        mainLayout = QVBoxLayout(self)
+        
+        self.calendar = QCalendarWidget()
+        mainLayout.addWidget(self.calendar)
+        
+        boxLayout = QHBoxLayout(self)
+        btnRun = QPushButton()
+        icoRun = QIcon("pix/16x16/Ok.png")
+        btnRun.setIcon(icoRun)
+        btnCancel = QPushButton()
+        icoCancel = QIcon("pix/16x16/Cancel.png")
+        btnCancel.setIcon(icoCancel)
+        
+        btnRun.clicked.connect(self.itsOK)
+        btnCancel.clicked.connect(self.close)
+
+        boxLayout.addStretch(1)
+        boxLayout.addWidget(btnRun)
+        boxLayout.addWidget(btnCancel)
+
+        mainLayout.addLayout(boxLayout)
+    
+#-------------------------------------------------------------------------------
+# itsOK()
+#-------------------------------------------------------------------------------
+    def itsOK(self):
+        self.selectedDate = self.calendar.selectedDate().toString("dd/MM/yyyy")
+        self.accept()
+        """
+        if self.txtTODO.text() != "":
+            self.tplTODO =  (self.dteTODO.date().toString("dd/MM/yyyy"), self.txtTODO.text(), self.txtNote.toPlainText())
+            self.accept()
+        else:
+            self.reject()
+        """
+            
+#-------------------------------------------------------------------------------
+# Class DlgAddTODO2
+#-------------------------------------------------------------------------------
+class DlgAddTODO2(QDialog):
+#-------------------------------------------------------------------------------
+# __init__()
+#-------------------------------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__(parent)    
+        
+        self.setWindowTitle("Add TODO")  
+        mainLayout = QVBoxLayout(self)
+        
+        formLayout = QFormLayout(self)
+        
         self.dteTODO = QDateEdit()
         self.dteTODO.setDateTime(QDateTime.currentDateTime())
         formLayout.addRow("Date", self.dteTODO)        
@@ -329,3 +447,22 @@ class DlgAddData(QDialog):
         mainLayout.addLayout(formLayout)
         mainLayout.addLayout(boxLayout)
         
+"""
+today = date.today()
+
+# dd/mm/YY
+d1 = today.strftime("%d/%m/%Y")
+print("d1 =", d1)
+
+# Textual month, day and year	
+d2 = today.strftime("%B %d, %Y")
+print("d2 =", d2)
+
+# mm/dd/y
+d3 = today.strftime("%m/%d/%y")
+print("d3 =", d3)
+
+# Month abbreviation, day and year	
+d4 = today.strftime("%b-%d-%Y")
+print("d4 =", d4)
+"""        

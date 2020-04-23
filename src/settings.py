@@ -103,7 +103,8 @@ defaultValues = [
     ['FOCUS_FONT_SIZE', 10],
     ['FOCUS_FORMAT_DATE', '%d/%m/%Y'],
     ['FOCUS_FORMAT_HOUR', '%H:%M:%S'],
-    ['FOCUS_FORMAT_TIMESTAMP', '%d/%m/%Y - %H:%M:%S']
+    ['FOCUS_FORMAT_TIMESTAMP', '%d/%m/%Y - %H:%M:%S'],
+    ['TODO_AUTORESIZE_NOTE', False]
 ]
 
 #-------------------------------------------------------------------------------

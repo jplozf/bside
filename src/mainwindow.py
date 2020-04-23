@@ -87,6 +87,10 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__( self, parent )
         uic.loadUi(resource_path('mainwindow.ui'), self)
         
+        self.appDir = os.path.join(os.path.expanduser("~"), const.APP_FOLDER)
+        if not os.path.exists(self.appDir):
+            os.makedirs(self.appDir)
+
         self.project = projects.Project(parent = self)
         self.todoManager = todomgr.TodoManager(parent = self)
         
@@ -233,10 +237,6 @@ class MainWindow(QMainWindow):
         self.chkVerboseOutput.stateChanged.connect(self.verboseOutputChanged)
 
         self.lblProjectName.setText(self.project.name)
-
-        self.appDir = os.path.join(os.path.expanduser("~"), const.APP_FOLDER)
-        if not os.path.exists(self.appDir):
-            os.makedirs(self.appDir)
 
         self.restoreSettings()
         # self.btnSaveSettings.clicked.connect(self.backupSettings)
