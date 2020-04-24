@@ -12,19 +12,14 @@
 #-------------------------------------------------------------------------------
 # Imports
 #-------------------------------------------------------------------------------
-from PyQt5 import uic
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import os
-import sqlite3
-from googlesearch import search 
-import webbrowser
-from pathlib import Path
+ 
 
 import settings
 import dialog
-import utils
 
 #-------------------------------------------------------------------------------
 # resource_path()
@@ -63,8 +58,8 @@ class TodoManager():
         self.mw.tvwTODO.itemChanged.connect(self.handleTODOChecked)
         self.mw.tvwTODO.setHeaderHidden(True)
         
-        self.db = sqlite3.connect(os.path.join(self.mw.appDir, "todo.db"))
-        self.db.execute(
+        # self.mw.dbTODO = sqlite3.connect(os.path.join(self.mw.appDir, "todo.db"))
+        self.mw.dbTODO.execute(
         """
         CREATE TABLE IF NOT EXISTS TODOs (
 	idTODO INTEGER PRIMARY KEY,
@@ -76,7 +71,7 @@ class TodoManager():
         );
         """
         )
-        self.db.commit()      
+        self.mw.dbTODO.commit()      
         self.displayTODOs()
             
 #-------------------------------------------------------------------------------
@@ -104,12 +99,12 @@ class TodoManager():
 # addDBTODO()
 #-------------------------------------------------------------------------------
     def addDBTODO(self, lblTODO, txtTODO, ordTODO=10, txtNOTE="", chkTODO=0):
-        cur = self.db.cursor()
+        # cur = self.mw.dbTODO.cursor()
         data = (lblTODO, txtTODO, ordTODO, txtNOTE, chkTODO)
         print(data)
-        cur.execute("insert into TODOs(lblTODO, txtTODO, ordTODO, txtNOTE, chkTODO) values (?, ?, ?, ?, ?)", data)
-        cur.close      
-        self.db.commit()
+        self.mw.curTODO.execute("insert into TODOs(lblTODO, txtTODO, ordTODO, txtNOTE, chkTODO) values (?, ?, ?, ?, ?)", data)
+        # cur.close      
+        self.mw.dbTODO.commit()
         self.displayTODOs()
         self.setTODOFocus(lblTODO, txtTODO)
         
@@ -117,12 +112,12 @@ class TodoManager():
 # getNextOrder()
 #-------------------------------------------------------------------------------
     def getNextOrder(self, lblTODO):
-        cur = self.db.cursor()
-        cur.execute("select max(ordTODO)+10 from TODOs where lblTODO = :label", {"label": lblTODO})
-        nxt = cur.fetchone()[0]
+        # cur = self.mw.dbTODO.cursor()
+        self.mw.curTODO.execute("select max(ordTODO)+10 from TODOs where lblTODO = :label", {"label": lblTODO})
+        nxt = self.mw.curTODO.fetchone()[0]
         if nxt is None:
             nxt = 10
-        cur.close()
+        # cur.close()
         return(nxt)
 
 #-------------------------------------------------------------------------------
@@ -172,9 +167,9 @@ class TodoManager():
 # displayTODOs()
 #-------------------------------------------------------------------------------
     def displayTODOs(self):
-        cur = self.db.cursor()
-        cur.execute("select idTODO, lblTODO, ordTODO, txtTODO, txtNOTE, chkTODO from TODOs order by lblTODO, ordTODO")
-        rows = cur.fetchall() 
+        # cur = self.db.cursor()
+        self.mw.curTODO.execute("select idTODO, lblTODO, ordTODO, txtTODO, txtNOTE, chkTODO from TODOs order by lblTODO, ordTODO")
+        rows = self.mw.curTODO.fetchall() 
         self.clearQTreeWidget(self.mw.tvwTODO)
         self.mw.tvwTODO.blockSignals(True)
         for row in rows:
@@ -213,7 +208,7 @@ class TodoManager():
                 itmText.setCheckState(0, Qt.Unchecked if chkTODO == 0 else Qt.Checked)
 
         self.mw.tvwTODO.blockSignals(False)
-        cur.close()
+        # cur.close()
 
 #-------------------------------------------------------------------------------
 # clearQTreeWidget()
@@ -238,13 +233,13 @@ class TodoManager():
                 self.mw.txtNote.setPlainText(self.getNote(int(item.text(1))))
                 if settings.db["TODO_AUTORESIZE_NOTE"]:
                     if self.mw.txtNote.toPlainText() == "":
-                        self.resizeSplitter(self.mw.splitter, 0, 90)
+                        self.resizeSplitter(self.mw.splitter, 0, 100)
                     else:
                         self.resizeSplitter(self.mw.splitter, 0, 50)
             except:
                 self.mw.txtNote.setPlainText("")
                 if settings.db["TODO_AUTORESIZE_NOTE"]:
-                    self.resizeSplitter(self.mw.splitter, 0, 90)
+                    self.resizeSplitter(self.mw.splitter, 0, 100)
                 
 #-------------------------------------------------------------------------------
 # handleTODOChecked()
@@ -277,21 +272,21 @@ class TodoManager():
 # getNote()
 #-------------------------------------------------------------------------------
     def getNote(self, id):
-        cur = self.db.cursor()
-        cur.execute("select txtNOTE from TODOs where idTODO = :id", {"id": id})
-        note = cur.fetchone()[0]
-        cur.close()
+        # cur = self.db.cursor()
+        self.mw.curTODO.execute("select txtNOTE from TODOs where idTODO = :id", {"id": id})
+        note = self.mw.curTODO.fetchone()[0]
+        # cur.close()
         return note
     
 #-------------------------------------------------------------------------------
 # updateCheckedTODO()
 #-------------------------------------------------------------------------------
     def updateCheckedTODO(self, id, checked):
-        cur = self.db.cursor()
+        # cur = self.db.cursor()
         chk = 0 if checked == Qt.Unchecked else 1
-        cur.execute("update TODOs set chkTODO = :chk where idTODO = :id", {"chk": chk, "id": id})
-        self.db.commit()
-        cur.close()
+        self.mw.curTODO.execute("update TODOs set chkTODO = :chk where idTODO = :id", {"chk": chk, "id": id})
+        self.mw.dbTODO.commit()
+        # cur.close()
       
             
 

@@ -19,6 +19,8 @@ from PyQt5.QtWidgets import *
 import os
 import re
 import markdown
+import webbrowser
+import subprocess
 
 import QCodeEditor
 import QHexEditor
@@ -45,6 +47,7 @@ class WEditor(QWidget):
         QWidget.__init__(self, parent)
         self.parent = parent
         self.window = window
+        self.filetype = filetype
         self.txtEditor = QCodeEditor.QCodeEditor()        
         
         css = 'font: %dpt "%s"; background-color: %s;' % (settings.db['EDITOR_FONT_SIZE'],settings.db['EDITOR_FONT'],settings.db['EDITOR_COLOR_BACKGROUND'])
@@ -112,13 +115,13 @@ class WEditor(QWidget):
         
         self.dirtyFlag = False
         if filename is not None:
-            if filetype == "python":
+            if self.filetype == "python":
                 self.highlight = syntax.PythonHighlighter(self.txtEditor.document())
                 self.cbxSyntax.setCurrentIndex(self.SYNTAX_PYTHON)
-            elif filetype == "xml" or filetype == "html":
+            elif self.filetype == "xml" or self.filetype == "html":
                 self.highlight = syntax.XMLHighlighter(self.txtEditor.document())
                 self.cbxSyntax.setCurrentIndex(self.SYNTAX_XML)
-            elif filetype == "sql":
+            elif self.filetype == "sql":
                 self.highlight = syntax.SQLHighlighter(self.txtEditor.document())
                 self.cbxSyntax.setCurrentIndex(self.SYNTAX_SQL)
             with open(filename, encoding=settings.db['EDITOR_CODEPAGE']) as pyFile:
@@ -137,11 +140,11 @@ class WEditor(QWidget):
 # doSyntaxChanged()
 #-------------------------------------------------------------------------------
     def doSyntaxChanged(self, i):
-        if self.cbxSyntax.currentText() == "Python":
+        if self.cbxSyntax.currentIndex() == self.SYNTAX_PYTHON:
             self.highlight = syntax.PythonHighlighter(self.txtEditor.document())
-        elif self.cbxSyntax.currentText() == "XML":
+        elif self.cbxSyntax.currentIndex() == self.SYNTAX_XML:
             self.highlight = syntax.XMLHighlighter(self.txtEditor.document())
-        elif self.cbxSyntax.currentText() == "SQL":
+        elif self.cbxSyntax.currentIndex() == self.SYNTAX_SQL:
             self.highlight = syntax.SQLHighlighter(self.txtEditor.document())
         else:
             self.highlight = syntax.TextHighlighter(self.txtEditor.document())
@@ -150,7 +153,12 @@ class WEditor(QWidget):
 # doOpenWith()
 #-------------------------------------------------------------------------------
     def doOpenWith(self, i):
-        pass
+        if self.cbxOpenWith.currentIndex() == self.OPEN_WITH_BROWSER:
+            webbrowser.open(self.filename) 
+            self.cbxOpenWith.setCurrentIndex(self.OPEN_WITH_LOCAL)
+        elif self.cbxOpenWith.currentIndex() == self.OPEN_WITH_QTDESIGNER:
+            subprocess.call([settings.db['BSIDE_QTDESIGNER_PATH'], self.filename])
+            self.cbxOpenWith.setCurrentIndex(self.OPEN_WITH_LOCAL)
         
 #-------------------------------------------------------------------------------
 # cursorPosition()
@@ -172,13 +180,14 @@ class WEditor(QWidget):
                 self.parent.tabBar().setTabTextColor(self.parent.currentIndex(), self.textColor)
                 self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon())
         else:
-            if filetype == "python":
+            
+            if self.filetype == "python":
                 filters = "Python sources (*.py);;All files (*.*)"
-            elif filetype == "xml":
+            elif self.filetype == "xml":
                 filters = "XML files (*.xml);;All files (*.*)"
-            elif filetype == "html":
+            elif self.filetype == "html":
                 filters = "HTML files (*.html);;All files (*.*)"
-            elif filetype == "sql":
+            elif self.filetype == "sql":
                 filters = "SQL files (*.sql);;All files (*.*)"
             else:
                 filters = "Text files (*.txt);;All files (*.*)"

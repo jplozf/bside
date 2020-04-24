@@ -60,7 +60,17 @@ def getDirSize(start_path = '.'):
             if not os.path.islink(fp):
                 total_size += os.path.getsize(fp)
 
-    return total_size    
+    return total_size
+
+#---------------------------------------------------------------------------
+# getDirSize()
+#---------------------------------------------------------------------------
+def getDirSize2(path, follow_symlinks=False):
+    try:
+        with os.scandir(path) as it:
+            return sum(getDirSize2(entry, follow_symlinks=follow_symlinks) for entry in it)
+    except NotADirectoryError:
+        return os.stat(path, follow_symlinks=follow_symlinks).st_size
 
 #---------------------------------------------------------------------------
 # UnixTime2DateTime()

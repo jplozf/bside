@@ -50,6 +50,7 @@ defaultValues = [
     ['BSIDE_TAB_SPACES', 4],
     ['BSIDE_THEME', "LIGHT"],
     ['BSIDE_SAVE_BEFORE_RUN', True],
+    ['BSIDE_QTDESIGNER_PATH', "/usr/bin/designer"],
     ['THEME_ALTERNATE', ["#efefef","#000000","#ffffff","#f7f7f7","#ffffdc","#000000","#000000","#efefef","#000000","#ffffff","#0000ff","#308cc6","#ffffff"]],
     ['TAB_LOW_LEFT_NAMES', True],
     ['TAB_LOW_RIGHT_NAMES', True],
