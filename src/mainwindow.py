@@ -27,6 +27,7 @@ import datetime
 # import vlc
 from os.path import expanduser
 from os import path
+import sqlite3
 
 import settings
 import const
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
     lastBackup = datetime.datetime(1970,1,1,0,0)    
     lastProject = None
     debug = False
+    tick = 0
 
 #-------------------------------------------------------------------------------
 # __init__()
@@ -90,6 +92,9 @@ class MainWindow(QMainWindow):
         self.appDir = os.path.join(os.path.expanduser("~"), const.APP_FOLDER)
         if not os.path.exists(self.appDir):
             os.makedirs(self.appDir)
+        
+        self.dbTODO = sqlite3.connect(os.path.join(self.appDir, "todo.db"))
+        self.curTODO = self.dbTODO.cursor()
 
         self.project = projects.Project(parent = self)
         self.todoManager = todomgr.TodoManager(parent = self)
@@ -228,9 +233,10 @@ class MainWindow(QMainWindow):
         self.lblClock = QLabel()
         self.statusBar.addPermanentWidget(self.lblClockIcon)
         self.statusBar.addPermanentWidget(self.lblClock)
+
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerCount)
-        self.timer.start(1000)
+        self.timer.start(5000)
         
         self.txtOutput.setStyleSheet(settings.db['OUTPUT_STYLE'])
         self.txtOutput.setReadOnly(True)
@@ -302,18 +308,26 @@ class MainWindow(QMainWindow):
 # timerCount()
 #-------------------------------------------------------------------------------
     def timerCount(self):
-        process = psutil.Process(os.getpid())
+        process = psutil.Process(os.getpid())                
         self.lblMemory.setText("{:.1f}".format(process.memory_info().rss/1024/1024) + " MB ")
-        try:
-            self.lblRepository.setText(utils.getHumanSize(utils.getDirSize(settings.db['BSIDE_REPOSITORY'])) + " / " + utils.getHumanSize(utils.getDirSize(settings.db['BACKUP_PATH'])))
-        except:
-            self.lblRepository.setText("REPOSITORY ERROR ")
+
+        self.tick = self.tick + 1
+        if self.tick == 10:
+            self.tick = 0
+            try:
+                repo = utils.getDirSize2(settings.db['BSIDE_REPOSITORY'])
+                bkup = utils.getDirSize2(settings.db['BACKUP_PATH'])
+                print("REPO = %s" % str(repo))
+                print("BKUP = %s" % str(bkup))
+                # self.lblRepository.setText(utils.getHumanSize(utils.getDirSize2(settings.db['BSIDE_REPOSITORY'])) + " / " + utils.getHumanSize(utils.getDirSize2(settings.db['BACKUP_PATH'])))
+                # self.lblRepository.setText(utils.getHumanSize(utils.getDirSize2(settings.db['BACKUP_PATH'])))
+            except:
+                self.lblRepository.setText("REPOSITORY ERROR ")
+        
         try:
             self.lblClock.setText(datetime.datetime.now().strftime(settings.db['BSIDE_CLOCK_FORMAT']) + " ")
         except:
             self.lblClock.setText("INVALID ")
-#        self.lblMemory.setText("{:.1f}".format(process.memory_info().rss/1024/1024) + " MB ")
-#        self.lblRepository.setText(utils.getHumanSize(utils.getDirSize(settings.db['BSIDE_REPOSITORY'])) + " / " + utils.getHumanSize(utils.getDirSize(settings.db['BACKUP_PATH'])))
         
 #-------------------------------------------------------------------------------
 # keyPressEvent()
@@ -479,6 +493,9 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         result = QMessageBox.question(self, "Confirm Exit", "Are you sure you want to quit ?", QMessageBox.Yes | QMessageBox.No)        
         if result == QMessageBox.Yes:
+            # Close TODO database
+            self.curTODO.close()
+            self.dbTODO.close()
             # Check for modified files not saved
             # Save the current files or project open
             for i in reversed(range(self.tbwHighRight.count())):
@@ -601,7 +618,7 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
     def openFileFromName(self, filename):
         if filename != "":            
-            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self)        
+            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python")        
             name = os.path.basename(filename)
             self.tbwHighRight.addTab(tabEditor, name)
             idxTab = self.tbwHighRight.count() - 1
@@ -618,7 +635,7 @@ class MainWindow(QMainWindow):
 # newPythonFile()
 #-------------------------------------------------------------------------------
     def newPythonFile(self):
-        textBox = editor.WEditor(parent=self.tbwHighRight, window=self)        
+        textBox = editor.WEditor(parent=self.tbwHighRight, window=self, filetype="python")        
         name = const.NEW_FILE % self.noname
         self.tbwHighRight.addTab(textBox, name)
         self.noname = self.noname + 1
@@ -1225,11 +1242,58 @@ class MainWindow(QMainWindow):
 # doEditFile()
 #-------------------------------------------------------------------------------
     def doEditFile(self, filename, syntax="guess"):
-        if path.exists(filename):
-            tabEditor = None
-            extension = os.path.splitext(filename)[1]
-            if syntax == "guess":
-                if extension == ".md":
+        if filename is not None:
+            if path.exists(filename):
+                tabEditor = None
+                extension = os.path.splitext(filename)[1]
+                if syntax == "guess":
+                    if extension == ".md":
+                        tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self)        
+                        if tabEditor != None:
+                            name = os.path.basename(filename)
+                            self.tbwHighRight.addTab(tabEditor, name)
+                            idxTab = self.tbwHighRight.count() - 1
+                            self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/markdown.png"))
+                            self.tbwHighRight.setCurrentIndex(idxTab)               
+
+                            # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
+                    else:
+                        icon = None
+                        if extension == ".py":
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python")                    
+                            icon = "pix/icons/text-x-python.png"
+                        elif extension == ".xml":
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml")                    
+                            icon = "pix/icons/application-xml.png"
+                        elif extension == ".html":
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="html")                    
+                            icon = "pix/icons/text-html.png"
+                        elif extension == ".sql":
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="sql")                    
+                            icon = "pix/icons/database.png"
+                        else:
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="text")                    
+                            icon = "pix/icons/text-icon.png"
+                        if tabEditor != None:
+                            name = os.path.basename(filename)
+                            self.tbwHighRight.addTab(tabEditor, name)
+                            idxTab = self.tbwHighRight.count() - 1
+                            self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
+                            self.tbwHighRight.setCurrentIndex(idxTab)               
+
+                            # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
+
+                elif syntax == "binary":
+                    tabEditor = QHexEditor.QHexEditor(filename=filename, readonly=True)        
+                    if tabEditor != None:
+                        name = os.path.basename(filename)
+                        self.tbwHighRight.addTab(tabEditor, name)
+                        idxTab = self.tbwHighRight.count() - 1
+                        self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/binary-icon.png"))
+                        self.tbwHighRight.setCurrentIndex(idxTab)               
+
+                        # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
+                elif syntax == "markdown":
                     tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self)        
                     if tabEditor != None:
                         name = os.path.basename(filename)
@@ -1238,92 +1302,48 @@ class MainWindow(QMainWindow):
                         self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/markdown.png"))
                         self.tbwHighRight.setCurrentIndex(idxTab)               
 
-                        tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
+                        # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))        
+                elif syntax == "python":
+                    icon = "pix/icons/text-x-python.png"
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
+                    name = os.path.basename(filename)
+                    self.tbwHighRight.addTab(tabEditor, name)
+                    idxTab = self.tbwHighRight.count() - 1
+                    self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
+                    self.tbwHighRight.setCurrentIndex(idxTab)               
+                elif syntax == "xml":
+                    icon = "pix/icons/application-xml.png"
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
+                    name = os.path.basename(filename)
+                    self.tbwHighRight.addTab(tabEditor, name)
+                    idxTab = self.tbwHighRight.count() - 1
+                    self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
+                    self.tbwHighRight.setCurrentIndex(idxTab)               
+                elif syntax == "html":
+                    icon = "pix/icons/text-html.png"
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
+                    name = os.path.basename(filename)
+                    self.tbwHighRight.addTab(tabEditor, name)
+                    idxTab = self.tbwHighRight.count() - 1
+                    self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
+                    self.tbwHighRight.setCurrentIndex(idxTab)               
                 else:
-                    icon = None
-                    if extension == ".py":
-                        tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python")                    
-                        icon = "pix/icons/text-x-python.png"
-                    elif extension == ".xml":
-                        tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml")                    
-                        icon = "pix/icons/application-xml.png"
-                    elif extension == ".html":
-                        tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="html")                    
-                        icon = "pix/icons/text-html.png"
-                    elif extension == ".sql":
-                        tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="sql")                    
-                        icon = "pix/icons/database.png"
-                    else:
-                        tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="text")                    
-                        icon = "pix/icons/text-icon.png"
-                    if tabEditor != None:
-                        name = os.path.basename(filename)
-                        self.tbwHighRight.addTab(tabEditor, name)
-                        idxTab = self.tbwHighRight.count() - 1
-                        self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                        self.tbwHighRight.setCurrentIndex(idxTab)               
-
-                        tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
-
-            elif syntax == "binary":
-                tabEditor = QHexEditor.QHexEditor(filename=filename, readonly=True)        
-                if tabEditor != None:
+                    icon = "pix/icons/text-icon.png"
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
-                    self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/binary-icon.png"))
+                    self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
                     self.tbwHighRight.setCurrentIndex(idxTab)               
 
-                    # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
-            elif syntax == "markdown":
-                tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self)        
                 if tabEditor != None:
-                    name = os.path.basename(filename)
-                    self.tbwHighRight.addTab(tabEditor, name)
-                    idxTab = self.tbwHighRight.count() - 1
-                    self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/markdown.png"))
-                    self.tbwHighRight.setCurrentIndex(idxTab)               
-
-                    tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))        
-            elif syntax == "python":
-                icon = "pix/icons/text-x-python.png"
-                tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
-                name = os.path.basename(filename)
-                self.tbwHighRight.addTab(tabEditor, name)
-                idxTab = self.tbwHighRight.count() - 1
-                self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                self.tbwHighRight.setCurrentIndex(idxTab)               
-            elif syntax == "xml":
-                icon = "pix/icons/application-xml.png"
-                tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
-                name = os.path.basename(filename)
-                self.tbwHighRight.addTab(tabEditor, name)
-                idxTab = self.tbwHighRight.count() - 1
-                self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                self.tbwHighRight.setCurrentIndex(idxTab)               
-            elif syntax == "html":
-                icon = "pix/icons/text-html.png"
-                tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
-                name = os.path.basename(filename)
-                self.tbwHighRight.addTab(tabEditor, name)
-                idxTab = self.tbwHighRight.count() - 1
-                self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                self.tbwHighRight.setCurrentIndex(idxTab)               
+                    self.showMessage("Editing %s" % filename)
+                else:
+                    self.showMessage("Can't open %s" % filename)
             else:
-                icon = "pix/icons/text-icon.png"
-                tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
-                name = os.path.basename(filename)
-                self.tbwHighRight.addTab(tabEditor, name)
-                idxTab = self.tbwHighRight.count() - 1
-                self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                self.tbwHighRight.setCurrentIndex(idxTab)               
-
-            if tabEditor != None:
-                self.showMessage("Editing %s" % filename)
-            else:
-                self.showMessage("Can't open %s" % filename)
+                self.showMessage("File %s does not exist" % filename)        
         else:
-            self.showMessage("File %s does not exist" % filename)
+            self.showMessage("File does not exist")
 
 #-------------------------------------------------------------------------------
 # doPromoteProjectAction()
