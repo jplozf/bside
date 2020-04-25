@@ -236,7 +236,7 @@ class MainWindow(QMainWindow):
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerCount)
-        self.timer.start(5000)
+        self.timer.start(settings.db['BSIDE_TIMER_INFO'])
         
         self.txtOutput.setStyleSheet(settings.db['OUTPUT_STYLE'])
         self.txtOutput.setReadOnly(True)
@@ -312,15 +312,10 @@ class MainWindow(QMainWindow):
         self.lblMemory.setText("{:.1f}".format(process.memory_info().rss/1024/1024) + " MB ")
 
         self.tick = self.tick + 1
-        if self.tick == 10:
+        if self.tick == settings.db['BSIDE_TIMER_REPOSITORY']:
             self.tick = 0
             try:
-                repo = utils.getDirSize2(settings.db['BSIDE_REPOSITORY'])
-                bkup = utils.getDirSize2(settings.db['BACKUP_PATH'])
-                print("REPO = %s" % str(repo))
-                print("BKUP = %s" % str(bkup))
-                # self.lblRepository.setText(utils.getHumanSize(utils.getDirSize2(settings.db['BSIDE_REPOSITORY'])) + " / " + utils.getHumanSize(utils.getDirSize2(settings.db['BACKUP_PATH'])))
-                # self.lblRepository.setText(utils.getHumanSize(utils.getDirSize2(settings.db['BACKUP_PATH'])))
+                self.lblRepository.setText(utils.getHumanSize(utils.getDirSize2(settings.db['BSIDE_REPOSITORY'])) + " / " + utils.getHumanSize(utils.getDirSize2(settings.db['BACKUP_PATH'])))
             except:
                 self.lblRepository.setText("REPOSITORY ERROR ")
         
@@ -493,6 +488,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         result = QMessageBox.question(self, "Confirm Exit", "Are you sure you want to quit ?", QMessageBox.Yes | QMessageBox.No)        
         if result == QMessageBox.Yes:
+            self.timer.stop()
             # Close TODO database
             self.curTODO.close()
             self.dbTODO.close()

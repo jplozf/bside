@@ -21,7 +21,7 @@ import utils
 # These are the default values
 #-------------------------------------------------------------------------------
 defaultValues = [ 
-    ['BSIDE_TIMER_STATUS', 3000, "Time delay for displaying message in status bar"],
+    ['BSIDE_TIMER_STATUS', 3000, "Time delay for displaying message in status bar"],    
     ['EDITOR_CODEPAGE', "utf8", "Default code page for opening files"],
     ['EDITOR_MD_EXTENSIONS', ['tables', 'fenced_code', 'codehilite', 'nl2br'], "Markdown extensions enabled"],
     ['EDITOR_FONT', "Courier", "Editor font's name"],
@@ -50,7 +50,9 @@ defaultValues = [
     ['BSIDE_TAB_SPACES', 4],
     ['BSIDE_THEME', "LIGHT"],
     ['BSIDE_SAVE_BEFORE_RUN', True],
-    ['BSIDE_QTDESIGNER_PATH', "/usr/bin/designer"],
+    ['BSIDE_TIMER_INFO', 5000],
+    ['BSIDE_TIMER_REPOSITORY', 10],
+    ['BSIDE_QTDESIGNER_PATH', "/usr/bin/designer"],    
     ['THEME_ALTERNATE', ["#efefef","#000000","#ffffff","#f7f7f7","#ffffdc","#000000","#000000","#efefef","#000000","#ffffff","#0000ff","#308cc6","#ffffff"]],
     ['TAB_LOW_LEFT_NAMES', True],
     ['TAB_LOW_RIGHT_NAMES', True],
