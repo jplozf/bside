@@ -120,6 +120,7 @@ def buildEXE(mw):
         mw.showMessage("Build failed")
         mw.btnRunEXE.setEnabled(False)
         mw.lblRunEXE.setText("-")
+    mw.project.refreshStatus()
 
 #-------------------------------------------------------------------------------
 # isEXE()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
-    <height>506</height>
+    <width>987</width>
+    <height>628</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -277,7 +277,7 @@
        </widget>
        <widget class="QTabWidget" name="tbwLowRight">
         <property name="currentIndex">
-         <number>2</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tabOutput">
          <attribute name="icon">
@@ -516,7 +516,7 @@
              <enum>QTabWidget::South</enum>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>8</number>
             </property>
             <widget class="QWidget" name="tabColorPicker">
              <attribute name="title">
@@ -650,6 +650,71 @@
              <attribute name="title">
               <string>TextGenerator</string>
              </attribute>
+             <layout class="QGridLayout" name="gridLayout_22">
+              <item row="0" column="0">
+               <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <item>
+                   <layout class="QVBoxLayout" name="verticalLayout_6">
+                    <item>
+                     <widget class="QComboBox" name="cbxLorem"/>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnLoremSentence">
+                      <property name="text">
+                       <string>Sentence</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnLoremParagraph">
+                      <property name="text">
+                       <string>Paragraph</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnLoremText">
+                      <property name="text">
+                       <string>Text</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="verticalSpacer_4">
+                      <property name="orientation">
+                       <enum>Qt::Vertical</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnLoremCopy">
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>pix/16x16/Clipboard Paste.png</normaloff>pix/16x16/Clipboard Paste.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QPlainTextEdit" name="txtLorem"/>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
+             </layout>
             </widget>
             <widget class="QWidget" name="tabBase64">
              <attribute name="title">
@@ -820,7 +885,7 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>411</width>
+                     <width>581</width>
                      <height>1290</height>
                     </rect>
                    </property>
@@ -1699,7 +1764,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>784</width>
+     <width>987</width>
      <height>26</height>
     </rect>
    </property>
@@ -1768,6 +1833,9 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
    <property name="floatable">
     <bool>false</bool>
    </property>
@@ -1777,6 +1845,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionBside"/>
    <addaction name="actionNewProject"/>
    <addaction name="actionOpenProject"/>
    <addaction name="actionCloseProject"/>
@@ -1791,6 +1860,7 @@
    <addaction name="actionPythonConsole"/>
    <addaction name="actionRunScript"/>
    <addaction name="actionPythonHelp"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -2032,6 +2102,15 @@
    </property>
    <property name="text">
     <string>Manage tools</string>
+   </property>
+  </action>
+  <action name="actionBside">
+   <property name="icon">
+    <iconset>
+     <normaloff>pix/bside.png</normaloff>pix/bside.png</iconset>
+   </property>
+   <property name="text">
+    <string>Bside</string>
    </property>
   </action>
  </widget>

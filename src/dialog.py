@@ -140,7 +140,7 @@ RO Created File
         
         boxLayout = QHBoxLayout(self)
         btnRun = QPushButton()
-        icoRun = QIcon("pix/16x16/Player Play.png")
+        icoRun = QIcon("pix/16x16/Ok.png")
         btnRun.setIcon(icoRun)
         btnCancel = QPushButton()
         icoCancel = QIcon("pix/16x16/Cancel.png")

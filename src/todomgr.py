@@ -125,6 +125,24 @@ class TodoManager():
 #-------------------------------------------------------------------------------
     def delTODO(self):
         self.mw.showMessage("Delete")
+        item = self.mw.tvwTODO.currentItem()
+        if item:
+            nextItem = self.mw.tvwTODO.itemBelow(item)
+        
+            if nextItem is None:
+                nextItem = item.parent()
+                nextItemText = nextItem.text(0)
+                nextItemLabel = "*"
+            else:
+                nextItemText = nextItem.text(0)
+                nextItemLabel = nextItem.parent().text(0)            
+            idTODO = int(item.text(1))
+            print("ID = %d" % idTODO)
+            self.mw.curTODO.execute("delete from TODOs where idTODO = (?)", (idTODO,))
+            self.mw.dbTODO.commit()
+            self.displayTODOs()
+            self.setTODOFocus(nextItemLabel, nextItemText)
+            
     
 #-------------------------------------------------------------------------------
 # upTODO()
@@ -147,19 +165,23 @@ class TodoManager():
 #-------------------------------------------------------------------------------
 # setTODOFocus()
 #-------------------------------------------------------------------------------
-    def setTODOFocus(self, lbl, txt):
+    def setTODOFocus(self, lbl, txt=None):
         found = False
         root = self.mw.tvwTODO.invisibleRootItem()
         children = root.childCount()
         for i in range(children):
             itmLabel = root.child(i)
             if itmLabel.text(0) == lbl:
-                jChildren = itmLabel.childCount()
-                for j in range(jChildren):
-                    itmTxt = itmLabel.child(j)
-                    if itmTxt.text(0) == txt:
+                if txt is not None:
+                    jChildren = itmLabel.childCount()
+                    for j in range(jChildren):
+                        itmTxt = itmLabel.child(j)
+                        if itmTxt.text(0) == txt:
+                            found = True
+                            break
+                    else:
+                        itmTxt = itmLabel
                         found = True
-                        break
         if found == True:
             self.mw.tvwTODO.setCurrentItem(itmTxt)
 

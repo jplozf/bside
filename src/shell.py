@@ -135,11 +135,12 @@ class WShell(QWidget):
         self.lblLED = QLabel()
         self.lblLED.setPixmap(QPixmap("pix/icons/led_green.png"))
         
-        self.lblCDR = QLabel(self.CurrentDrive)
-        self.lblCDR.setFrameShape(QFrame.Panel)
-        self.lblCDR.setFrameShadow(QFrame.Sunken)
-        self.lblCDR.setLineWidth(1)
-        self.lblCDR.setFont(QFont('Courier', 10))
+        if platform.system() == 'Windows':
+            self.lblCDR = QLabel(self.CurrentDrive)
+            self.lblCDR.setFrameShape(QFrame.Panel)
+            self.lblCDR.setFrameShadow(QFrame.Sunken)
+            self.lblCDR.setLineWidth(1)
+            self.lblCDR.setFont(QFont('Courier', 10))
         
         self.lblPWD = QLabel(self.CurrentDir)
         self.lblPWD.setFrameShape(QFrame.Panel)
@@ -154,7 +155,8 @@ class WShell(QWidget):
         hLayout.addWidget(self.txtCommand)
         hLayout.addWidget(self.btnEnter)
         hLayout.addWidget(self.btnBreak)
-        hLayout.addWidget(self.lblCDR)
+        if platform.system() == 'Windows':
+            hLayout.addWidget(self.lblCDR)
         hLayout.addWidget(self.lblPWD)
         hLayout.addWidget(self.lblTime)
         hLayout.addWidget(self.lblRC)
@@ -245,7 +247,8 @@ class WShell(QWidget):
         # self.tabWidget.setCurrentIndex(0)
         self.flagBusy = False
         self.btnEnter.setEnabled(True)
-        self.lblCDR.setText(self.CurrentDrive)
+        if platform.system() == 'Windows':
+            self.lblCDR.setText(self.CurrentDrive)
         self.lblPWD.setText(self.CurrentDir)
         self.lblLED.setPixmap(QPixmap("pix/icons/led_green.png"))
         self.txtCommand.selectAll()

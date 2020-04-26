@@ -57,6 +57,11 @@ class WEditor(QWidget):
         self.lblFileName = QLabel("*NONE")
         self.lblFileName.setTextFormat(Qt.RichText)
         
+        self.btnCopyName = QPushButton()
+        self.btnCopyName.setIcon(QIcon(QPixmap("pix/16x16/Clipboard Paste.png")))
+        self.btnCopyName.clicked.connect(self.copyNameToClipboard)
+        
+        
         self.lblSyntax = QLabel("Syntax")
         self.cbxSyntax = QComboBox()
         self.cbxSyntax.addItem("Text")
@@ -90,6 +95,7 @@ class WEditor(QWidget):
         vLayout = QVBoxLayout(self)
 
         h1Layout = QHBoxLayout(self)
+        h1Layout.addWidget(self.btnCopyName)       
         h1Layout.addWidget(self.lblFileName)        
         h1Layout.addItem(h1Spacer)
         h1Layout.addWidget(self.lblSyntax)        
@@ -148,6 +154,13 @@ class WEditor(QWidget):
             self.highlight = syntax.SQLHighlighter(self.txtEditor.document())
         else:
             self.highlight = syntax.TextHighlighter(self.txtEditor.document())
+            
+#-------------------------------------------------------------------------------
+# copyNameToClipboard()
+#-------------------------------------------------------------------------------
+    def copyNameToClipboard(self):
+        QApplication.clipboard().setText(self.filename)
+        self.window.showMessage("Copy file name to clipboard")
         
 #-------------------------------------------------------------------------------
 # doOpenWith()

@@ -93,6 +93,10 @@ def zipDir(dirPath=None, zipFilePath=None, includeDirInZip=True):
     if not os.path.isdir(dirPath):
         raise OSError("dirPath argument must point to a directory. "
                       "'%s' does not." % dirPath)
+
+    if not os.path.exists(os.path.dirname(zipFilePath)):
+        os.makedirs(os.path.dirname(zipFilePath))
+    
     parentDir, dirToZip = os.path.split(dirPath)
     #Little nested function to prepare the proper archive path
     def trimPath(path):

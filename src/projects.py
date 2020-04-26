@@ -23,12 +23,14 @@ import xml.etree.ElementTree as ET
 
 from datetime import datetime
 from string import Template
+import time
 
 import utils
 import const
 import settings
 import editor
 import dialog
+import backup
 
 #-------------------------------------------------------------------------------
 # class DlgNewProject
@@ -208,6 +210,57 @@ class DlgPromoteProject(QDialog):
         self.resize(640, height)
         
 #-------------------------------------------------------------------------------
+# class DlgExportProject
+#-------------------------------------------------------------------------------
+class DlgExportProject(QDialog):
+#-------------------------------------------------------------------------------
+# __init__()
+#-------------------------------------------------------------------------------
+    def __init__(self, folder, parent=None):
+        super().__init__(parent)
+        
+        self.setWindowTitle("Export Project")
+        layout = QFormLayout(self)
+        
+        projectName = os.path.basename(os.path.normpath(folder))
+        projectName = projectName.replace(' ', '_')
+        # Project name
+        self.lblProjectName = QLabel("Project Name")
+        self.txtProjectName = QLineEdit(projectName)
+        self.txtProjectName.setReadOnly(True)
+        layout.addRow(self.lblProjectName, self.txtProjectName)
+        
+        # Export folder
+        self.lblExportFolder = QLabel("Export Folder")
+        self.hBox1 = QHBoxLayout()
+        self.txtExportFolder = QLineEdit(QDir.homePath())
+        self.btnBrowseFolder = QPushButton()
+        icoBrowse = QIcon("pix/16x16/Folder.png")
+        self.btnBrowseFolder.setIcon(icoBrowse)
+        self.btnBrowseFolder.clicked.connect(self.browseExportFolder)
+        self.hBox1.addWidget(self.txtExportFolder)
+        self.hBox1.addWidget(self.btnBrowseFolder)
+        layout.addRow(self.lblExportFolder, self.hBox1)
+                       
+        # Buttons
+        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self);
+        layout.addWidget(buttonBox)
+        buttonBox.accepted.connect(self.accept)
+        buttonBox.rejected.connect(self.reject)
+        
+        # Show modal and resize
+        self.setWindowModality(Qt.ApplicationModal)
+        self.show()        
+
+#-------------------------------------------------------------------------------
+# browseExportFolder()
+#-------------------------------------------------------------------------------
+    def browseExportFolder(self):
+        dlg = QFileDialog.getExistingDirectory(self, 'Select a directory', self.txtExportFolder.text())
+        if dlg:
+            self.txtExportFolder.setText(str(dlg))
+    
+#-------------------------------------------------------------------------------
 # class Project
 #-------------------------------------------------------------------------------
 class Project():
@@ -250,6 +303,7 @@ class Project():
         self.parent.setWindowTitle(self.name + " - " + const.APPLICATION_NAME)
         self.parent.lblProject.setText(self.name)
         self.parent.lblProjectName.setText(self.name)
+        self.refreshStatus()
         
         self.timeStart = datetime.now()
         
@@ -267,7 +321,11 @@ class Project():
         
         return (tabEditor, mainFile)
         
-        
+#-------------------------------------------------------------------------------
+# refreshStatus()
+#-------------------------------------------------------------------------------
+    def refreshStatus(self):
+        self.parent.lblProjectStatus.setText(str(utils.getHumanSize(utils.getDirSize2(self.path))))
         
 #-------------------------------------------------------------------------------
 # save()
@@ -344,6 +402,19 @@ class Project():
         mainFile = os.path.join(name, root.find('main').text)
         return mainFile
     
+#-------------------------------------------------------------------------------
+# exportProject()
+#-------------------------------------------------------------------------------
+    def exportProject(self):
+        dialog = DlgExportProject(self.path, self.parent)
+        result = dialog.exec()
+        if result == QDialog.Accepted:
+            archiveName = os.path.join(dialog.txtExportFolder.text(), self.name + time.strftime("_%Y%m%d-%H%M%S.zip"))
+            self.parent.showMessage("Exporting project %s to %s" % (self.name, archiveName))
+            backup.zipDir(self.path, archiveName)
+        else:
+            self.parent.showMessage("Export cancelled")
+
 #-------------------------------------------------------------------------------
 # promoteProject()
 #-------------------------------------------------------------------------------
@@ -571,7 +642,7 @@ class Project():
         if result == QDialog.Accepted:
             self.parent.showMessage("Create Markdown %s" % dlg.rname)            
             if not os.path.isfile(dlg.rname):
-                md = "resources/templates/newfiles/new.py"
+                md = "resources/templates/newfiles/new.md"
                 utils.copyFile(pkg_resources.resource_filename(__name__, md), dlg.rname)            
                 self.parent.showMessage("New Markdown %s created" % dlg.rname)
             else:

@@ -46,6 +46,7 @@ import workspace
 import pyinstall
 import tools
 import todomgr
+import lorem
 
 #-------------------------------------------------------------------------------
 # resource_path()
@@ -130,6 +131,14 @@ class MainWindow(QMainWindow):
         self.btnForegroundColor.clicked.connect(self.colorForegroundPicker)
         self.btnSwapColors.clicked.connect(self.swapColors)
         
+        self.txtLorem.setPlainText("")
+        self.txtLorem.setReadOnly(True)
+        self.cbxLorem.addItem("Lorem Ipsum")
+        self.btnLoremText.clicked.connect(self.doLoremText)
+        self.btnLoremParagraph.clicked.connect(self.doLoremParagraph)
+        self.btnLoremSentence.clicked.connect(self.doLoremSentence)
+        self.btnLoremCopy.clicked.connect(self.doLoremCopy)
+        
         self.btnExportOutput.clicked.connect(self.outputExport)
         self.btnClearOutput.clicked.connect(self.outputClear)
         self.btnKillProcess.clicked.connect(self.killProcess)
@@ -170,6 +179,7 @@ class MainWindow(QMainWindow):
         self.tvwProject.customContextMenuRequested.connect(self.menuContextProject)
         self.tvwProject.clicked.connect(self.clickedProject)        
         self.tvwProject.doubleClicked.connect(self.doubleClickedProject)        
+        self.btnProjectExport.clicked.connect(self.doExportProject)
         
         self.movieWidget = mediaPlayer.MovieWidget()
         self.tabVideoSplitter.addWidget(self.movieWidget)
@@ -598,6 +608,7 @@ class MainWindow(QMainWindow):
         tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
         if isinstance(tab, editor.WEditor) or isinstance(tab, editor.WMarkdown):
             tab.saveFile()
+            self.project.refreshStatus()
             self.showMessage("File saved")
         else:
             self.showMessage("Nothing to save")
@@ -1405,9 +1416,9 @@ class MainWindow(QMainWindow):
             isDir = self.tvwModel.isDir(self.idxSelectedFile)
             filePath = self.tvwModel.filePath(self.idxSelectedFile)
             if isDir:
-                msg = "Delete [%s] folder ?" % os.path.basename(filePath)
+                msg = "Delete\n\n%s\n\nfolder ?" % os.path.basename(filePath)
             else:
-                msg = "Delete [%s] file ?" % os.path.basename(filePath)
+                msg = "Delete\n\n%s\n\nfile ?" % os.path.basename(filePath)
             result = QMessageBox.question(self, "Delete an object", msg, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)        
             if result == QMessageBox.Yes:
                 if isDir:
@@ -1426,6 +1437,7 @@ class MainWindow(QMainWindow):
                         self.closeTabFromIndex(fop[1], force=True)
                     rc = utils.deleteFile(filePath)
                 if rc:
+                    self.project.refreshStatus()
                     self.showMessage("Object [%s] deleted" % os.path.basename(filePath))
                 else:
                     self.showMessage("Unable to delete object [%s]" % os.path.basename(filePath))
@@ -1500,6 +1512,12 @@ class MainWindow(QMainWindow):
     def doCloseProjectAction(self):
         pass
     
+#-------------------------------------------------------------------------------
+# doExportProject()
+#-------------------------------------------------------------------------------
+    def doExportProject(self):
+        self.project.exportProject()
+        
 #-------------------------------------------------------------------------------
 # doProjectPropertiesAction()
 #-------------------------------------------------------------------------------
@@ -1585,7 +1603,34 @@ class MainWindow(QMainWindow):
         else:
             for i in range(0, tabWidget.count()):
                 tabWidget.setTabText(i, "")
+                
+#-------------------------------------------------------------------------------
+# doLoremText()
+#-------------------------------------------------------------------------------
+    def doLoremText(self):
+        txt = lorem.Lorem()
+        self.txtLorem.setPlainText(txt.text())
                            
+#-------------------------------------------------------------------------------
+# doLoremParagraph()
+#-------------------------------------------------------------------------------
+    def doLoremParagraph(self):
+        txt = lorem.Lorem()
+        self.txtLorem.setPlainText(txt.paragraph())
+
+#-------------------------------------------------------------------------------
+# doLoremSentence()
+#-------------------------------------------------------------------------------
+    def doLoremSentence(self):
+        txt = lorem.Lorem()
+        self.txtLorem.setPlainText(txt.sentence())
+#-------------------------------------------------------------------------------
+# copyNameToClipboard()
+#-------------------------------------------------------------------------------
+    def doLoremCopy(self):
+        QApplication.clipboard().setText(self.txtLorem.toPlainText())
+        self.showMessage("Copy Lorem Ipsum to clipboard")
+
 #-------------------------------------------------------------------------------
 # colorBackgroundPicker()
 #-------------------------------------------------------------------------------
