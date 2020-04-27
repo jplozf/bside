@@ -44,6 +44,7 @@ import QHexEditor
 import scratch
 import workspace
 import pyinstall
+import sqlinter
 import tools
 import todomgr
 import lorem
@@ -82,6 +83,7 @@ class MainWindow(QMainWindow):
     lastProject = None
     debug = False
     tick = 0
+    SQLDatabase = ":memory:"
 
 #-------------------------------------------------------------------------------
 # __init__()
@@ -96,6 +98,9 @@ class MainWindow(QMainWindow):
         
         self.dbTODO = sqlite3.connect(os.path.join(self.appDir, "todo.db"))
         self.curTODO = self.dbTODO.cursor()
+        
+        self.dbSQLDatabase = sqlite3.connect(self.SQLDatabase)
+        self.curSQLDatabase = self.dbSQLDatabase.cursor()
 
         self.project = projects.Project(parent = self)
         self.todoManager = todomgr.TodoManager(parent = self)
@@ -195,6 +200,8 @@ class MainWindow(QMainWindow):
         self.btnBrowseMainFile.clicked.connect(lambda: pyinstall.browseMainFile(self))
         self.btnRunEXE.clicked.connect(lambda: pyinstall.runEXE(self))
         pyinstall.initFormEXE(self)
+        
+        sqlinter.initFormSQL(self)
         
         self.setTabsText(self.tbwLowLeft, settings.db['TAB_LOW_LEFT_NAMES'])
         self.setTabsText(self.tbwLowRight, settings.db['TAB_LOW_RIGHT_NAMES'])
@@ -502,6 +509,9 @@ class MainWindow(QMainWindow):
             # Close TODO database
             self.curTODO.close()
             self.dbTODO.close()
+            # Close SQL database
+            self.curSQLDatabase.close()
+            self.dbSQLDatabase.close()
             # Check for modified files not saved
             # Save the current files or project open
             for i in reversed(range(self.tbwHighRight.count())):

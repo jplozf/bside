@@ -1,3 +1,20 @@
+import sqlite3
+ 
+db = sqlite3.connect(':memory:')
+cur = db.cursor()
+ 
+print "SQLite 3 simple shell from python.wikia.com\n\n"
+ 
+while True:
+    cmd = input("sql> ")#in python2.7 use raw_input
+    try:
+        cur.execute(cmd.strip())
+        if cmd.lstrip().upper().startswith("SELECT"):
+            print cur.fetchall()
+    except sqlite3.Error, e:
+       print "An error occurred:", e.args[0]
+
+
 # Light Theme
 ["#efefef","#000000","#ffffff","#f7f7f7","#ffffdc","#000000","#000000","#efefef","#000000","#ffffff","#0000ff","#308cc6","#ffffff"]
 

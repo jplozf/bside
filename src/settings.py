@@ -107,7 +107,12 @@ defaultValues = [
     ['FOCUS_FORMAT_DATE', '%d/%m/%Y'],
     ['FOCUS_FORMAT_HOUR', '%H:%M:%S'],
     ['FOCUS_FORMAT_TIMESTAMP', '%d/%m/%Y - %H:%M:%S'],
-    ['TODO_AUTORESIZE_NOTE', False]
+    ['TODO_AUTORESIZE_NOTE', False],
+    ['SQLITE3_FONT', "Courier"],
+    ['SQLITE3_FONT_SIZE', 12],
+    ['SQLITE3_COLOR_BACKGROUND', "#f9f0e1"],
+    ['SQLITE3_COLOR_FOREGROUND', "#000000"],
+    ['SQLITE3_PROMPT', "> "]
 ]
 
 #-------------------------------------------------------------------------------
