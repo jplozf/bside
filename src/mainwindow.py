@@ -78,6 +78,8 @@ class MainWindow(QMainWindow):
     CurrentDir = os.path.splitdrive(os.path.dirname(os.path.realpath(__file__)))[1]
     aCommands = []
     iCommands = 0
+    aSQL = []
+    iSQL = 0
     tools = []
     lastBackup = datetime.datetime(1970,1,1,0,0)    
     lastProject = None
@@ -319,6 +321,23 @@ class MainWindow(QMainWindow):
             if key == Qt.Key_T and modifiers == (Qt.ControlModifier | Qt.ShiftModifier):
                 today = datetime.datetime.now()
                 self.txtFocus.insertPlainText(today.strftime(settings.db['FOCUS_FORMAT_TIMESTAMP']))
+        if source is self.txtSQLInput and event.type() == event.KeyPress:
+            key = event.key()
+            if key == Qt.Key_Up:
+                if self.aSQL:
+                    if self.iSQL > 0:
+                        self.iSQL = self.iSQL - 1
+                    else:
+                        self.iSQL = len(self.aSQL) - 1
+                    self.txtSQLInput.setText(self.aSQL[self.iSQL])
+            elif key == Qt.Key_Down:
+                if self.aSQL:
+                    if self.iSQL < (len(self.aSQL) - 1):
+                        self.iSQL = self.iSQL + 1
+                    else:
+                        self.iSQL = 0
+                    self.txtSQLInput.setText(self.aSQL[self.iSQL])
+                
         return QWidget.eventFilter(self, source, event)
 
 #-------------------------------------------------------------------------------
@@ -391,6 +410,13 @@ class MainWindow(QMainWindow):
             pass        
         #
         try:
+            with open(os.path.join(self.appDir, const.HISTORY_SQL), "rb") as fp:
+                self.aSQL = pickle.load(fp)
+                self.iSQL = len(self.aSQL)
+        except:
+            pass        
+        #
+        try:
             with open(os.path.join(self.appDir, const.BACKUP_STAMP), "rb") as fp:
                 self.lastBackup = pickle.load(fp)
         except:
@@ -449,6 +475,9 @@ class MainWindow(QMainWindow):
     def backupSettings(self):
         with open(os.path.join(self.appDir, const.HISTORY_FILE), "wb") as fp:
             pickle.dump(self.aCommands, fp)        
+        #
+        with open(os.path.join(self.appDir, const.HISTORY_SQL), "wb") as fp:
+            pickle.dump(self.aSQL, fp)        
         #
         with open(os.path.join(self.appDir, const.TOOLS_FILE), "wb") as fp:
             pickle.dump(self.tools, fp)        
