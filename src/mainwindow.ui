@@ -277,7 +277,7 @@
        </widget>
        <widget class="QTabWidget" name="tbwLowRight">
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tabOutput">
          <attribute name="icon">
@@ -516,7 +516,7 @@
              <enum>QTabWidget::South</enum>
             </property>
             <property name="currentIndex">
-             <number>7</number>
+             <number>9</number>
             </property>
             <widget class="QWidget" name="tabColorPicker">
              <attribute name="title">
@@ -806,6 +806,118 @@
              <attribute name="title">
               <string>Base64</string>
              </attribute>
+             <layout class="QGridLayout" name="gridLayout_24">
+              <item row="0" column="0">
+               <layout class="QHBoxLayout" name="horizontalLayout_11">
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <item>
+                   <widget class="QLabel" name="label_4">
+                    <property name="text">
+                     <string>TextLabel</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_10">
+                    <item>
+                     <widget class="QPushButton" name="pushButton_4">
+                      <property name="text">
+                       <string>PushButton</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButton_5">
+                      <property name="text">
+                       <string>PushButton</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButton_6">
+                      <property name="text">
+                       <string>PushButton</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_8">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_8">
+                  <item>
+                   <widget class="QLabel" name="label_3">
+                    <property name="text">
+                     <string>TextLabel</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPlainTextEdit" name="plainTextEdit"/>
+                  </item>
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_9">
+                    <item>
+                     <widget class="QPushButton" name="pushButton">
+                      <property name="text">
+                       <string>PushButton</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButton_2">
+                      <property name="text">
+                       <string>PushButton</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButton_3">
+                      <property name="text">
+                       <string>PushButton</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_6">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                   </layout>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
+             </layout>
+             <zorder>horizontalLayoutWidget_2</zorder>
+             <zorder>horizontalLayoutWidget_3</zorder>
             </widget>
            </widget>
           </item>

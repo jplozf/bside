@@ -84,7 +84,16 @@ class TodoManager():
 # addTODO()
 #-------------------------------------------------------------------------------
     def addTODO(self):
-        dlg = dialog.DlgAddTODO(self.mw)
+        item = self.mw.tvwTODO.currentItem()
+        if item:
+            parent = item.parent()
+            if parent is not None:
+                lbl = parent.text(0)
+            else:
+                lbl = item.text(0)
+            dlg = dialog.DlgAddTODO(self.mw, lbl)
+        else:
+            dlg = dialog.DlgAddTODO(self.mw)
         result = dlg.exec()
         if result == QDialog.Accepted:
             sDate = str(dlg.tplTODO[0])
@@ -124,43 +133,49 @@ class TodoManager():
 # delTODO()
 #-------------------------------------------------------------------------------
     def delTODO(self):
-        self.mw.showMessage("Delete")
         item = self.mw.tvwTODO.currentItem()
         if item:
-            nextItem = self.mw.tvwTODO.itemBelow(item)
-        
-            if nextItem is None:
-                nextItem = item.parent()
-                nextItemText = nextItem.text(0)
-                nextItemLabel = "*"
-            else:
-                nextItemText = nextItem.text(0)
-                nextItemLabel = nextItem.parent().text(0)            
+            parent = item.parent().text(0)                
             idTODO = int(item.text(1))
-            print("ID = %d" % idTODO)
             self.mw.curTODO.execute("delete from TODOs where idTODO = (?)", (idTODO,))
             self.mw.dbTODO.commit()
             self.displayTODOs()
-            self.setTODOFocus(nextItemLabel, nextItemText)
-            
-    
+            self.setTODOFocus(parent)
+
 #-------------------------------------------------------------------------------
 # upTODO()
 #-------------------------------------------------------------------------------
     def upTODO(self):
-        self.mw.showMessage("Go up")
-    
+        item = self.mw.tvwTODO.currentItem()
+        if item:
+            if item.text(1) != "":
+                currID = int(item.text(1))
+                prevID = self.getPrevID(currID)
+                print("CurrID = %d" % currID)
+                print("PrevID = %d" % prevID)
+                        
 #-------------------------------------------------------------------------------
 # downTODO()
 #-------------------------------------------------------------------------------
     def downTODO(self):
-        self.mw.showMessage("Go down")
+        item = self.mw.tvwTODO.currentItem()
+        if item:
+            if item.text(1) != "":
+                currID = int(item.text(1))
+                nextID = self.getNextID(currID)
+                print("CurrID = %d" % currID)
+                print("NextID = %d" % nextID)
         
 #-------------------------------------------------------------------------------
 # changeNOTE()
 #-------------------------------------------------------------------------------
     def changeNote(self):
-        self.mw.showMessage("Edit Note")
+        item = self.mw.tvwTODO.currentItem()
+        if item:
+            try:
+                self.updateNoteTODO(int(item.text(1)), self.mw.txtNote.toPlainText())
+            except:
+                pass
         
 #-------------------------------------------------------------------------------
 # setTODOFocus()
@@ -184,12 +199,12 @@ class TodoManager():
                         found = True
         if found == True:
             self.mw.tvwTODO.setCurrentItem(itmTxt)
+        self.mw.tvwTODO.expandAll()
 
 #-------------------------------------------------------------------------------
 # displayTODOs()
 #-------------------------------------------------------------------------------
     def displayTODOs(self):
-        # cur = self.db.cursor()
         self.mw.curTODO.execute("select idTODO, lblTODO, ordTODO, txtTODO, txtNOTE, chkTODO from TODOs order by lblTODO, ordTODO")
         rows = self.mw.curTODO.fetchall() 
         self.clearQTreeWidget(self.mw.tvwTODO)
@@ -304,46 +319,47 @@ class TodoManager():
 # updateCheckedTODO()
 #-------------------------------------------------------------------------------
     def updateCheckedTODO(self, id, checked):
-        # cur = self.db.cursor()
         chk = 0 if checked == Qt.Unchecked else 1
         self.mw.curTODO.execute("update TODOs set chkTODO = :chk where idTODO = :id", {"chk": chk, "id": id})
         self.mw.dbTODO.commit()
-        # cur.close()
       
-            
+#-------------------------------------------------------------------------------
+# updateNoteTODO()
+#-------------------------------------------------------------------------------
+    def updateNoteTODO(self, id, note):
+        self.mw.tvwTODO.blockSignals(True)
+        self.mw.curTODO.execute("update TODOs set txtNOTE = :note where idTODO = :id", {"note": note, "id": id})
+        self.mw.dbTODO.commit()
+        self.mw.tvwTODO.blockSignals(False)
 
-"""
-REGEX TESTER    https://regex101.com/
-BANNER ASCII    http://patorjk.com/software/taag/#p=display&f=Graffiti&t=Type%20Something%20
-QtDesigner
+#-------------------------------------------------------------------------------
+# getNextID()
+# https://stackoverflow.com/questions/17828070/select-next-and-previous-row-data-sqlite
+#-------------------------------------------------------------------------------
+    def getNextID(self, id):
+        self.mw.curTODO.execute("select idTODO from TODOs where idTODO > ? order by lblTODO, ordTODO limit 1", (id,))
+        nextID = self.mw.curTODO.fetchone()[0]
+        return nextID
+        """
+        SELECT *
+        FROM MyTable
+        WHERE NameID > 8787
+        ORDER BY NameID
+        LIMIT 1
+        """    
 
-CREATE TABLE TODOs (
-	idTODO INTEGER DEFAULT 1 NOT NULL,
-	dteTODO INTEGER,
-	ordTODO INTEGER DEFAULT 10 NOT NULL,
-	txtTODO TEXT NOT NULL,
-	txtNOTE TEXT,
-	chkTODO INTEGER DEFAULT 0 NOT NULL
-);
-
->>> import time
->>> import datetime
->>> s = "01/12/2011"
->>> time.mktime(datetime.datetime.strptime(s, "%d/%m/%Y").timetuple())
-1322697600.0
-
-selmodel = self.treeWidget.selectionModel()
-selmodel.selectionChanged.connect(self.handleSelection)
-        ...
-
-    def handleSelection(self, selected, deselected):
-        for index in selected.indexes():
-            item = self.treeWidget.itemFromIndex(index)
-            print('SEL: row: %s, col: %s, text: %s' % (
-                index.row(), index.column(), item.text(0)))
-        for index in deselected.indexes():
-            item = self.treeWidget.itemFromIndex(index)
-            print('DESEL: row: %s, col: %s, text: %s' % (
-                index.row(), index.column(), item.text(0)))
-
-"""
+#-------------------------------------------------------------------------------
+# getPrevID()
+# https://stackoverflow.com/questions/17828070/select-next-and-previous-row-data-sqlite
+#-------------------------------------------------------------------------------
+    def getPrevID(self, id):
+        self.mw.curTODO.execute("select idTODO from TODOs where idTODO < ? order by lblTODO, ordTODO desc limit 1", (id,))
+        prevID = self.mw.curTODO.fetchone()[0]
+        return prevID
+        """
+        SELECT *
+        FROM MyTable
+        WHERE NameID < 8787
+        ORDER BY NameID DESC
+        LIMIT 1
+        """

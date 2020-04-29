@@ -245,7 +245,7 @@ class DlgAddTODO(QDialog):
 #-------------------------------------------------------------------------------
 # __init__()
 #-------------------------------------------------------------------------------
-    def __init__(self, parent):
+    def __init__(self, parent, lbl=None):
         super().__init__(parent)    
         
         self.setWindowTitle("Add TODO")  
@@ -255,7 +255,10 @@ class DlgAddTODO(QDialog):
         
         self.hBox = QHBoxLayout()        
         
-        self.lblTODO = QLineEdit(date.today().strftime("%d/%m/%Y"))
+        if lbl is None :
+            self.lblTODO = QLineEdit(date.today().strftime("%d/%m/%Y"))
+        else:
+            self.lblTODO = QLineEdit(lbl)
         self.lblTODO.selectAll()
         self.btnPickDate = QPushButton()
         icoPickDate = QIcon("pix/16x16/Clock.png")
@@ -267,8 +270,9 @@ class DlgAddTODO(QDialog):
         formLayout.addRow("Label", self.hBox)        
         
         self.txtTODO = QLineEdit()
+        self.txtTODO.returnPressed.connect(self.itsOK)
         formLayout.addRow("TODO", self.txtTODO)
-        
+                
         self.txtNote = QPlainTextEdit()
         formLayout.addRow("Notes", self.txtNote)
 
