@@ -48,6 +48,7 @@ import sqlinter
 import tools
 import todomgr
 import lorem
+import toolsbase64
 
 #-------------------------------------------------------------------------------
 # resource_path()
@@ -137,15 +138,7 @@ class MainWindow(QMainWindow):
         self.btnBackgroundColor.clicked.connect(self.colorBackgroundPicker)
         self.btnForegroundColor.clicked.connect(self.colorForegroundPicker)
         self.btnSwapColors.clicked.connect(self.swapColors)
-        
-        self.txtLorem.setPlainText("")
-        self.txtLorem.setReadOnly(True)
-        self.cbxLorem.addItem("Lorem Ipsum")
-        self.btnLoremText.clicked.connect(self.doLoremText)
-        self.btnLoremParagraph.clicked.connect(self.doLoremParagraph)
-        self.btnLoremSentence.clicked.connect(self.doLoremSentence)
-        self.btnLoremCopy.clicked.connect(self.doLoremCopy)
-        
+               
         self.btnExportOutput.clicked.connect(self.outputExport)
         self.btnClearOutput.clicked.connect(self.outputClear)
         self.btnKillProcess.clicked.connect(self.killProcess)
@@ -201,9 +194,14 @@ class MainWindow(QMainWindow):
         self.lblTimeBuild.setFont(QFont('Courier', 10))
         self.btnBrowseMainFile.clicked.connect(lambda: pyinstall.browseMainFile(self))
         self.btnRunEXE.clicked.connect(lambda: pyinstall.runEXE(self))
+        
+        lorem.initFormLorem(self)
+        
         pyinstall.initFormEXE(self)
         
         sqlinter.initFormSQL(self)
+        
+        toolsbase64.initBase64(self)
         
         self.setTabsText(self.tbwLowLeft, settings.db['TAB_LOW_LEFT_NAMES'])
         self.setTabsText(self.tbwLowRight, settings.db['TAB_LOW_RIGHT_NAMES'])
@@ -252,7 +250,20 @@ class MainWindow(QMainWindow):
         self.lblClock = QLabel()
         self.statusBar.addPermanentWidget(self.lblClockIcon)
         self.statusBar.addPermanentWidget(self.lblClock)
-
+        
+        self.lblClockWake = QLabel()
+        self.lblClockWake.setPixmap(QPixmap("pix/silk/icons/clock.png"))
+        self.lblClockWake.mousePressEvent = self.doClockWake
+        self.lblClockTimer = QLabel()
+        self.lblClockTimer.setPixmap(QPixmap("pix/silk/icons/time.png"))
+        self.lblClockTimer.mousePressEvent = self.doClockTimer
+        self.lblClockWatch = QLabel()
+        self.lblClockWatch.setPixmap(QPixmap("pix/silk/icons/hourglass.png"))
+        self.lblClockWatch.mousePressEvent = self.doClockWatch
+        self.statusBar.addPermanentWidget(self.lblClockWake)
+        self.statusBar.addPermanentWidget(self.lblClockTimer)
+        self.statusBar.addPermanentWidget(self.lblClockWatch)
+        
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerCount)
         self.timer.start(settings.db['BSIDE_TIMER_INFO'])
@@ -304,7 +315,25 @@ class MainWindow(QMainWindow):
             if settings.db['BSIDE_DISPLAY_WELCOME'] == True:
                 self.welcome()
             self.tbwHighRight.setCurrentIndex(0)              
-        
+
+#-------------------------------------------------------------------------------
+# doClockWake()
+#-------------------------------------------------------------------------------
+    def doClockWake(self, event):
+        self.showMessage("WAKE")       
+
+#-------------------------------------------------------------------------------
+# doClockTimer()
+#-------------------------------------------------------------------------------
+    def doClockTimer(self, event):
+        self.showMessage("TIMER")       
+
+#-------------------------------------------------------------------------------
+# doClockWatch()
+#-------------------------------------------------------------------------------
+    def doClockWatch(self, event):
+        self.showMessage("WATCH")       
+
 #-------------------------------------------------------------------------------
 # eventFilter()
 #-------------------------------------------------------------------------------
@@ -1643,33 +1672,6 @@ class MainWindow(QMainWindow):
             for i in range(0, tabWidget.count()):
                 tabWidget.setTabText(i, "")
                 
-#-------------------------------------------------------------------------------
-# doLoremText()
-#-------------------------------------------------------------------------------
-    def doLoremText(self):
-        txt = lorem.Lorem()
-        self.txtLorem.setPlainText(txt.text())
-                           
-#-------------------------------------------------------------------------------
-# doLoremParagraph()
-#-------------------------------------------------------------------------------
-    def doLoremParagraph(self):
-        txt = lorem.Lorem()
-        self.txtLorem.setPlainText(txt.paragraph())
-
-#-------------------------------------------------------------------------------
-# doLoremSentence()
-#-------------------------------------------------------------------------------
-    def doLoremSentence(self):
-        txt = lorem.Lorem()
-        self.txtLorem.setPlainText(txt.sentence())
-#-------------------------------------------------------------------------------
-# copyNameToClipboard()
-#-------------------------------------------------------------------------------
-    def doLoremCopy(self):
-        QApplication.clipboard().setText(self.txtLorem.toPlainText())
-        self.showMessage("Copy Lorem Ipsum to clipboard")
-
 #-------------------------------------------------------------------------------
 # colorBackgroundPicker()
 #-------------------------------------------------------------------------------

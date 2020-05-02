@@ -7,12 +7,67 @@
 #                                                      | |_) \__ \ | (_| |  __/
 #                                                      |____/|___/_|\__,_|\___|
 #                         
-#============================================================(C) JPL 2019=======
+#============================================================(C) JPL 2020=======
 
 #-------------------------------------------------------------------------------
 # Imports
 #-------------------------------------------------------------------------------
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 import random
+
+#-------------------------------------------------------------------------------
+# initFormLorem()
+#-------------------------------------------------------------------------------
+def initFormLorem(mw):
+    mw.txtLorem.setPlainText("")
+    mw.txtLorem.setReadOnly(True)
+    
+    mw.cbxLorem.addItem("Lorem Ipsum")
+    mw.cbxLorem.addItem("Hacker News")
+    mw.cbxLorem.addItem("Hexadecimal")
+    
+    mw.cbxLorem.addItem("UUID")
+    
+    mw.cbxLorem.addItem("Private/Public Keys")
+    
+    # https://strm.sh/post/bitcoin-address-generation/ 
+    # https://www.freecodecamp.org/news/how-to-create-a-bitcoin-wallet-address-from-a-private-key-eca3ddd9c05f/
+    mw.cbxLorem.addItem("Bitcoin Address")  
+    
+    mw.btnLoremText.clicked.connect(lambda _, mw=mw : doLoremText(mw))
+    mw.btnLoremParagraph.clicked.connect(lambda _, mw=mw : doLoremParagraph(mw))
+    mw.btnLoremSentence.clicked.connect(lambda _, mw=mw : doLoremSentence(mw))
+    mw.btnLoremCopy.clicked.connect(lambda _, mw=mw : doLoremCopy(mw))
+
+#-------------------------------------------------------------------------------
+# doLoremText()
+#-------------------------------------------------------------------------------
+def doLoremText(mw):
+    txt = Lorem()
+    mw.txtLorem.setPlainText(txt.text())
+                           
+#-------------------------------------------------------------------------------
+# doLoremParagraph()
+#-------------------------------------------------------------------------------
+def doLoremParagraph(mw):
+    txt = Lorem()
+    mw.txtLorem.setPlainText(txt.paragraph())
+
+#-------------------------------------------------------------------------------
+# doLoremSentence()
+#-------------------------------------------------------------------------------
+def doLoremSentence(mw):
+    txt = Lorem()
+    mw.txtLorem.setPlainText(txt.sentence())
+
+#-------------------------------------------------------------------------------
+# copyNameToClipboard()
+#-------------------------------------------------------------------------------
+def doLoremCopy(mw):
+    QApplication.clipboard().setText(mw.txtLorem.toPlainText())
+    mw.showMessage("Copy Lorem Ipsum to clipboard")
 
 #-------------------------------------------------------------------------------
 # Class Lorem
@@ -68,3 +123,29 @@ class Lorem():
 #-------------------------------------------------------------------------------
     def _word(self):
         return random.choice(self._words)         
+    
+"""
+from Crypto.PublicKey import RSA
+key = RSA.generate(1024) # or 2048
+f = open("private.pem", "wb")
+f.write(key.exportKey('PEM'))
+f.close()
+
+pubkey = key.publickey()
+f = open("public.pem", "wb")
+f.write(pubkey.exportKey('OpenSSH'))
+f.close()
+
+-- OR --
+
+from os import chmod
+from Crypto.PublicKey import RSA
+
+key = RSA.generate(2048)
+with open("/tmp/private.key", 'wb') as content_file:
+    chmod("/tmp/private.key", 0600)
+    content_file.write(key.exportKey('PEM'))
+pubkey = key.publickey()
+with open("/tmp/public.key", 'wb') as content_file:
+    content_file.write(pubkey.exportKey('OpenSSH'))
+"""    

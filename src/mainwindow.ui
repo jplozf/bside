@@ -277,7 +277,7 @@
        </widget>
        <widget class="QTabWidget" name="tbwLowRight">
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tabOutput">
          <attribute name="icon">
@@ -408,17 +408,6 @@
                  <item row="0" column="0">
                   <layout class="QVBoxLayout" name="verticalLayout_5">
                    <item>
-                    <widget class="QPushButton" name="btnNowTODO">
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset>
-                       <normaloff>pix/16x16/Clock.png</normaloff>pix/16x16/Clock.png</iconset>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
                     <widget class="QPushButton" name="btnAddTODO">
                      <property name="text">
                       <string/>
@@ -516,7 +505,7 @@
              <enum>QTabWidget::South</enum>
             </property>
             <property name="currentIndex">
-             <number>9</number>
+             <number>8</number>
             </property>
             <widget class="QWidget" name="tabColorPicker">
              <attribute name="title">
@@ -734,7 +723,7 @@
             </widget>
             <widget class="QWidget" name="tabTextGenerator">
              <attribute name="title">
-              <string>TextGenerator</string>
+              <string>Generator</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_22">
               <item row="0" column="0">
@@ -802,9 +791,9 @@
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tabBase64">
+            <widget class="QWidget" name="tabHashes">
              <attribute name="title">
-              <string>Base64</string>
+              <string>Hashes</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_24">
               <item row="0" column="0">
@@ -812,35 +801,53 @@
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_9">
                   <item>
-                   <widget class="QLabel" name="label_4">
-                    <property name="text">
-                     <string>TextLabel</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+                   <widget class="QPlainTextEdit" name="txtBase64_1"/>
                   </item>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_10">
                     <item>
-                     <widget class="QPushButton" name="pushButton_4">
+                     <widget class="QPushButton" name="btnBase64Copy_1">
                       <property name="text">
-                       <string>PushButton</string>
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>pix/16x16/Clipboard Copy.png</normaloff>pix/16x16/Clipboard Copy.png</iconset>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="pushButton_5">
+                     <widget class="QPushButton" name="btnBase64Paste_1">
                       <property name="text">
-                       <string>PushButton</string>
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>pix/16x16/Clipboard Paste.png</normaloff>pix/16x16/Clipboard Paste.png</iconset>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="pushButton_6">
+                     <widget class="QPushButton" name="btnBase64Clear_1">
                       <property name="text">
-                       <string>PushButton</string>
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>pix/16x16/Trash.png</normaloff>pix/16x16/Trash.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="lblSizeText_1">
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Plain</enum>
+                      </property>
+                      <property name="text">
+                       <string>0</string>
                       </property>
                      </widget>
                     </item>
@@ -862,37 +869,119 @@
                  </layout>
                 </item>
                 <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_8">
+                 <layout class="QVBoxLayout" name="verticalLayout_10">
                   <item>
-                   <widget class="QLabel" name="label_3">
+                   <widget class="QComboBox" name="cbxCodec"/>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnEncode_1_to_2">
                     <property name="text">
-                     <string>TextLabel</string>
+                     <string>Encode</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>pix/16x16/Arrow - Right.png</normaloff>pix/16x16/Arrow - Right.png</iconset>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QPlainTextEdit" name="plainTextEdit"/>
+                   <widget class="QPushButton" name="btnDecode_1_to_2">
+                    <property name="text">
+                     <string>Decode</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>pix/16x16/Arrow - Right.png</normaloff>pix/16x16/Arrow - Right.png</iconset>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnEncode_2_to_1">
+                    <property name="text">
+                     <string>Encode</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>pix/16x16/Arrow - Left.png</normaloff>pix/16x16/Arrow - Left.png</iconset>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnDecode_2_to_1">
+                    <property name="text">
+                     <string>Decode</string>
+                    </property>
+                    <property name="icon">
+                     <iconset>
+                      <normaloff>pix/16x16/Arrow - Left.png</normaloff>pix/16x16/Arrow - Left.png</iconset>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="verticalSpacer_5">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>40</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout_8">
+                  <item>
+                   <widget class="QPlainTextEdit" name="txtBase64_2"/>
                   </item>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_9">
                     <item>
-                     <widget class="QPushButton" name="pushButton">
+                     <widget class="QPushButton" name="btnBase64Copy_2">
                       <property name="text">
-                       <string>PushButton</string>
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>pix/16x16/Clipboard Copy.png</normaloff>pix/16x16/Clipboard Copy.png</iconset>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="pushButton_2">
+                     <widget class="QPushButton" name="btnBase64Paste_2">
                       <property name="text">
-                       <string>PushButton</string>
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>pix/16x16/Clipboard Paste.png</normaloff>pix/16x16/Clipboard Paste.png</iconset>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="pushButton_3">
+                     <widget class="QPushButton" name="btnBase64Clear_2">
                       <property name="text">
-                       <string>PushButton</string>
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset>
+                        <normaloff>pix/16x16/Trash.png</normaloff>pix/16x16/Trash.png</iconset>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="lblSizeText_2">
+                      <property name="frameShape">
+                       <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                       <enum>QFrame::Plain</enum>
+                      </property>
+                      <property name="text">
+                       <string>0</string>
                       </property>
                      </widget>
                     </item>
@@ -916,8 +1005,6 @@
                </layout>
               </item>
              </layout>
-             <zorder>horizontalLayoutWidget_2</zorder>
-             <zorder>horizontalLayoutWidget_3</zorder>
             </widget>
            </widget>
           </item>
@@ -1083,7 +1170,7 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>581</width>
+                     <width>600</width>
                      <height>1290</height>
                     </rect>
                    </property>

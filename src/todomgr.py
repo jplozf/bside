@@ -46,7 +46,6 @@ class TodoManager():
     def __init__(self, parent = None):
         self.mw = parent
         
-        self.mw.btnNowTODO.clicked.connect(self.nowTODO)
         self.mw.btnAddTODO.clicked.connect(self.addTODO)
         self.mw.btnDelTODO.clicked.connect(self.delTODO)
         self.mw.btnUpTODO.clicked.connect(self.upTODO)
@@ -74,12 +73,6 @@ class TodoManager():
         self.mw.dbTODO.commit()      
         self.displayTODOs()
             
-#-------------------------------------------------------------------------------
-# nowTODO()
-#-------------------------------------------------------------------------------
-    def nowTODO(self):
-        self.mw.showMessage("Now")
-
 #-------------------------------------------------------------------------------
 # addTODO()
 #-------------------------------------------------------------------------------
@@ -153,6 +146,9 @@ class TodoManager():
                 prevID = self.getPrevID(currID)
                 print("CurrID = %d" % currID)
                 print("PrevID = %d" % prevID)
+                self.swapOrders(currID, prevID)
+                self.displayTODOs()
+                self.setTODOFocusFromID(currID)
                         
 #-------------------------------------------------------------------------------
 # downTODO()
@@ -165,6 +161,9 @@ class TodoManager():
                 nextID = self.getNextID(currID)
                 print("CurrID = %d" % currID)
                 print("NextID = %d" % nextID)
+                self.swapOrders(currID, nextID)
+                self.displayTODOs()
+                self.setTODOFocusFromID(currID)
         
 #-------------------------------------------------------------------------------
 # changeNOTE()
@@ -200,6 +199,25 @@ class TodoManager():
         if found == True:
             self.mw.tvwTODO.setCurrentItem(itmTxt)
         self.mw.tvwTODO.expandAll()
+        
+#-------------------------------------------------------------------------------
+# setTODOFocusFromID()
+#-------------------------------------------------------------------------------
+    def setTODOFocusFromID(self, id):
+        found = False
+        root = self.mw.tvwTODO.invisibleRootItem()
+        children = root.childCount()
+        for i in range(children):
+            itmLabel = root.child(i)
+            jChildren = itmLabel.childCount()
+            for j in range(jChildren):
+                itmTxt = itmLabel.child(j)
+                if int(itmTxt.text(1)) == id:
+                    found = True
+                    break
+        if found == True:
+            self.mw.tvwTODO.setCurrentItem(itmTxt)        
+            self.mw.tvwTODO.setFocus()
 
 #-------------------------------------------------------------------------------
 # displayTODOs()
@@ -334,32 +352,45 @@ class TodoManager():
 
 #-------------------------------------------------------------------------------
 # getNextID()
-# https://stackoverflow.com/questions/17828070/select-next-and-previous-row-data-sqlite
 #-------------------------------------------------------------------------------
     def getNextID(self, id):
-        self.mw.curTODO.execute("select idTODO from TODOs where idTODO > ? order by lblTODO, ordTODO limit 1", (id,))
-        nextID = self.mw.curTODO.fetchone()[0]
-        return nextID
-        """
-        SELECT *
-        FROM MyTable
-        WHERE NameID > 8787
-        ORDER BY NameID
-        LIMIT 1
-        """    
+        self.mw.curTODO.execute("select idTODO from TODOs where ordTODO > (select ordTODO from TODOs where idTODO = (?)) and lblTODO = (select lblTODO from TODOs where idTODO = (?)) order by lblTODO, ordTODO limit 1", (id, id))
+        nextID = self.mw.curTODO.fetchone()
+        if nextID != None:
+            return nextID[0]
+        else:
+            return 0
 
 #-------------------------------------------------------------------------------
 # getPrevID()
-# https://stackoverflow.com/questions/17828070/select-next-and-previous-row-data-sqlite
 #-------------------------------------------------------------------------------
     def getPrevID(self, id):
-        self.mw.curTODO.execute("select idTODO from TODOs where idTODO < ? order by lblTODO, ordTODO desc limit 1", (id,))
-        prevID = self.mw.curTODO.fetchone()[0]
-        return prevID
-        """
-        SELECT *
-        FROM MyTable
-        WHERE NameID < 8787
-        ORDER BY NameID DESC
-        LIMIT 1
-        """
+        self.mw.curTODO.execute("select idTODO from TODOs where ordTODO < (select ordTODO from TODOs where idTODO = (?)) and lblTODO = (select lblTODO from TODOs where idTODO = (?)) order by lblTODO, ordTODO desc limit 1", (id, id))
+        prevID = self.mw.curTODO.fetchone()
+        if prevID != None:
+            return prevID[0]
+        else:
+            return 0
+        
+#-------------------------------------------------------------------------------
+# swapOrders()
+#-------------------------------------------------------------------------------
+    def swapOrders(self, id1, id2):
+        if id1 == 0 or id2 == 0:
+            return
+        self.mw.curTODO.execute("select idTODO, lblTODO, ordTODO, txtTODO, txtNOTE, chkTODO from TODOs where idTODO = (?)",(id1,))
+        rec1 = self.mw.curTODO.fetchone() 
+        self.mw.curTODO.execute("select idTODO, lblTODO, ordTODO, txtTODO, txtNOTE, chkTODO from TODOs where idTODO = (?)",(id2,))
+        rec2 = self.mw.curTODO.fetchone() 
+        
+        lbl1 = rec1[1]
+        ord1 = rec1[2]
+
+        lbl2 = rec2[1]
+        ord2 = rec2[2]
+        
+        if lbl1 == lbl2:
+            self.mw.curTODO.execute("update TODOs set ordTODO = (?) where idTODO = (?)", (ord2, id1))
+            self.mw.dbTODO.commit()
+            self.mw.curTODO.execute("update TODOs set ordTODO = (?) where idTODO = (?)", (ord1, id2))
+            self.mw.dbTODO.commit()
