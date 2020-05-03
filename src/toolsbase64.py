@@ -66,7 +66,23 @@ def doROT13(mw, fromText, way):
        'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm')
     message = srcText.toPlainText()
     dstText.setPlainText(message.translate(rot13trans))
+    
+#-------------------------------------------------------------------------------
+# doLeet()
+#-------------------------------------------------------------------------------
+def doLeet(mw, fromText, way):
+    if fromText == ONE:
+        srcText = mw.txtBase64_1
+        dstText = mw.txtBase64_2
+    else:
+        srcText = mw.txtBase64_2
+        dstText = mw.txtBase64_1    
 
+    leet = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 
+       '4bcd3f6h1jklmn0pqr57uvwxyz4bcd3f6h1jklmn0pqr57uvwxyz')
+    message = srcText.toPlainText()
+    dstText.setPlainText(message.translate(leet))
+    
 #-------------------------------------------------------------------------------
 # doNTLM()
 #-------------------------------------------------------------------------------
@@ -318,6 +334,7 @@ def doWhirlpool(mw, fromText, way):
 algos = [
     ['Base64', True, lambda mw, fromText, way : doBase64(mw, fromText, way)],
     ['ROT13', True, lambda mw, fromText, way : doROT13(mw, fromText, way)],
+    ['1337', False, lambda mw, fromText, way : doLeet(mw, fromText, way)],
     ['NTLM', False, lambda mw, fromText, way : doNTLM(mw, fromText, way)],    
     ['md4', False, lambda mw, fromText, way : doMd4(mw, fromText, way)],
     ['md5', False, lambda mw, fromText, way : doMd5(mw, fromText, way)],    
@@ -440,3 +457,12 @@ def doClear(mw, src):
     else:
         mw.txtBase64_2.setPlainText("")
     mw.showMessage("Text field cleared")
+    
+"""
+http://www.robertecker.com/hp/research/leet-converter.php?lang=en
+abcdefghijklmnopqrstuvwxyz
+4bcd3f6h1jklmn0pqr57uvwxyz
+    leet = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 
+       '4bcd3f6h1jklmn0pqr57uvwxyz4bcd3f6h1jklmn0pqr57uvwxyz')
+
+"""    

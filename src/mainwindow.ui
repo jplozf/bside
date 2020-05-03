@@ -505,7 +505,7 @@
              <enum>QTabWidget::South</enum>
             </property>
             <property name="currentIndex">
-             <number>8</number>
+             <number>9</number>
             </property>
             <widget class="QWidget" name="tabColorPicker">
              <attribute name="title">
@@ -736,23 +736,48 @@
                      <widget class="QComboBox" name="cbxLorem"/>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="btnLoremSentence">
+                     <widget class="QRadioButton" name="chkLoremSentence">
                       <property name="text">
                        <string>Sentence</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="btnLoremParagraph">
+                     <widget class="QRadioButton" name="chkLoremParagraph">
                       <property name="text">
                        <string>Paragraph</string>
                       </property>
                      </widget>
                     </item>
                     <item>
-                     <widget class="QPushButton" name="btnLoremText">
+                     <widget class="QRadioButton" name="chkLoremText">
                       <property name="text">
                        <string>Text</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QLabel" name="label_3">
+                      <property name="text">
+                       <string>Number</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <layout class="QHBoxLayout" name="horizontalLayout_12">
+                      <item>
+                       <widget class="QSpinBox" name="spnLoremNumber">
+                        <property name="maximum">
+                         <number>4096</number>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="btnLoremGenerate">
+                      <property name="text">
+                       <string>Generate</string>
                       </property>
                      </widget>
                     </item>
@@ -783,7 +808,13 @@
                    </layout>
                   </item>
                   <item>
-                   <widget class="QPlainTextEdit" name="txtLorem"/>
+                   <widget class="QPlainTextEdit" name="txtLorem">
+                    <property name="font">
+                     <font>
+                      <family>Courier 10 Pitch</family>
+                     </font>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
@@ -801,7 +832,13 @@
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_9">
                   <item>
-                   <widget class="QPlainTextEdit" name="txtBase64_1"/>
+                   <widget class="QPlainTextEdit" name="txtBase64_1">
+                    <property name="font">
+                     <font>
+                      <family>Courier 10 Pitch</family>
+                     </font>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -935,7 +972,13 @@
                 <item>
                  <layout class="QVBoxLayout" name="verticalLayout_8">
                   <item>
-                   <widget class="QPlainTextEdit" name="txtBase64_2"/>
+                   <widget class="QPlainTextEdit" name="txtBase64_2">
+                    <property name="font">
+                     <font>
+                      <family>Courier 10 Pitch</family>
+                     </font>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_9">

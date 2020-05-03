@@ -252,13 +252,13 @@ class MainWindow(QMainWindow):
         self.statusBar.addPermanentWidget(self.lblClock)
         
         self.lblClockWake = QLabel()
-        self.lblClockWake.setPixmap(QPixmap("pix/silk/icons/clock.png"))
+        self.lblClockWake.setPixmap(QPixmap("pix/silk/icons/clock_gray.png"))
         self.lblClockWake.mousePressEvent = self.doClockWake
         self.lblClockTimer = QLabel()
-        self.lblClockTimer.setPixmap(QPixmap("pix/silk/icons/time.png"))
+        self.lblClockTimer.setPixmap(QPixmap("pix/silk/icons/time_gray.png"))
         self.lblClockTimer.mousePressEvent = self.doClockTimer
         self.lblClockWatch = QLabel()
-        self.lblClockWatch.setPixmap(QPixmap("pix/silk/icons/hourglass.png"))
+        self.lblClockWatch.setPixmap(QPixmap("pix/silk/icons/hourglass_gray.png"))
         self.lblClockWatch.mousePressEvent = self.doClockWatch
         self.statusBar.addPermanentWidget(self.lblClockWake)
         self.statusBar.addPermanentWidget(self.lblClockTimer)
