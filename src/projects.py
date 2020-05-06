@@ -259,7 +259,7 @@ class DlgExportProject(QDialog):
         dlg = QFileDialog.getExistingDirectory(self, 'Select a directory', self.txtExportFolder.text())
         if dlg:
             self.txtExportFolder.setText(str(dlg))
-    
+            
 #-------------------------------------------------------------------------------
 # class Project
 #-------------------------------------------------------------------------------
@@ -302,7 +302,10 @@ class Project():
             tabEditor = self.openFile(mainFile)
         self.parent.setWindowTitle(self.name + " - " + const.APPLICATION_NAME)
         self.parent.lblProject.setText(self.name)
-        self.parent.lblProjectName.setText("%s (%s)" % (self.name, self.getTimeProject()))
+        if settings.db['PROJECT_DISPLAY_TIME'] == True:
+            self.parent.lblProjectName.setText("%s (%s)" % (self.name, self.getTimeProject()))
+        else:
+            self.parent.lblProjectName.setText("%s" % (self.name))
         self.refreshStatus()        
         self.startSession()
         
