@@ -2174,10 +2174,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionBside"/>
+   <addaction name="separator"/>
    <addaction name="actionNewProject"/>
    <addaction name="actionOpenProject"/>
    <addaction name="actionCloseProject"/>
-   <addaction name="separator"/>
    <addaction name="actionOpenFile"/>
    <addaction name="actionScratchFile"/>
    <addaction name="actionNewAnonymousFile"/>
@@ -2189,6 +2189,8 @@
    <addaction name="actionRunScript"/>
    <addaction name="actionPythonHelp"/>
    <addaction name="separator"/>
+   <addaction name="actionSplitVertical"/>
+   <addaction name="actionSplitHorizontal"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -2439,6 +2441,24 @@
    </property>
    <property name="text">
     <string>Bside</string>
+   </property>
+  </action>
+  <action name="actionSplitVertical">
+   <property name="icon">
+    <iconset>
+     <normaloff>pix/silk/icons/application_tile_horizontal.png</normaloff>pix/silk/icons/application_tile_horizontal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Vertical</string>
+   </property>
+  </action>
+  <action name="actionSplitHorizontal">
+   <property name="icon">
+    <iconset>
+     <normaloff>pix/silk/icons/application_split.png</normaloff>pix/silk/icons/application_split.png</iconset>
+   </property>
+   <property name="text">
+    <string>Split Horizontal</string>
    </property>
   </action>
  </widget>

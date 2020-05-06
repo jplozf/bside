@@ -79,6 +79,10 @@ class MainWindow(QMainWindow):
     CurrentDir = os.path.splitdrive(os.path.dirname(os.path.realpath(__file__)))[1]
     aCommands = []
     iCommands = 0
+    fullSplitHorizontal = False
+    fullSplitVertical = False
+    sizesHorizontal = []
+    sizesVertical = []
     aSQL = []
     iSQL = 0
     tools = []
@@ -132,6 +136,8 @@ class MainWindow(QMainWindow):
         self.actionPackages.triggered.connect(self.doPackagesAction)
         self.actionWelcome.triggered.connect(self.welcome)
         self.actionAddTools.triggered.connect(lambda x, mw=self : tools.manageTools(mw))
+        self.actionSplitHorizontal.triggered.connect(self.splitHorizontalResize)
+        self.actionSplitVertical.triggered.connect(self.splitVerticalResize)        
         
         self.txtBackgroundColor.setText(self.bgColor)
         self.txtForegroundColor.setText(self.fgColor)
@@ -315,6 +321,38 @@ class MainWindow(QMainWindow):
             if settings.db['BSIDE_DISPLAY_WELCOME'] == True:
                 self.welcome()
             self.tbwHighRight.setCurrentIndex(0)              
+
+#-------------------------------------------------------------------------------
+# splitHorizontalResize()
+#-------------------------------------------------------------------------------
+    def splitHorizontalResize(self):
+        if self.fullSplitHorizontal == False:
+            self.sizesHorizontal = self.rightSplitter.sizes()
+            szTotal = self.sizesHorizontal[0] + self.sizesHorizontal[1]
+            sz0 = int(szTotal)
+            sz1 = int(0)
+            szSplitter = [sz0, sz1]
+            self.rightSplitter.setSizes(szSplitter)
+            self.fullSplitHorizontal = True
+        else:
+            self.rightSplitter.setSizes(self.sizesHorizontal)
+            self.fullSplitHorizontal = False
+    
+#-------------------------------------------------------------------------------
+# splitVerticalResize()
+#-------------------------------------------------------------------------------
+    def splitVerticalResize(self):
+        if self.fullSplitVertical == False:
+            self.sizesVertical = self.mainSplitter.sizes()
+            szTotal = self.sizesVertical[0] + self.sizesVertical[1]
+            sz1 = int(szTotal)
+            sz0 = int(0)
+            szSplitter = [sz0, sz1]
+            self.mainSplitter.setSizes(szSplitter)
+            self.fullSplitVertical = True
+        else:
+            self.mainSplitter.setSizes(self.sizesVertical)
+            self.fullSplitVertical = False
 
 #-------------------------------------------------------------------------------
 # doClockWake()
@@ -564,6 +602,8 @@ class MainWindow(QMainWindow):
         result = QMessageBox.question(self, "Confirm Exit", "Are you sure you want to quit ?", QMessageBox.Yes | QMessageBox.No)        
         if result == QMessageBox.Yes:
             self.timer.stop()
+            # Close project
+            self.project.endSession()
             # Close TODO database
             self.curTODO.close()
             self.dbTODO.close()

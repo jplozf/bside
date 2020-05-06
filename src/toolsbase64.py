@@ -17,6 +17,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 import base64
 import hashlib 
+import re
+import random
 
 import utils
 
@@ -83,6 +85,37 @@ def doLeet(mw, fromText, way):
     message = srcText.toPlainText()
     dstText.setPlainText(message.translate(leet))
     
+#-------------------------------------------------------------------------------
+# doClever()
+#-------------------------------------------------------------------------------
+def doClever(mw, fromText, way):
+    if fromText == ONE:
+        srcText = mw.txtBase64_1
+        dstText = mw.txtBase64_2
+    else:
+        srcText = mw.txtBase64_2
+        dstText = mw.txtBase64_1    
+
+    message = srcText.toPlainText()
+    clever = ""
+    words = re.findall('\w+', message)
+    for word in words:
+        clever = clever + scramble(word) + " "
+    
+    dstText.setPlainText(clever)
+    
+#-------------------------------------------------------------------------------
+# scramble()
+#-------------------------------------------------------------------------------
+def scramble(word):
+    if len(word)>3:
+        shStr = list(word[1:-1])
+        random.shuffle(shStr)
+        sword = word[0] + "".join(shStr) + word[-1]
+    else:
+        sword = word
+    return sword
+
 #-------------------------------------------------------------------------------
 # doNTLM()
 #-------------------------------------------------------------------------------
@@ -335,6 +368,7 @@ algos = [
     ['Base64', True, lambda mw, fromText, way : doBase64(mw, fromText, way)],
     ['ROT13', True, lambda mw, fromText, way : doROT13(mw, fromText, way)],
     ['1337', False, lambda mw, fromText, way : doLeet(mw, fromText, way)],
+    ['Clever', False, lambda mw, fromText, way : doClever(mw, fromText, way)],
     ['NTLM', False, lambda mw, fromText, way : doNTLM(mw, fromText, way)],    
     ['md4', False, lambda mw, fromText, way : doMd4(mw, fromText, way)],
     ['md5', False, lambda mw, fromText, way : doMd5(mw, fromText, way)],    

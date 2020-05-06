@@ -21,7 +21,7 @@ import lxml.etree
 import lxml.builder    
 import xml.etree.ElementTree as ET
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from string import Template
 import time
 
@@ -302,10 +302,9 @@ class Project():
             tabEditor = self.openFile(mainFile)
         self.parent.setWindowTitle(self.name + " - " + const.APPLICATION_NAME)
         self.parent.lblProject.setText(self.name)
-        self.parent.lblProjectName.setText(self.name)
-        self.refreshStatus()
-        
-        self.timeStart = datetime.now()
+        self.parent.lblProjectName.setText("%s (%s)" % (self.name, self.getTimeProject()))
+        self.refreshStatus()        
+        self.startSession()
         
         # TODO : Read metadata from XML project.bsix file
         # Name (Project = Package)
@@ -543,40 +542,12 @@ class Project():
         TagCreated = E.created
         TagModified = E.modified
         TagMain = E.main
-        TagTimeSpent = E.TimeSpent
 
         XMLDoc = TagProject(
                     TagBSide(const.VERSION),
                     TagCreated(datetime.now().strftime("%Y/%m/%d-%H:%M:%S")),
                     TagModified(datetime.now().strftime("%Y/%m/%d-%H:%M:%S")),
                     TagMain(module),
-                    TagTimeSpent("0:00"),
-                    name=self.name
-                    )
-
-        projectFull = os.path.join(self.path, const.PROJECT_FILE_NAME)
-        with open(projectFull, "w") as projectFile:
-            projectFile.write('<?xml version="1.0" encoding="UTF-8"?>\n')  
-            projectFile.write(lxml.etree.tostring(XMLDoc, pretty_print=True).decode("utf-8"))    
-
-#-------------------------------------------------------------------------------
-# updateXMLProjectFile()
-#-------------------------------------------------------------------------------
-    def updateXMLProjectFile(self, module):   
-        E = lxml.builder.ElementMaker()
-        TagProject = E.project
-        TagBSide = E.bside
-        TagCreated = E.created
-        TagModified = E.modified
-        TagMain = E.main
-        TagTimeSpent = E.TimeSpent
-
-        XMLDoc = TagProject(
-                    TagBSide(const.VERSION),
-                    TagCreated(datetime.now().strftime("%Y/%m/%d-%H:%M:%S")),
-                    TagModified(datetime.now().strftime("%Y/%m/%d-%H:%M:%S")),
-                    TagMain(module),
-                    TagTimeSpent("0:00"),
                     name=self.name
                     )
 
@@ -585,6 +556,52 @@ class Project():
             projectFile.write('<?xml version="1.0" encoding="UTF-8"?>\n')  
             projectFile.write(lxml.etree.tostring(XMLDoc, pretty_print=True).decode("utf-8"))    
             
+#-------------------------------------------------------------------------------
+# startSession()
+#-------------------------------------------------------------------------------
+    def startSession(self):
+        self.session = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+            
+#-------------------------------------------------------------------------------
+# endSession()
+#-------------------------------------------------------------------------------
+    def endSession(self):
+        filename = os.path.join(self.path, const.PROJECT_FILE_NAME)
+        parser = lxml.etree.XMLParser(remove_blank_text=True)
+        tree = lxml.etree.parse(filename, parser)
+        root = tree.getroot()
+        # Targeting <SESSIONS> tag
+        sessions = root.find('.//sessions')
+        if sessions is None:
+            # Creating <SESSIONS> tag if it not exists
+            sessions = lxml.etree.SubElement(root, 'sessions')
+        # Creating the current <SESSION> tag
+        session = lxml.etree.SubElement(sessions, 'session')
+        session.set("start", self.session)
+        session.set("end", datetime.now().strftime("%Y/%m/%d-%H:%M:%S"))
+        # Appending the <SESSION> tag to the <SESSIONS>
+        sessions.insert(root.index(sessions) + 1, session)
+        # Writing all
+        tree.write(filename, pretty_print=True)
+
+#-------------------------------------------------------------------------------
+# getTimeProject()
+#-------------------------------------------------------------------------------
+    def getTimeProject(self):
+        filename = os.path.join(self.path, const.PROJECT_FILE_NAME)
+        parser = lxml.etree.XMLParser(remove_blank_text=True)
+        tree = lxml.etree.parse(filename, parser)
+        sessions = tree.xpath('//project/sessions/session')
+        # Create blank timedelta object
+        d = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+        for session in sessions:
+            # Compute time of each session
+            d1 = datetime.strptime(session.get('start'), "%Y/%m/%d-%H:%M:%S")
+            d2 = datetime.strptime(session.get('end'), "%Y/%m/%d-%H:%M:%S")
+            # Sum the full time of sessions
+            d = d + (d2 - d1)
+        return(str(d))
+                        
 #-------------------------------------------------------------------------------
 # newModule()
 #-------------------------------------------------------------------------------
