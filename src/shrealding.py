@@ -33,6 +33,7 @@ class Shreald(QThread):
     def __init__(self, parent, cmd):
         super(Shreald, self).__init__(parent)
         self.cmd = cmd
+        self.mw = parent
         self.daemon = True
         self.start()
 
@@ -54,15 +55,16 @@ class Shreald(QThread):
             while True:
                 try:
                     line = q.get_nowait()
-                    # print(line)
                     self.linePrinted.emit(line)
+                    if line[0] == 'x':
+                        break
                 except:
                     pass
                 
             tp.join()
             to.join()
-            te.join()                        
-                   
+            te.join()
+                           
 #-------------------------------------------------------------------------------
 # enqueueStream()
 #-------------------------------------------------------------------------------
