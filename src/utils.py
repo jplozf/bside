@@ -20,6 +20,10 @@ import datetime
 from datetime import datetime
 from dateutil import tz
 import pkg_resources
+import threading
+import subprocess
+import traceback
+import shlex
 
 #-------------------------------------------------------------------------------
 # isBinaryFile()
@@ -66,11 +70,14 @@ def getDirSize(start_path = '.'):
 # getDirSize()
 #---------------------------------------------------------------------------
 def getDirSize2(path, follow_symlinks=False):
-    try:
-        with os.scandir(path) as it:
-            return sum(getDirSize2(entry, follow_symlinks=follow_symlinks) for entry in it)
-    except NotADirectoryError:
-        return os.stat(path, follow_symlinks=follow_symlinks).st_size
+    if os.path.exists(path):
+        try:
+            with os.scandir(path) as it:
+                return sum(getDirSize2(entry, follow_symlinks=follow_symlinks) for entry in it)
+        except NotADirectoryError:
+            return os.stat(path, follow_symlinks=follow_symlinks).st_size
+    else:
+        return 0
 
 #---------------------------------------------------------------------------
 # UnixTime2DateTime()
@@ -362,3 +369,41 @@ def isColorName(sColor):
 >>> time.mktime(datetime.datetime.strptime(s, "%d/%m/%Y").timetuple())
 1322697600.0
 """
+
+#---------------------------------------------------------------------------
+# Class ThreadedCommand2
+#---------------------------------------------------------------------------
+class ThreadedCommand2(object):
+    '''
+    Enables to run subprocess commands in a different thread
+    with TIMEOUT option!
+
+    Based on jcollado's solution:
+    http://stackoverflow.com/questions/1191374/subprocess-with-timeout/4825933#4825933
+    '''
+#---------------------------------------------------------------------------
+# __init__()
+#---------------------------------------------------------------------------
+    def __init__(self, cmd):
+        self.cmd = cmd
+        self.process = None
+        self.out = None
+        self.err = None
+
+#---------------------------------------------------------------------------
+# run()
+#---------------------------------------------------------------------------
+    def run(self, timeout=0, **kwargs):
+        def target(**kwargs):
+            self.process = subprocess.Popen(self.cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
+            self.out, self.err = self.process.communicate(timeout=1)
+
+        thread = threading.Thread(target=target, kwargs=kwargs)
+        thread.start()
+
+        thread.join(timeout)
+        if thread.is_alive():
+            self.process.terminate()
+            thread.join()
+
+        return self.process.returncode

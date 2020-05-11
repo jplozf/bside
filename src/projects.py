@@ -292,23 +292,27 @@ class Project():
         print("PROJECT %s" % self.name)
         self.parent.showMessage("Opening project %s" % self.name)
         self.path = os.path.join(settings.db['BSIDE_REPOSITORY'], self.name)
-        self.parent.tvmProject.setRootPath(self.path)        
-        self.parent.tvwProject.setRootIndex(self.parent.tvmProject.index(self.path))
-        self.parent.tbwHighLeft.setCurrentIndex(1)
-        tabEditor = None
-        mainFile = None
-        if raw == False:
-            mainFile = self.getMainModule(self.path)
-            tabEditor = self.openFile(mainFile)
-        self.parent.setWindowTitle(self.name + " - " + const.APPLICATION_NAME)
-        self.parent.lblProject.setText(self.name)
-        if settings.db['PROJECT_DISPLAY_TIME'] == True:
-            self.parent.lblProjectName.setText("%s (%s)" % (self.name, self.getTimeProject()))
+        if os.path.exists(self.path):
+            self.parent.tvmProject.setRootPath(self.path)        
+            self.parent.tvwProject.setRootIndex(self.parent.tvmProject.index(self.path))
+            self.parent.tbwHighLeft.setCurrentIndex(1)
+            tabEditor = None
+            mainFile = None
+            if raw == False:
+                mainFile = self.getMainModule(self.path)
+                tabEditor = self.openFile(mainFile)
+            self.parent.setWindowTitle(self.name + " - " + const.APPLICATION_NAME)
+            self.parent.lblProject.setText(self.name)
+            if settings.db['PROJECT_DISPLAY_TIME'] == True:
+                self.parent.lblProjectName.setText("%s (%s)" % (self.name, self.getTimeProject()))
+            else:
+                self.parent.lblProjectName.setText("%s" % (self.name))
+            self.refreshStatus()        
+            self.startSession()
+            return True
         else:
-            self.parent.lblProjectName.setText("%s" % (self.name))
-        self.refreshStatus()        
-        self.startSession()
-        
+            self.parent.showMessage("Can't find project %s" % self.name)
+            return False
         # TODO : Read metadata from XML project.bsix file
         # Name (Project = Package)
         # Path
@@ -321,7 +325,7 @@ class Project():
         # Time spent
         # Files
         
-        return (tabEditor, mainFile)
+        # return (tabEditor, mainFile)
         
 #-------------------------------------------------------------------------------
 # refreshStatus()

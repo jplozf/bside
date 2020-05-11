@@ -49,6 +49,7 @@ import tools
 import todomgr
 import lorem
 import toolsbase64
+import shrealding
 
 #-------------------------------------------------------------------------------
 # resource_path()
@@ -293,30 +294,30 @@ class MainWindow(QMainWindow):
             self.showMessage("Restoring workspace")
             db = workspace.restoreWorkspace()
             self.project.set(db["PROJECT"])
-            self.project.open(raw=True)            
-            tabs = db["TABS"]
-            for i in range(len(tabs)):
-                print(tabs[i])
-                if tabs[i][0] == "Welcome":
-                    self.welcome()
-                elif tabs[i][0] == "Settings":
-                    self.settings()
-                elif tabs[i][0] == "WEditor":
-                    self.doEditFile(tabs[i][1])
-                elif tabs[i][0] == "WMarkdown":
-                    self.doEditFile(tabs[i][1])
-                elif tabs[i][0] == "WHexedit":
-                    self.doEditFile(tabs[i][1], syntax="binary")
-                elif tabs[i][0] == "WXInter" or tabs[i][0] == "LXInter" or tabs[i][0] == "WInter":
-                    self.newPynter()
-                elif tabs[i][0] == "WXShell" or tabs[i][0] == "LXShell" or tabs[i][0] == "WShell":
-                    self.newShell()
-                elif tabs[i][0] == "TabPIP":
-                    self.doPackagesAction()
-                elif tabs[i][0] == "Help":
-                    self.about()
-            self.tbwHighRight.setCurrentIndex(db["CURRENT_TAB"])
-            self.tbwLowRight.setCurrentIndex(db["CURRENT_LOW_TAB"])
+            if self.project.open(raw=True):
+                tabs = db["TABS"]
+                for i in range(len(tabs)):
+                    print(tabs[i])
+                    if tabs[i][0] == "Welcome":
+                        self.welcome()
+                    elif tabs[i][0] == "Settings":
+                        self.settings()
+                    elif tabs[i][0] == "WEditor":
+                        self.doEditFile(tabs[i][1])
+                    elif tabs[i][0] == "WMarkdown":
+                        self.doEditFile(tabs[i][1])
+                    elif tabs[i][0] == "WHexedit":
+                        self.doEditFile(tabs[i][1], syntax="binary")
+                    elif tabs[i][0] == "WXInter" or tabs[i][0] == "LXInter" or tabs[i][0] == "WInter":
+                        self.newPynter()
+                    elif tabs[i][0] == "WXShell" or tabs[i][0] == "LXShell" or tabs[i][0] == "WShell":
+                        self.newShell()
+                    elif tabs[i][0] == "TabPIP":
+                        self.doPackagesAction()
+                    elif tabs[i][0] == "Help":
+                        self.about()
+                self.tbwHighRight.setCurrentIndex(db["CURRENT_TAB"])
+                self.tbwLowRight.setCurrentIndex(db["CURRENT_LOW_TAB"])
         else:
             if settings.db['BSIDE_DISPLAY_WELCOME'] == True:
                 self.welcome()
@@ -1789,9 +1790,60 @@ class MainWindow(QMainWindow):
         self.openFileFromName(name)
         
 #-------------------------------------------------------------------------------
-# runScript()
+# runScript3()
 #-------------------------------------------------------------------------------
-    def runScript(self):
+    def runScript3(self):
+        tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())        
+        if tabEditor.filename is not None:
+            if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
+                tabEditor.saveFile()     
+            pybin = sys.executable
+            script = tabEditor.filename    
+            
+            dlg = dialog.DlgRunScript(script)
+            dlg.exec()
+            if dlg.result() != 0:
+                self.showMessage("=" * 80)
+                self.showMessage("Run script %s" % script)
+                self.showMessage("Parameters [%s]" % dlg.params)
+                self.showMessage("External Shell %s" % str(dlg.externalShell))
+                cmd = "%s %s %s" % (pybin, script, dlg.params)
+                if dlg.externalShell == True:
+                    self.btnKillProcess.setEnabled(False)
+                    if platform.system() == 'Windows':
+                        os.system("start /wait cmd /c \"%s & pause\"" % cmd)
+                    else:
+                        os.system("gnome-terminal -e 'bash -c \"%s; echo; read -p Paused\"'" % cmd)
+                    self.showMessage("End of running script %s" % script)
+                    self.showMessage("=" * 80)                
+                else:
+                    cmd = "%s %s %s" % (pybin, script, dlg.params)
+                    self.btnKillProcess.setEnabled(True)
+                    self.tbwLowRight.setCurrentIndex(0)
+                    QGuiApplication.processEvents() 
+                    # TODO : Run process in a separate thread
+                    self.tCmd = utils.ThreadedCommand(cmd)
+                    self.tCmd.run(timeout=1, shell=True)
+                    sOut = self.tCmd.out.decode("utf-8") 
+                    sErr = self.tCmd.err.decode("utf-8") 
+                    result = sOut.split('\n')
+                    for lin in result:
+                        if len(lin.rstrip()) != 0:
+                            self.outputMessage("[OUT] %s" % lin.rstrip())
+                    result = sErr.split('\n')
+                    for lin in result:
+                        if len(lin.rstrip()) != 0:
+                            self.outputMessage("[ERR] %s" % lin.rstrip())
+                    self.showMessage("End of running script %s" % script)
+                    self.showMessage("=" * 80)
+                    # self.btnKillProcess.setEnabled(False)
+            else:
+                self.showMessage("Cancel running script %s" % script)   
+                
+#-------------------------------------------------------------------------------
+# runScript2()
+#-------------------------------------------------------------------------------
+    def runScript2(self):
         tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())        
         if tabEditor.filename is not None:
             if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
@@ -1839,10 +1891,69 @@ class MainWindow(QMainWindow):
                 self.showMessage("Cancel running script %s" % script)        
         
 #-------------------------------------------------------------------------------
+# runScript()
+#-------------------------------------------------------------------------------
+    def runScript(self):
+        tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())        
+        if tabEditor.filename is not None:
+            if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
+                tabEditor.saveFile()     
+            pybin = sys.executable
+            script = tabEditor.filename    
+            
+            dlg = dialog.DlgRunScript(script)
+            dlg.exec()
+            if dlg.result() != 0:
+                self.showMessage("=" * 80)
+                self.showMessage("Run script %s" % script)
+                self.showMessage("Parameters [%s]" % dlg.params)
+                self.showMessage("External Shell %s" % str(dlg.externalShell))
+                cmd = "%s %s %s" % (pybin, script, dlg.params)
+                if dlg.externalShell == True:
+                    self.btnKillProcess.setEnabled(False)
+                    if platform.system() == 'Windows':
+                        os.system("start /wait cmd /c \"%s & pause\"" % cmd)
+                    else:
+                        os.system("gnome-terminal -e 'bash -c \"%s; echo; read -p Paused\"'" % cmd)
+                    self.showMessage("End of running script %s" % script)
+                    self.showMessage("=" * 80)                
+                else:
+                    cmd = (pybin, "-u", script, dlg.params)
+                    self.btnKillProcess.setEnabled(True)
+                    self.tbwLowRight.setCurrentIndex(0)
+                    QGuiApplication.processEvents()                     
+                    # self.tCmd = shrealding.Shreald(self, "%s -u %s" % (pybin, script))
+                    self.tCmd = shrealding.Shreald(self, cmd)
+                    # self.showMessage("Starting application with PID %s" % str(self.tCmd.process.pid))
+                    self.tCmd.linePrinted.connect(self.handleLine)                    
+            else:
+                self.showMessage("Cancel running script %s" % script)   
+
+#-------------------------------------------------------------------------------
+# handleLine()
+#-------------------------------------------------------------------------------
+    def handleLine(self, line):
+        if line !=  "":
+            # print("Handle %s" % line)
+            if line[0] == '1':
+                self.showMessage("[OUT] %s " % line[1:].rstrip())
+            elif line[0] == '2':
+                self.showMessage("[ERR] %s " % line[1:].rstrip())
+            elif line[0] == 'x':
+                self.killProcess()
+            
+#-------------------------------------------------------------------------------
 # killProcess()
 #-------------------------------------------------------------------------------
     def killProcess(self):        
-        self.procScript.kill()
+        self.showMessage("Killing application PID %s" % str(self.tCmd.process.pid))
+        self.showMessage("End of script %s" % str(self.tCmd.cmd[2]))
+        self.showMessage("=" * 80)                        
+        try:
+            self.tCmd.kill()
+        except:
+            pass
+        self.btnKillProcess.setEnabled(False)
         
 #-------------------------------------------------------------------------------
 # newProject()
