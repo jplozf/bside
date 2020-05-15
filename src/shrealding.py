@@ -23,6 +23,7 @@ from PyQt5.QtCore import QThread, pyqtSignal
 
 #-------------------------------------------------------------------------------
 # Class Shreald
+# Shrealding means "Shell in Thread"
 #-------------------------------------------------------------------------------
 class Shreald(QThread):
 
@@ -38,6 +39,7 @@ class Shreald(QThread):
         self.mw = parent
         self.shell = shell
         self.daemon = True
+        self.returncode = None
         print(cmd)
         self.start()
 
@@ -90,7 +92,7 @@ class Shreald(QThread):
 # enqueueProcess()
 #-------------------------------------------------------------------------------
     def enqueueProcess(self, process, queue):
-        process.wait()
+        self.returncode = process.wait()
         queue.put('x')
         self.mw.bgJob = self.mw.bgJob - 1
         

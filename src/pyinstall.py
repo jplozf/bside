@@ -263,3 +263,43 @@ def patchChars(s):
         ret.append(myChars.get(item, item)) # Try to get from dict, otherwise keep value
     return(" ".join(ret))
     
+"""
+                    cmd = (pybin, "-u", script, dlg.params)
+                    self.btnKillProcess.setEnabled(True)
+                    self.tbwLowRight.setCurrentIndex(0)
+                    QGuiApplication.processEvents()                     
+                    # self.tCmd = shrealding.Shreald(self, "%s -u %s" % (pybin, script))
+                    self.tCmd = shrealding.Shreald(self, cmd, os.path.dirname(script))
+                    self.tCmd.linePrinted.connect(self.handleLine)                    
+            else:
+                self.showMessage("Cancel running script %s" % script)   
+
+#-------------------------------------------------------------------------------
+# handleLine()
+#-------------------------------------------------------------------------------
+    def handleLine(self, line):
+        if line !=  "":
+            # print("Handle %s" % line)
+            if line[0] == '1':
+                self.showMessage("[OUT] %s " % line[1:].rstrip())
+            elif line[0] == '2':
+                self.showMessage("[ERR] %s " % line[1:].rstrip())
+            elif line[0] == 'x':
+                self.killProcess()
+            
+#-------------------------------------------------------------------------------
+# killProcess()
+#-------------------------------------------------------------------------------
+    def killProcess(self):        
+        self.showMessage("Killing application PID %s" % str(self.tCmd.process.pid))
+        self.showMessage("End of script %s" % str(self.tCmd.cmd[2]))
+        try:
+            self.tCmd.kill()
+        except:
+            pass
+        self.btnKillProcess.setEnabled(False)
+        self.showMessage("Return Code : %d" % self.tCmd.returncode)
+        self.showMessage("=" * 80)                        
+        
+
+"""        

@@ -430,8 +430,6 @@ class MainWindow(QMainWindow):
                 self.timeNoFocus2 = time.time()
                 self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
                 self.previousFocusState = self.HAS_FOCUS
-            print("has focus !")
-            print("lost focus for %s seconds" % str(self.timeNoFocus))
             self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock.png"))
             # self.setWindowOpacity(1.0)
         else:
@@ -439,7 +437,6 @@ class MainWindow(QMainWindow):
             if self.previousFocusState == self.HAS_FOCUS:
                 self.timeNoFocus1 = time.time()
                 self.previousFocusState = self.HAS_NOT_FOCUS
-            print("has not focus !")
             self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock_gray.png"))
             # self.setWindowOpacity(0.75)
         
@@ -1827,107 +1824,6 @@ class MainWindow(QMainWindow):
         self.openFileFromName(name)
         
 #-------------------------------------------------------------------------------
-# runScript3()
-#-------------------------------------------------------------------------------
-    def runScript3(self):
-        tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())        
-        if tabEditor.filename is not None:
-            if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
-                tabEditor.saveFile()     
-            pybin = sys.executable
-            script = tabEditor.filename    
-            
-            dlg = dialog.DlgRunScript(script)
-            dlg.exec()
-            if dlg.result() != 0:
-                self.showMessage("=" * 80)
-                self.showMessage("Run script %s" % script)
-                self.showMessage("Parameters [%s]" % dlg.params)
-                self.showMessage("External Shell %s" % str(dlg.externalShell))
-                cmd = "%s %s %s" % (pybin, script, dlg.params)
-                if dlg.externalShell == True:
-                    self.btnKillProcess.setEnabled(False)
-                    if platform.system() == 'Windows':
-                        os.system("start /wait cmd /c \"%s & pause\"" % cmd)
-                    else:
-                        os.system("gnome-terminal -e 'bash -c \"%s; echo; read -p Paused\"'" % cmd)
-                    self.showMessage("End of running script %s" % script)
-                    self.showMessage("=" * 80)                
-                else:
-                    cmd = "%s %s %s" % (pybin, script, dlg.params)
-                    self.btnKillProcess.setEnabled(True)
-                    self.tbwLowRight.setCurrentIndex(0)
-                    QGuiApplication.processEvents() 
-                    # TODO : Run process in a separate thread
-                    self.tCmd = utils.ThreadedCommand(cmd)
-                    self.tCmd.run(timeout=1, shell=True)
-                    sOut = self.tCmd.out.decode("utf-8") 
-                    sErr = self.tCmd.err.decode("utf-8") 
-                    result = sOut.split('\n')
-                    for lin in result:
-                        if len(lin.rstrip()) != 0:
-                            self.outputMessage("[OUT] %s" % lin.rstrip())
-                    result = sErr.split('\n')
-                    for lin in result:
-                        if len(lin.rstrip()) != 0:
-                            self.outputMessage("[ERR] %s" % lin.rstrip())
-                    self.showMessage("End of running script %s" % script)
-                    self.showMessage("=" * 80)
-                    # self.btnKillProcess.setEnabled(False)
-            else:
-                self.showMessage("Cancel running script %s" % script)   
-                
-#-------------------------------------------------------------------------------
-# runScript2()
-#-------------------------------------------------------------------------------
-    def runScript2(self):
-        tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())        
-        if tabEditor.filename is not None:
-            if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
-                tabEditor.saveFile()     
-            pybin = sys.executable
-            script = tabEditor.filename    
-            
-            dlg = dialog.DlgRunScript(script)
-            dlg.exec()
-            if dlg.result() != 0:
-                self.showMessage("=" * 80)
-                self.showMessage("Run script %s" % script)
-                self.showMessage("Parameters [%s]" % dlg.params)
-                self.showMessage("External Shell %s" % str(dlg.externalShell))
-                cmd = "%s %s %s" % (pybin, script, dlg.params)
-                if dlg.externalShell == True:
-                    if platform.system() == 'Windows':
-                        os.system("start /wait cmd /c \"%s & pause\"" % cmd)
-                    else:
-                        os.system("gnome-terminal -e 'bash -c \"%s; echo; read -p Paused\"'" % cmd)
-                    self.showMessage("End of running script %s" % script)
-                    self.showMessage("=" * 80)                
-                else:
-                    cmd = "%s %s %s" % (pybin, script, dlg.params)
-                    self.btnKillProcess.setEnabled(True)
-                    self.tbwLowRight.setCurrentIndex(0)
-                    QGuiApplication.processEvents() 
-                    # TODO : Run process in a separate thread
-                    self.procScript = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                    out, err = self.procScript.communicate()
-                    sOut = out.decode("utf-8") 
-                    sErr = err.decode("utf-8") 
-                    result = sOut.split('\n')
-                    for lin in result:
-                        if len(lin.rstrip()) != 0:
-                            self.outputMessage("[OUT] %s" % lin.rstrip())
-                    result = sErr.split('\n')
-                    for lin in result:
-                        if len(lin.rstrip()) != 0:
-                            self.outputMessage("[ERR] %s" % lin.rstrip())
-                    self.showMessage("End of running script %s" % script)
-                    self.showMessage("=" * 80)
-                    self.btnKillProcess.setEnabled(False)
-            else:
-                self.showMessage("Cancel running script %s" % script)        
-        
-#-------------------------------------------------------------------------------
 # runScript()
 #-------------------------------------------------------------------------------
     def runScript(self):
@@ -1984,12 +1880,13 @@ class MainWindow(QMainWindow):
     def killProcess(self):        
         self.showMessage("Killing application PID %s" % str(self.tCmd.process.pid))
         self.showMessage("End of script %s" % str(self.tCmd.cmd[2]))
-        self.showMessage("=" * 80)                        
         try:
             self.tCmd.kill()
         except:
             pass
         self.btnKillProcess.setEnabled(False)
+        self.showMessage("Return Code : %d" % self.tCmd.returncode)
+        self.showMessage("=" * 80)                        
         
 #-------------------------------------------------------------------------------
 # newProject()

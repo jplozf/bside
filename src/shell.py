@@ -290,6 +290,7 @@ class WShell(QWidget):
         if platform.system() == 'Windows':
             self.lblCDR.setText(self.CurrentDrive)
         self.lblPWD.setText(self.CurrentDir)
+        self.lblRC.setText("RC=%d" % self.tCmd.returncode)
         self.txtCommand.setEnabled(True)
         self.txtCommand.selectAll()
         self.txtCommand.setFocus()
