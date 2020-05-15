@@ -80,6 +80,13 @@
               </property>
              </spacer>
             </item>
+            <item>
+             <widget class="QLabel" name="lblFocusMode">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item row="1" column="0">
@@ -1213,7 +1220,7 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>600</width>
+                     <width>590</width>
                      <height>1290</height>
                     </rect>
                    </property>

@@ -62,6 +62,7 @@ defaultValues = [
     ['PROJECT_SITE', "www.yourcompany.org"],
     ['PROJECT_LICENSE', "gnu-gpl-v3.0"],
     ['PROJECT_DISPLAY_TIME', True],
+    ['PROJECT_USE_FOCUS_TIME', True],
     ['BACKUP_PATH', "~/Documents/Backup"],
     ['BACKUP_RETAINS', 5],
     ['BACKUP_ENABLED', True],

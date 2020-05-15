@@ -15,7 +15,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from subprocess import Popen, PIPE
+from subprocess import PIPE
 import platform
 import socket
 import time
@@ -180,83 +180,6 @@ class WShell(QWidget):
         self.txtConsoleOut.append("")
         self.txtCommand.setFocus()
         
-#-------------------------------------------------------------------------------
-# runCommand2()
-#-------------------------------------------------------------------------------
-    def runCommand2(self):        
-        self.flagBusy = True
-        self.btnEnter.setEnabled(False)
-        # self.statusBar.showMessage("Running...", settings.dbSettings['TIMER_STATUS'])
-        self.lblLED.setPixmap(QPixmap("pix/icons/led_red.png"))
-        self.repaint()
-        self.aCommands.append(self.txtCommand.text())
-        self.iCommands = self.iCommands + 1        
-        command = str(self.txtCommand.text()).strip()        
-        # if self.chkClearConsole.isChecked():
-        #     self.txtConsoleOut.setText("")
-        if command == "cls" or command == "clear":
-            self.txtConsoleOut.setText("")
-            # self.statusBar.showMessage("Command executed", settings.dbSettings['TIMER_STATUS'])
-        elif command == "quit" or command == "exit":
-            self.close()
-        elif command[1:2] == ":":
-            self.CurrentDrive = command[0:2].upper()
-            self.CurrentDir = os.sep
-            # self.statusBar.showMessage("Current drive changed", settings.dbSettings['TIMER_STATUS'])
-        elif command[0:3] == "cd ":
-            self.CurrentDir = os.path.abspath(command[3:])
-            # self.statusBar.showMessage("Current directory changed", settings.dbSettings['TIMER_STATUS'])
-        else:
-            self.txtConsoleOut.append(settings.db['SHELL_PROMPT'] + command + "\n")
-            time1 = time.time()
-            # p = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=1, universal_newlines=True, shell = True)
-            p = Popen(command, cwd=os.path.join(self.CurrentDrive, self.CurrentDir), stdin=PIPE, stdout=PIPE, stderr=PIPE, bufsize=1, shell = True)
-            p.poll()
-            while True:
-                line = p.stdout.readline()
-                if self.CurrentOS == "Windows":
-                    sLine = line.decode(settings.db['SHELL_CODEPAGE']).rstrip()
-                    oLine = self.patchChars(sLine)
-                    self.txtConsoleOut.append(oLine)
-                else:
-                    self.txtConsoleOut.append(line.decode(settings.db['SHELL_CODEPAGE']).rstrip())
-                self.repaint()
-                if not line and p.poll is not None: 
-                    break
-
-            while True:
-                err = p.stderr.readline()
-                if self.CurrentOS == "Windows":
-                    sLine = err.decode(settings.db['SHELL_CODEPAGE']).rstrip()
-                    oLine = self.patchChars(sLine)
-                    self.txtConsoleOut.append(oLine)
-                else:
-                    self.txtConsoleOut.append(err.decode(settings.db['SHELL_CODEPAGE']).rstrip())
-                self.repaint()
-                if not err and p.poll is not None: 
-                    break
-
-            self.txtConsoleOut.moveCursor(QTextCursor.End)
-            rc = p.poll()
-            self.lblRC.setText("RC=" + str(rc))
-            if rc != 0:
-                self.lblRC.setStyleSheet('background-color : red; color: white')
-            else:
-                self.lblRC.setStyleSheet('background-color:' + self.colLabel.name() + '; color: black')
-            time2 = time.time()
-            elapsed = (time2-time1)*1000.0
-            # self.statusBar.showMessage("Command executed in {:.3f} ms".format(elapsed), settings.dbSettings['TIMER_STATUS'])
-            self.lblTime.setText("{:.3f} ms".format(elapsed))
-        # self.tabWidget.setCurrentIndex(0)
-        self.flagBusy = False
-        self.btnEnter.setEnabled(True)
-        if platform.system() == 'Windows':
-            self.lblCDR.setText(self.CurrentDrive)
-        self.lblPWD.setText(self.CurrentDir)
-        self.lblLED.setPixmap(QPixmap("pix/icons/led_green.png"))
-        self.txtCommand.selectAll()
-        self.txtCommand.setFocus()
-
 #-------------------------------------------------------------------------------
 # patchChars()
 #-------------------------------------------------------------------------------

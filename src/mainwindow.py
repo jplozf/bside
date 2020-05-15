@@ -28,6 +28,7 @@ import datetime
 from os.path import expanduser
 from os import path
 import sqlite3
+import time
 
 import settings
 import const
@@ -71,6 +72,8 @@ def resource_path(relative_path):
 #-------------------------------------------------------------------------------
 class MainWindow(QMainWindow):
     EXIT_CODE_REBOOT = -123
+    HAS_FOCUS = 0
+    HAS_NOT_FOCUS = 1
     appDir = ""
     noname = 0
     nopyth = 0
@@ -93,7 +96,12 @@ class MainWindow(QMainWindow):
     tick = 0
     bgJob = 0
     SQLDatabase = ":memory:"
-
+    timeNoFocus = 0
+    timeNoFocus1 = 0
+    timeNoFocus2 = 0
+    focusState = HAS_FOCUS
+    previousFocusState = HAS_FOCUS
+    
 #-------------------------------------------------------------------------------
 # __init__()
 #-------------------------------------------------------------------------------
@@ -322,8 +330,8 @@ class MainWindow(QMainWindow):
         else:
             if settings.db['BSIDE_DISPLAY_WELCOME'] == True:
                 self.welcome()
-            self.tbwHighRight.setCurrentIndex(0)              
-
+            self.tbwHighRight.setCurrentIndex(0) 
+            
 #-------------------------------------------------------------------------------
 # splitHorizontalResize()
 #-------------------------------------------------------------------------------
@@ -415,6 +423,25 @@ class MainWindow(QMainWindow):
     def timerCount(self):
         process = psutil.Process(os.getpid())                
         self.lblMemory.setText("{:.1f}".format(process.memory_info().rss/1024/1024) + " MB ")
+        
+        if QApplication.activeWindow() == self:
+            self.focusState = self.HAS_FOCUS
+            if self.previousFocusState == self.HAS_NOT_FOCUS:
+                self.timeNoFocus2 = time.time()
+                self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
+                self.previousFocusState = self.HAS_FOCUS
+            print("has focus !")
+            print("lost focus for %s seconds" % str(self.timeNoFocus))
+            self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock.png"))
+            # self.setWindowOpacity(1.0)
+        else:
+            self.focusState = self.HAS_NOT_FOCUS
+            if self.previousFocusState == self.HAS_FOCUS:
+                self.timeNoFocus1 = time.time()
+                self.previousFocusState = self.HAS_NOT_FOCUS
+            print("has not focus !")
+            self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock_gray.png"))
+            # self.setWindowOpacity(0.75)
         
         if self.bgJob == 0:
             self.tick = self.tick + 1
@@ -606,6 +633,12 @@ class MainWindow(QMainWindow):
         if result == QMessageBox.Yes:
             self.timer.stop()
             # Close project
+            self.focusState = self.HAS_FOCUS
+            if self.previousFocusState == self.HAS_NOT_FOCUS:
+                self.timeNoFocus2 = time.time()
+                self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
+                self.previousFocusState = self.HAS_FOCUS
+            self.project.timeNoFocus = self.timeNoFocus
             self.project.endSession()
             # Close TODO database
             self.curTODO.close()

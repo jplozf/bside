@@ -271,6 +271,7 @@ class Project():
     timeStart = 0
     files = []
     openFiles = []
+    timeNoFocus = 0
     
 #-------------------------------------------------------------------------------
 # __init__()
@@ -584,8 +585,17 @@ class Project():
             sessions = lxml.etree.SubElement(root, 'sessions')
         # Creating the current <SESSION> tag
         session = lxml.etree.SubElement(sessions, 'session')
+        endSession = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
         session.set("start", self.session)
-        session.set("end", datetime.now().strftime("%Y/%m/%d-%H:%M:%S"))
+        session.set("end", endSession)
+        d = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+        d1 = datetime.strptime(self.session, "%Y/%m/%d-%H:%M:%S")
+        d2 = datetime.strptime(endSession, "%Y/%m/%d-%H:%M:%S")
+        # Sum the full time of sessions
+        d = d + (d2 - d1)
+        timeFocus = d.total_seconds() - self.timeNoFocus        
+        # session.set("focus", str(timedelta(seconds=timeFocus)))
+        session.set("focus", str(int(timeFocus)))
         # Appending the <SESSION> tag to the <SESSIONS>
         sessions.insert(root.index(sessions) + 1, session)
         # Writing all
@@ -601,13 +611,20 @@ class Project():
         sessions = tree.xpath('//project/sessions/session')
         # Create blank timedelta object
         d = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+        s = 0
         for session in sessions:
             # Compute time of each session
-            d1 = datetime.strptime(session.get('start'), "%Y/%m/%d-%H:%M:%S")
-            d2 = datetime.strptime(session.get('end'), "%Y/%m/%d-%H:%M:%S")
-            # Sum the full time of sessions
-            d = d + (d2 - d1)
-        return(str(d))
+            if settings.db['PROJECT_USE_FOCUS_TIME'] == True:
+                s = s + int((session.get('focus')))                
+            else:
+                d1 = datetime.strptime(session.get('start'), "%Y/%m/%d-%H:%M:%S")
+                d2 = datetime.strptime(session.get('end'), "%Y/%m/%d-%H:%M:%S")
+                # Sum the full time of sessions
+                d = d + (d2 - d1)
+        if settings.db['PROJECT_USE_FOCUS_TIME'] == True:
+            return(str(timedelta(seconds=s)))
+        else:
+            return(str(d))
                         
 #-------------------------------------------------------------------------------
 # newModule()
