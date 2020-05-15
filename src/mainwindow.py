@@ -91,6 +91,7 @@ class MainWindow(QMainWindow):
     lastProject = None
     debug = False
     tick = 0
+    bgJob = 0
     SQLDatabase = ":memory:"
 
 #-------------------------------------------------------------------------------
@@ -414,14 +415,15 @@ class MainWindow(QMainWindow):
     def timerCount(self):
         process = psutil.Process(os.getpid())                
         self.lblMemory.setText("{:.1f}".format(process.memory_info().rss/1024/1024) + " MB ")
-
-        self.tick = self.tick + 1
-        if self.tick == settings.db['BSIDE_TIMER_REPOSITORY']:
-            self.tick = 0
-            try:
-                self.lblRepository.setText(utils.getHumanSize(utils.getDirSize2(settings.db['BSIDE_REPOSITORY'])) + " / " + utils.getHumanSize(utils.getDirSize2(settings.db['BACKUP_PATH'])))
-            except:
-                self.lblRepository.setText("REPOSITORY ERROR ")
+        
+        if self.bgJob == 0:
+            self.tick = self.tick + 1
+            if self.tick == settings.db['BSIDE_TIMER_REPOSITORY']:
+                self.tick = 0
+                try:
+                    self.lblRepository.setText(utils.getHumanSize(utils.getDirSize2(settings.db['BSIDE_REPOSITORY'])) + " / " + utils.getHumanSize(utils.getDirSize2(settings.db['BACKUP_PATH'])))
+                except:
+                    self.lblRepository.setText("REPOSITORY ERROR ")
         
         try:
             self.lblClock.setText(datetime.datetime.now().strftime(settings.db['BSIDE_CLOCK_FORMAT']) + " ")
@@ -792,17 +794,18 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
     def newShell(self):
         if settings.db['SHELL_UI'] == "SHELL_QT":
-            shBox = shell.WShell(parent=self.tbwHighRight)
+            # shBox = shell.WShell(parent=self.tbwHighRight)
+            shBox = shell.WShell(parent=self)
         else:            
             if platform.system() == 'Windows':    # Windows
                 # shBox = shell.WXShell(parent=self.tbwHighRight)        
                 # WXShell is not working well, let's do it with WShell
-                shBox = shell.WShell(parent=self.tbwHighRight)        
+                shBox = shell.WShell(parent=self)        
             else:                                 # linux variants
                 try:
                     shBox = shell.LXShell(parent=self.tbwHighRight)         
                 except:
-                    shBox = shell.WShell(parent=self.tbwHighRight)
+                    shBox = shell.WShell(parent=self)
         name = "Shell-%02d" % self.noshell
         self.tbwHighRight.addTab(shBox, name)
         self.noshell = self.noshell + 1
@@ -1336,6 +1339,7 @@ class MainWindow(QMainWindow):
                             self.project.set(myProject)
                             (_, filename) = self.project.open()
                         else:
+                            self.doEditFile(filepath, syntax="xml")
                             self.showMessage("Project %s already open" % projectName)
                     else:
                         self.doEditFile(filepath)
@@ -1429,7 +1433,7 @@ class MainWindow(QMainWindow):
                     self.tbwHighRight.setCurrentIndex(idxTab)               
                 elif syntax == "xml":
                     icon = "pix/icons/application-xml.png"
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml")                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
@@ -1923,8 +1927,7 @@ class MainWindow(QMainWindow):
                     self.tbwLowRight.setCurrentIndex(0)
                     QGuiApplication.processEvents()                     
                     # self.tCmd = shrealding.Shreald(self, "%s -u %s" % (pybin, script))
-                    self.tCmd = shrealding.Shreald(self, cmd)
-                    # self.showMessage("Starting application with PID %s" % str(self.tCmd.process.pid))
+                    self.tCmd = shrealding.Shreald(self, cmd, os.path.dirname(script))
                     self.tCmd.linePrinted.connect(self.handleLine)                    
             else:
                 self.showMessage("Cancel running script %s" % script)   

@@ -219,7 +219,7 @@ class WInter(QWidget):
         self.parent = parent
         self.window = window
         
-        css1 = 'font: %dpt "%s"; background-color: %s; color: %s;' % (settings.db['CONSOLE_FONT_SIZE'],settings.db['CONSOLE_FONT'],settings.db['CONSOLE_COLOR_BACKGROUND'],settings.db['CONSOLE_COLOR_FOREGROUND'])        
+        css1 = 'border: 2px solid gray; border-radius: 6px; font: %dpt "%s"; background-color: %s; color: %s;' % (settings.db['CONSOLE_FONT_SIZE'],settings.db['CONSOLE_FONT'],settings.db['CONSOLE_COLOR_BACKGROUND'],settings.db['CONSOLE_COLOR_FOREGROUND'])        
         css2 = 'font: %dpt "%s";' % (settings.db['CONSOLE_FONT_SIZE'],settings.db['CONSOLE_FONT'])
         self.consoleLog = QPlainTextEdit()
         self.consoleLog.setStyleSheet(css1)

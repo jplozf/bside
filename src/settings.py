@@ -76,6 +76,7 @@ defaultValues = [
     ['HEXEDITOR_HEXA_HIGHLIGHT', "#53868B"],
     ['HEXEDITOR_TEXT_HIGHLIGHT', "#53868B"],
     ['HEXEDITOR_FONT', "Courier"],
+    ['SHELL_BANNER', "Hello from BSide"],
     ['SHELL_BACKGROUND', "#000000"],
     ['SHELL_FOREGROUND', "#FFFFFF"],
     ['SHELL_FONT_FAMILY', "Courier"],

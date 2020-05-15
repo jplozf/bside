@@ -23,6 +23,7 @@ import os
 import subprocess
 
 import settings
+import shrealding
 
 if platform.system() == 'Windows':
     import win32gui
@@ -110,14 +111,19 @@ class WShell(QWidget):
         
         self.btnBreak = QPushButton()
         self.btnBreak.setIcon(QIcon("pix/16x16/Player Stop.png"))
-        self.btnBreak.clicked.connect(self.breakCommand)
+        self.btnBreak.clicked.connect(self.killProcess)
+        self.btnBreak.setEnabled(False)
         
+        css = "QWidget {border: 2px solid gray; border-radius: 6px; background-color: %s; color: %s; font-family: %s; font-size: %spx}" % (settings.db['SHELL_BACKGROUND'], settings.db['SHELL_FOREGROUND'], settings.db['SHELL_FONT_FAMILY'], settings.db['SHELL_FONT_SIZE'])
+        
+        self.lblShellPrompt = QLabel(settings.db['SHELL_PROMPT'])
         self.txtCommand = QLineEdit()
+        self.txtCommand.setStyleSheet(css)
         self.txtCommand.installEventFilter(self)
-        self.txtCommand.setFont(QFont('Courier', 10))
+        # self.txtCommand.setFont(QFont('Courier', 10))
         
         self.txtConsoleOut = QTextEdit()
-        self.txtConsoleOut.setStyleSheet("QWidget {background-color: %s; color: %s; font-family: %s; font-size: %spx}" % (settings.db['SHELL_BACKGROUND'], settings.db['SHELL_FOREGROUND'], settings.db['SHELL_FONT_FAMILY'], settings.db['SHELL_FONT_SIZE']))
+        self.txtConsoleOut.setStyleSheet(css)
         self.txtConsoleOut.setReadOnly(True)
         
         self.lblTime = QLabel("0.000 ms")
@@ -152,6 +158,7 @@ class WShell(QWidget):
         vLayout = QVBoxLayout(self)
         vLayout.addWidget(self.txtConsoleOut)
         hLayout = QHBoxLayout(self)
+        hLayout.addWidget(self.lblShellPrompt)
         hLayout.addWidget(self.txtCommand)
         hLayout.addWidget(self.btnEnter)
         hLayout.addWidget(self.btnBreak)
@@ -164,23 +171,19 @@ class WShell(QWidget):
         vLayout.addLayout(hLayout)
         
         self.colLabel = self.lblRC.palette().button().color();
-        self.txtConsoleOut.append(80 * '=')
+        # self.txtConsoleOut.append(80 * '=')
         self.txtConsoleOut.append(platform.platform())
         self.txtConsoleOut.append("Hostname is %s (%s)" % (socket.gethostname(), platform.machine()))
-        self.txtConsoleOut.append(80 * '=')
+        self.txtConsoleOut.append(settings.db['SHELL_BANNER'])
+        # self.txtConsoleOut.append(80 * '=')
+        self.txtConsoleOut.append("")
         self.txtConsoleOut.append("")
         self.txtCommand.setFocus()
         
 #-------------------------------------------------------------------------------
-# breakCommand()
+# runCommand2()
 #-------------------------------------------------------------------------------
-    def breakCommand(self):        
-        pass
-    
-#-------------------------------------------------------------------------------
-# runCommand()
-#-------------------------------------------------------------------------------
-    def runCommand(self):        
+    def runCommand2(self):        
         self.flagBusy = True
         self.btnEnter.setEnabled(False)
         # self.statusBar.showMessage("Running...", settings.dbSettings['TIMER_STATUS'])
@@ -288,3 +291,83 @@ class WShell(QWidget):
             elif key in (Qt.Key_Enter, Qt.Key_Return):
                 self.runCommand()
         return False
+    
+#-------------------------------------------------------------------------------
+# runCommand()
+#-------------------------------------------------------------------------------
+    def runCommand(self):        
+        self.flagBusy = True
+        self.btnEnter.setEnabled(False)
+        self.lblLED.setPixmap(QPixmap("pix/icons/led_red.png"))
+        self.repaint()
+        self.aCommands.append(self.txtCommand.text())
+        self.iCommands = self.iCommands + 1        
+        command = str(self.txtCommand.text()).strip()        
+        # if self.chkClearConsole.isChecked():
+        #     self.txtConsoleOut.setText("")
+        if command == "cls" or command == "clear":
+            self.txtConsoleOut.setText("")            
+            self.finalizeCommand()
+        elif command == "quit" or command == "exit":
+            self.close()
+        elif command[1:2] == ":":
+            self.CurrentDrive = command[0:2].upper()
+            self.CurrentDir = os.sep
+            self.txtConsoleOut.append(settings.db['SHELL_PROMPT'] + command)
+            self.finalizeCommand()
+        elif command[0:3] == "cd ":
+            self.CurrentDir = os.path.abspath(command[3:])
+            self.txtConsoleOut.append(settings.db['SHELL_PROMPT'] + command)
+            self.finalizeCommand()
+        else:
+            self.txtConsoleOut.append(settings.db['SHELL_PROMPT'] + command)
+            self.time1 = time.time()
+            self.btnBreak.setEnabled(True)
+            QGuiApplication.processEvents()                     
+            self.tCmd = shrealding.Shreald(self.parent, command, self.CurrentDir, shell=True)
+            self.tCmd.linePrinted.connect(self.handleLine)                    
+            self.lblTime.setText("---")
+            self.txtCommand.setEnabled(False)
+
+#-------------------------------------------------------------------------------
+# handleLine()
+#-------------------------------------------------------------------------------
+    def handleLine(self, line):
+        if line !=  "":
+            # print("Shell Handle %s" % line)
+            if line[0] == '1':
+                self.txtConsoleOut.append("%s" % line[1:].rstrip())
+            elif line[0] == '2':
+                self.txtConsoleOut.append("%s" % line[1:].rstrip())
+            elif line[0] == 'x':
+                self.killProcess()
+
+#-------------------------------------------------------------------------------
+# killProcess()
+#-------------------------------------------------------------------------------
+    def killProcess(self):        
+        try:
+            self.tCmd.kill()
+        except:
+            pass
+        self.finalizeCommand()
+
+#-------------------------------------------------------------------------------
+# finalizeCommand()
+#-------------------------------------------------------------------------------
+    def finalizeCommand(self):
+        self.time2 = time.time()
+        elapsed = (self.time2 - self.time1)*1000.0
+        self.lblTime.setText("{:.3f} ms".format(elapsed))
+        
+        self.flagBusy = False
+        self.btnEnter.setEnabled(True)
+        # self.statusBar.showMessage("Running...", settings.dbSettings['TIMER_STATUS'])
+        self.lblLED.setPixmap(QPixmap("pix/icons/led_green.png"))
+        if platform.system() == 'Windows':
+            self.lblCDR.setText(self.CurrentDrive)
+        self.lblPWD.setText(self.CurrentDir)
+        self.txtCommand.setEnabled(True)
+        self.txtCommand.selectAll()
+        self.txtCommand.setFocus()
+        self.btnBreak.setEnabled(False)

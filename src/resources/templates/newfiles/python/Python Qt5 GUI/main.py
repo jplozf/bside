@@ -1,25 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtGui import QWidget, QApplication
-from PyQt5.uic import loadUi as load_ui_widget
+from PyQt5 import QtWidgets, uic
+import sys
 
-class PyQtApplication(QApplication):
-    def __init__(self, **kwargs):
-        super(PyQtApplication, self).__init__([], **kwargs)
-
-    def start(self):
-        self.exec_()
-
-
-class PyQtWidget(QWidget):
+class Ui(QtWidgets.QMainWindow):
     def __init__(self):
-        super(PyQtWidget, self).__init__()
-        load_ui_widget("mainwindow.ui", self)
-        self.setWindowTitle("PyQt Application")
+        super(Ui, self).__init__()
+        uic.loadUi('mainwindow.ui', self)
+
+        self.statusbar.showMessage("Good morning Earth", 3000)		
+
         self.show()
 
-if __name__ == "__main__":
-    app = PyQtApplication()
-    widget = PyQtWidget()
-    app.start()
+app = QtWidgets.QApplication(sys.argv)
+window = Ui()
+app.exec_()

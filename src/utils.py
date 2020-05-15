@@ -22,8 +22,6 @@ from dateutil import tz
 import pkg_resources
 import threading
 import subprocess
-import traceback
-import shlex
 
 #-------------------------------------------------------------------------------
 # isBinaryFile()
