@@ -22,7 +22,7 @@ import utils
 #-------------------------------------------------------------------------------
 defaultValues = [ 
     ['BSIDE_TIMER_STATUS', 3000, "Time delay for displaying message in status bar"],    
-    ['EDITOR_CODEPAGE', "utf8", "Default code page for opening files"],
+    ['EDITOR_CODEPAGE', "utf_8", "Default code page for opening files"],
     ['EDITOR_MD_EXTENSIONS', ['tables', 'fenced_code', 'codehilite', 'nl2br'], "Markdown extensions enabled"],
     ['EDITOR_FONT', "Courier", "Editor font's name"],
     ['EDITOR_FONT_SIZE', 12, "Editor font's size"],

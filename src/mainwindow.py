@@ -114,7 +114,7 @@ class MainWindow(QMainWindow):
         if not os.path.exists(self.appDir):
             os.makedirs(self.appDir)
         
-        self.dbTODO = sqlite3.connect(os.path.join(self.appDir, "todo.db"))
+        self.dbTODO = sqlite3.connect(os.path.join(self.appDir, const.TODO_DATABASE))
         self.curTODO = self.dbTODO.cursor()
         
         self.dbSQLDatabase = sqlite3.connect(self.SQLDatabase)
@@ -193,8 +193,7 @@ class MainWindow(QMainWindow):
         self.tvwProject.doubleClicked.connect(self.doubleClickedProject)        
         self.btnProjectExport.clicked.connect(self.doExportProject)
         self.btnProjectClose.clicked.connect(self.closeProject)
-        # self.tvmProject.setRootPath(expanduser("~"))        
-        # self.tvwProject.setRootIndex(self.tvmProject.index(expanduser("~")))
+        self.btnProjectProperties.clicked.connect(self.doProjectPropertiesAction)
         self.tvwProject.setModel(None)
         
         self.movieWidget = mediaPlayer.MovieWidget()
@@ -1432,6 +1431,10 @@ class MainWindow(QMainWindow):
 # doEditFile()
 #-------------------------------------------------------------------------------
     def doEditFile(self, filename, syntax="guess"):
+        if self.project is not None:
+            encoding = self.project.encoding
+        else:
+            encoding = settings.db['EDITOR_CODEPAGE']
         if filename is not None:
             if path.exists(filename):
                 tabEditor = None
@@ -1450,19 +1453,19 @@ class MainWindow(QMainWindow):
                     else:
                         icon = None
                         if extension == ".py":
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python")                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python", encoding=encoding)                    
                             icon = "pix/icons/text-x-python.png"
                         elif extension == ".xml":
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml")                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml", encoding=encoding)
                             icon = "pix/icons/application-xml.png"
                         elif extension == ".html":
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="html")                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="html", encoding=encoding)                    
                             icon = "pix/icons/text-html.png"
                         elif extension == ".sql":
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="sql")                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="sql", encoding=encoding)                    
                             icon = "pix/icons/database.png"
                         else:
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="text")                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="text", encoding=encoding)                    
                             icon = "pix/icons/text-icon.png"
                         if tabEditor != None:
                             name = os.path.basename(filename)
@@ -1484,7 +1487,7 @@ class MainWindow(QMainWindow):
 
                         # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
                 elif syntax == "markdown":
-                    tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self)        
+                    tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self, encoding=encoding)        
                     if tabEditor != None:
                         name = os.path.basename(filename)
                         self.tbwHighRight.addTab(tabEditor, name)
@@ -1495,7 +1498,7 @@ class MainWindow(QMainWindow):
                         # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))        
                 elif syntax == "python":
                     icon = "pix/icons/text-x-python.png"
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
@@ -1503,7 +1506,7 @@ class MainWindow(QMainWindow):
                     self.tbwHighRight.setCurrentIndex(idxTab)               
                 elif syntax == "xml":
                     icon = "pix/icons/application-xml.png"
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml")                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml", encoding=encoding)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
@@ -1511,7 +1514,7 @@ class MainWindow(QMainWindow):
                     self.tbwHighRight.setCurrentIndex(idxTab)               
                 elif syntax == "html":
                     icon = "pix/icons/text-html.png"
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
@@ -1519,7 +1522,7 @@ class MainWindow(QMainWindow):
                     self.tbwHighRight.setCurrentIndex(idxTab)               
                 else:
                     icon = "pix/icons/text-icon.png"
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype)                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
@@ -1674,12 +1677,12 @@ class MainWindow(QMainWindow):
         lastModified = self.tvwModel.lastModified(self.idxSelectedFile)
         
         fileProps = {}
-        fileProps.update({'name': fileName})
-        fileProps.update({'path': filePath})
+        fileProps.update({'Name': fileName})
+        fileProps.update({'Path': filePath})
         # fileProps.update({'type': "Directory" if isDir == True else "File"})
-        fileProps.update({'type': fType})
-        fileProps.update({'size': "%d (%s)" % (fSize, utils.getHumanSize(fSize))})
-        fileProps.update({'last_modified': lastModified.toString(Qt.DefaultLocaleLongDate)})
+        fileProps.update({'Type': fType})
+        fileProps.update({'Size': "%d (%s)" % (fSize, utils.getHumanSize(fSize))})
+        fileProps.update({'Last modified': lastModified.toString(Qt.DefaultLocaleLongDate)})
         dlg = dialog.DlgProperties(fileProps)
         dlg.exec()
 
@@ -1690,6 +1693,24 @@ class MainWindow(QMainWindow):
         self.outputMessage("=" * 80)            
             
 #-------------------------------------------------------------------------------
+# doProjectPropertiesAction()
+#-------------------------------------------------------------------------------
+    def doProjectPropertiesAction(self):
+        if self.project is not None:
+            dlg = dialog.DlgProperties(self.project.getProperties())
+            dlg.exec()
+
+            """
+            self.outputMessage("=" * 80)
+            self.showMessage("Show properties for %s" % fileName)
+            for key in fileProps:
+                self.outputMessage("%s : %s" % (key, fileProps[key]))
+            self.outputMessage("=" * 80)            
+            """
+        else:
+            self.showMessage("No open project")
+            
+#-------------------------------------------------------------------------------
 # doExportProject()
 #-------------------------------------------------------------------------------
     def doExportProject(self):
@@ -1698,12 +1719,6 @@ class MainWindow(QMainWindow):
         else:
             self.showMessage("No open project")
         
-#-------------------------------------------------------------------------------
-# doProjectPropertiesAction()
-#-------------------------------------------------------------------------------
-    def doProjectPropertiesAction(self):
-        pass
-
 #-------------------------------------------------------------------------------
 # doPackagesAction()
 #-------------------------------------------------------------------------------

@@ -115,6 +115,17 @@
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="btnProjectProperties">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>pix/16x16/Gear.png</normaloff>pix/16x16/Gear.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="btnProjectClose">
               <property name="text">
                <string/>
@@ -1220,7 +1231,7 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>590</width>
+                     <width>359</width>
                      <height>1290</height>
                     </rect>
                    </property>

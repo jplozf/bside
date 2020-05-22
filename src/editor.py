@@ -43,12 +43,14 @@ class WEditor(QWidget):
 #-------------------------------------------------------------------------------
 # __init__()
 #-------------------------------------------------------------------------------
-    def __init__(self, filename = None, parent = None, window = None, filetype = None):
+    def __init__(self, filename = None, parent = None, window = None, filetype = None, encoding = None):
         QWidget.__init__(self, parent)
         self.parent = parent
         self.window = window
         self.filetype = filetype
-        self.txtEditor = QCodeEditor.QCodeEditor()        
+        if encoding == None:
+            encoding = settings.db['EDITOR_CODEPAGE']
+        self.txtEditor = QCodeEditor.QCodeEditor()     
         
         css = 'font: %dpt "%s"; background-color: %s;' % (settings.db['EDITOR_FONT_SIZE'],settings.db['EDITOR_FONT'],settings.db['EDITOR_COLOR_BACKGROUND'])
         self.txtEditor.setStyleSheet(css)
@@ -60,8 +62,7 @@ class WEditor(QWidget):
         
         self.btnCopyName = QPushButton()
         self.btnCopyName.setIcon(QIcon(QPixmap("pix/16x16/Clipboard Paste.png")))
-        self.btnCopyName.clicked.connect(self.copyNameToClipboard)
-        
+        self.btnCopyName.clicked.connect(self.copyNameToClipboard)        
         
         self.lblSyntax = QLabel("Syntax")
         self.cbxSyntax = QComboBox()
@@ -80,7 +81,7 @@ class WEditor(QWidget):
         self.cbxOpenWith.currentIndexChanged.connect(self.doOpenWith)
         
         self.lblModified = QLabel("")
-        self.lblCodePage= QLabel(settings.db['EDITOR_CODEPAGE'])
+        self.lblCodePage= QLabel("Encoding : %s" % encoding)
         self.lblSize = QLabel("0")
         self.txtGotoSearch = QLineEdit()
         self.lblGotoSearch = QLabel("")
@@ -131,7 +132,7 @@ class WEditor(QWidget):
             elif self.filetype == "sql":
                 self.highlight = syntax.SQLHighlighter(self.txtEditor.document())
                 self.cbxSyntax.setCurrentIndex(self.SYNTAX_SQL)
-            with open(filename, encoding=settings.db['EDITOR_CODEPAGE']) as pyFile:
+            with open(filename, encoding=encoding) as pyFile:
                 self.txtEditor.setPlainText(str(pyFile.read()))
                 self.extractFuncs()
                 self.displaySize()
@@ -419,10 +420,13 @@ class WMarkdown(QWidget):
 #-------------------------------------------------------------------------------
 # __init__()
 #-------------------------------------------------------------------------------
-    def __init__(self, filename = None, parent = None, window = None):
+    def __init__(self, filename = None, parent = None, window = None, encoding = None):
         QWidget.__init__(self, parent)
         self.parent = parent
         self.window = window
+        if encoding == None:
+            encoding = settings.db['EDITOR_CODEPAGE']
+
         self.txtEditor = QCodeEditor.QCodeEditor()        
         self.txtMarkdown = QTextEdit()
         self.txtMarkdown.setReadOnly(True)
@@ -469,7 +473,7 @@ class WMarkdown(QWidget):
         self.dirtyFlag = False
         if filename is not None:
             self.highlight = syntax.PythonHighlighter(self.txtEditor.document())
-            with open(filename, encoding=settings.db['EDITOR_CODEPAGE']) as pyFile:
+            with open(filename, encoding=encoding) as pyFile:
                 self.txtEditor.setPlainText(str(pyFile.read()))
             self.txtMarkdown.setText(markdown.markdown(self.txtEditor.toPlainText(), extensions=settings.db['EDITOR_MD_EXTENSIONS']))
         

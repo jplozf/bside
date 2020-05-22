@@ -101,6 +101,16 @@ class DlgNewProject(QDialog):
             self.cbxLicense.setCurrentIndex(index)        
         layout.addRow(self.lblLicense, self.cbxLicense)
                 
+        # Encoding
+        self.lblEncoding = QLabel("Encoding")
+        self.cbxEncoding = QComboBox()
+        for f in const.ENCODING:
+            self.cbxEncoding.addItem(f)
+        index = self.cbxEncoding.findText(settings.db['EDITOR_CODEPAGE'])
+        if index >= 0:
+            self.cbxEncoding.setCurrentIndex(index)        
+        layout.addRow(self.lblEncoding, self.cbxEncoding)
+
         # Buttons
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self);
         layout.addWidget(buttonBox)
@@ -271,11 +281,12 @@ class Project():
     files = []
     openFiles = []
     timeNoFocus = 0
+    encoding = None
     
 #-------------------------------------------------------------------------------
 # __init__()
 #-------------------------------------------------------------------------------
-    def __init__(self, name = "*NONE", parent = None):
+    def __init__(self, name = const.PROJECT_NONE, parent = None):
         self.name = name
         self.parent = parent
     
@@ -408,7 +419,26 @@ class Project():
         tree = ET.parse(xmlFile)
         root = tree.getroot()
         mainFile = os.path.join(name, root.find('main').text)
+        self.encoding = root.find('encoding').text
         return mainFile
+    
+#-------------------------------------------------------------------------------
+# getProperties()
+#-------------------------------------------------------------------------------
+    def getProperties(self):
+        xmlFile = os.path.join(self.path, const.PROJECT_FILE_NAME)
+        tree = ET.parse(xmlFile)
+        root = tree.getroot()
+        props = {}
+        props.update({'Project': os.path.basename(os.path.normpath(self.path))})
+        props.update({'Main module': root.find('main').text})
+        props.update({'Encoding': root.find('encoding').text})
+        props.update({'Created' : root.find('created').text})
+        props.update({'Modified' : root.find('modified').text})
+        props.update({'BSide version' : root.find('bside').text})
+        props.update({'Size' : str(utils.getHumanSize(utils.getDirSize2(self.path)))})
+        props.update({'Time' : self.getTimeProject()})
+        return props
     
 #-------------------------------------------------------------------------------
 # exportProject()
@@ -508,12 +538,15 @@ class Project():
                     license = 'resources/templates/licenses/' + dialog.cbxLicense.currentText() + ".md"
                     utils.copyFile(pkg_resources.resource_filename(__name__, license), os.path.join(package, "LICENSE.md"))
                     
+                    # Encoding
+                    encoding = dialog.cbxEncoding.currentText()
+                    
                     # update members
                     self.name = dirProject
                     self.path = package
 
                     # Project file
-                    self.createXMLProjectFile(module)
+                    self.createXMLProjectFile(module, encoding)
 
                     # Open project
                     self.open()
@@ -544,25 +577,27 @@ class Project():
 #-------------------------------------------------------------------------------
 # createXMLProjectFile()
 #-------------------------------------------------------------------------------
-    def createXMLProjectFile(self, module):   
+    def createXMLProjectFile(self, module, encoding):   
         E = lxml.builder.ElementMaker()
         TagProject = E.project
         TagBSide = E.bside
         TagCreated = E.created
         TagModified = E.modified
         TagMain = E.main
+        TagEncoding = E.encoding
 
         XMLDoc = TagProject(
                     TagBSide(const.VERSION),
                     TagCreated(datetime.now().strftime("%Y/%m/%d-%H:%M:%S")),
                     TagModified(datetime.now().strftime("%Y/%m/%d-%H:%M:%S")),
                     TagMain(module),
+                    TagEncoding(encoding),
                     name=self.name
                     )
 
         projectFull = os.path.join(self.path, const.PROJECT_FILE_NAME)
         with open(projectFull, "w") as projectFile:
-            projectFile.write('<?xml version="1.0" encoding="UTF-8"?>\n')  
+            # projectFile.write('<?xml version="1.0" encoding="UTF-8"?>\n')  
             projectFile.write(lxml.etree.tostring(XMLDoc, pretty_print=True).decode("utf-8"))    
             
 #-------------------------------------------------------------------------------
@@ -579,6 +614,9 @@ class Project():
         parser = lxml.etree.XMLParser(remove_blank_text=True)
         tree = lxml.etree.parse(filename, parser)
         root = tree.getroot()
+        # Modify the <modified> tag
+        modified = root.find('modified')
+        modified.text = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
         # Targeting <SESSIONS> tag
         sessions = root.find('.//sessions')
         if sessions is None:

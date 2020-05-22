@@ -33,9 +33,10 @@ class DlgProperties(QDialog):
         self.setWindowTitle("Properties")
         layout = QFormLayout(self)
         for key, value in dict.items():
-            self.Line = QLabel(self)
-            self.Line.setText(str(value))
-            layout.addRow(key, self.Line)
+            self.lblKey = QLabel(key)
+            self.txtValue = QLineEdit(str(value))
+            self.txtValue.setEnabled(False)
+            layout.addRow(self.lblKey, self.txtValue)
 
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok, self);
         layout.addWidget(buttonBox)
