@@ -17,7 +17,6 @@ import psutil
 import queue
 import subprocess
 import threading
-from time import sleep
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
@@ -65,7 +64,6 @@ class Shreald(QThread):
                         line = q.get_nowait()
                         self.linePrinted.emit(line)
                         if line[0] == 'x':
-                            # sleep(1)
                             break
                     except:
                         pass
@@ -74,6 +72,7 @@ class Shreald(QThread):
                 to.join()
                 te.join()
             except:
+                print("Shreald Except")
                 self.mw.bgJob = self.mw.bgJob - 1
                 
 #-------------------------------------------------------------------------------

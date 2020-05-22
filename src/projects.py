@@ -268,7 +268,6 @@ class Project():
     path = ""
     parent = None
     dirtyFlag = True
-    timeStart = 0
     files = []
     openFiles = []
     timeNoFocus = 0
@@ -344,12 +343,14 @@ class Project():
 # close()
 #-------------------------------------------------------------------------------
     def close(self):
-        # TODO : Update XML project.bsix file with metadata
-        # Modified
-        # Time spent
-        # Main module
-        # Close open files
-        print(datetime.now() - self.timeStart)
+        self.parent.showMessage("Closing project")
+        self.endSession()
+        self.parent.project = None
+        self.parent.lastProject = None
+        
+        # close files belonging to the project
+        # clear project treeview
+        # set focus on repository tab
     
 #-------------------------------------------------------------------------------
 # openFile()

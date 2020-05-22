@@ -86,7 +86,10 @@ def saveWorkspace(mw):
     db["CURRENT_LOW_TAB"] = mw.tbwLowRight.currentIndex()
     
     # Save mw current open project     
-    db["PROJECT"] = mw.project.name
+    if mw.project is not None:
+        db["PROJECT"] = mw.project.name
+    else:
+        db["PROJECT"] = None
 
     # Save mw open tabs
     for i in range(mw.tbwHighRight.count()):

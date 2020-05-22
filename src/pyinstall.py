@@ -11,6 +11,10 @@ from subprocess import Popen, PIPE
 import settings
 import utils
 import dialog
+import shrealding
+
+MODE_RUN = 0
+MODE_BUILD = 1
 
 #-------------------------------------------------------------------------------
 # initFormEXE()
@@ -88,6 +92,7 @@ def buildEXE(mw):
     if mw.chkOneDir.isChecked():
         dist_path = os.path.join(dist_path, name_base)
     
+    global name_EXE
     name_EXE = os.path.join(dist_path, name_base)
     
     if mw.CurrentOS == "Windows":
@@ -101,25 +106,7 @@ def buildEXE(mw):
     command_line = buildCommand(mw)    
     mw.showMessage("Building with %s" % command_line)
     mw.tbwBuild.setCurrentIndex(0)
-    rc = runCommand(command_line, source_path, mw)
-    if rc == 0:
-        mw.showMessage("Build complete")
-        mw.btnRunEXE.setEnabled(True)
-        # aEXE = getEXE(os.path.join(source_path,"dist"))
-        fInfo = utils.getFileInfo(name_EXE)
-        mw.txtBuildOutput.appendPlainText("Executable file info")
-        mw.txtBuildOutput.appendPlainText("====================")
-        for key, value in fInfo.items():
-            mw.txtBuildOutput.appendPlainText("{}\t{}".format(key, value))
-        mw.txtBuildOutput.appendPlainText("")
-        mw.lblRunEXE.setText(name_EXE)
-    else:
-        mw.txtBuildOutput.appendPlainText("!!! BUILD FAILED !!!")
-        mw.txtBuildOutput.appendPlainText("Retry with checking first the upper right \"Clean\" option.")
-        mw.txtBuildOutput.appendPlainText("")
-        mw.showMessage("Build failed")
-        mw.btnRunEXE.setEnabled(False)
-        mw.lblRunEXE.setText("-")
+    runCommand(command_line, source_path, mw, MODE_BUILD)
     mw.project.refreshStatus()
 
 #-------------------------------------------------------------------------------
@@ -193,16 +180,16 @@ def runEXE(mw):
     try:
         source_path = os.path.split(mw.lblRunEXE.text())[0]
         mw.tbwBuild.setCurrentIndex(0)
-        rc = runCommand("{} {}".format(mw.lblRunEXE.text(), mw.txtParamsEXE.text()), source_path, mw)
+        rc = runCommand("{} {}".format(mw.lblRunEXE.text(), mw.txtParamsEXE.text()), source_path, mw, MODE_RUN)
     except:
         mw.btnBuildEXE.setEnabled(True)
         mw.lblLEDBuild.setPixmap(QPixmap("pix/icons/led_green.png"))
         mw.showMessage("Can't run this")
 
 #-------------------------------------------------------------------------------
-# runCommand()
+# runCommand2()
 #-------------------------------------------------------------------------------
-def runCommand(command, cwd, mw):        
+def runCommand2(command, cwd, mw):        
     mw.btnBuildEXE.setEnabled(False)
     mw.lblLEDBuild.setPixmap(QPixmap("pix/icons/led_red.png"))
     mw.repaint()
@@ -251,6 +238,103 @@ def runCommand(command, cwd, mw):
     mw.lblLEDBuild.setPixmap(QPixmap("pix/icons/led_green.png"))
     
     return(rc)
+
+#-------------------------------------------------------------------------------
+# runCommand()
+#-------------------------------------------------------------------------------
+def runCommand(command, cwd, mw, typeRun):    
+    global mode
+    mode = typeRun
+    mw.btnBuildEXE.setEnabled(False)
+    mw.lblLEDBuild.setPixmap(QPixmap("pix/icons/led_red.png"))
+    mw.repaint()
+    mw.txtBuildOutput.appendPlainText(settings.db['SHELL_PROMPT'] + " " + command + "\n")
+    global time1
+    time1 = time.time()
+    mw.btnBreakEXE.setEnabled(True)
+    mw.tbwBuild.setCurrentIndex(0)
+    QGuiApplication.processEvents()  
+    global tCmd
+    tCmd = shrealding.Shreald(mw, command, cwd, shell=True)
+    tCmd.linePrinted.connect(lambda line, mw=mw: handleLine(line, mw))
+    mw.lblTimeBuild.setText("---")
+
+#-------------------------------------------------------------------------------
+# handleLine()
+#-------------------------------------------------------------------------------
+def handleLine(line, mw):
+    global mode
+    if line !=  "":
+        if line[0] == '1':
+            if mode == MODE_BUILD:
+                mw.txtBuildOutput.appendPlainText("%s " % line[1:].rstrip())
+            else:
+                mw.txtBuildOutput.appendPlainText("[OUT] %s " % line[1:].rstrip())
+        elif line[0] == '2':
+            if mode == MODE_BUILD:
+                mw.txtBuildOutput.appendPlainText("%s " % line[1:].rstrip())
+            else:
+                mw.txtBuildOutput.appendPlainText("[ERR] %s " % line[1:].rstrip())
+        elif line[0] == 'x':
+            killProcess(mw)
+
+#-------------------------------------------------------------------------------
+# killProcess()
+#-------------------------------------------------------------------------------
+def killProcess(mw):  
+    global tCmd
+    try:
+        tCmd.kill()
+    except:
+        pass        
+    finalizeCommand(mw)
+
+#-------------------------------------------------------------------------------
+# finalizeCommand()
+#-------------------------------------------------------------------------------
+def finalizeCommand(mw):
+    global tCmd
+    global time1
+    mw.txtBuildOutput.appendPlainText("")
+    mw.txtBuildOutput.appendPlainText("End of         : %s" % str(tCmd.cmd))
+    mw.txtBuildOutput.appendPlainText("Running PID    : %s" % str(tCmd.process.pid))
+    mw.txtBuildOutput.appendPlainText("Return Code    : %d" % tCmd.returncode)
+    time2 = time.time()
+    elapsed = (time2 - time1)*1000.0
+    mw.lblTimeBuild.setText("{:.3f} ms".format(elapsed))
+
+    mw.lblLEDBuild.setPixmap(QPixmap("pix/icons/led_green.png"))
+    mw.lblRCBuild.setText("RC=%d" % tCmd.returncode)
+    mw.btnBreakEXE.setEnabled(False)
+    mw.btnBuildEXE.setEnabled(True)
+    
+    global name_EXE
+    global mode
+    
+    if mode == MODE_BUILD:
+        if tCmd.returncode == 0:
+            mw.btnRunEXE.setEnabled(True)
+            # aEXE = getEXE(os.path.join(source_path,"dist"))
+            fInfo = utils.getFileInfo(name_EXE)
+            mw.txtBuildOutput.appendPlainText("")
+            mw.txtBuildOutput.appendPlainText("Executable file info")
+            mw.txtBuildOutput.appendPlainText("====================")
+            for key, value in fInfo.items():
+                mw.txtBuildOutput.appendPlainText("{}\t{}".format(key, value))
+            mw.txtBuildOutput.appendPlainText("")
+            mw.lblRunEXE.setText(name_EXE)
+            mw.showMessage("Build completed successfully")
+        else:
+            mw.txtBuildOutput.appendPlainText("")
+            mw.txtBuildOutput.appendPlainText("!!! BUILD FAILED !!!")
+            mw.txtBuildOutput.appendPlainText("Retry with checking first the upper right \"Clean\" option.")
+            mw.txtBuildOutput.appendPlainText("")
+            mw.btnRunEXE.setEnabled(False)
+            mw.lblRunEXE.setText("-")   
+            mw.showMessage("Build failed")
+    else:
+        mw.btnRunEXE.setEnabled(True)
+        mw.showMessage("End of runnning builded executable with return code %d" % tCmd.returncode)
 
 #-------------------------------------------------------------------------------
 # patchChars()

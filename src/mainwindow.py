@@ -101,6 +101,7 @@ class MainWindow(QMainWindow):
     timeNoFocus2 = 0
     focusState = HAS_FOCUS
     previousFocusState = HAS_FOCUS
+    aAlarms = []
     
 #-------------------------------------------------------------------------------
 # __init__()
@@ -119,7 +120,8 @@ class MainWindow(QMainWindow):
         self.dbSQLDatabase = sqlite3.connect(self.SQLDatabase)
         self.curSQLDatabase = self.dbSQLDatabase.cursor()
 
-        self.project = projects.Project(parent = self)
+        # self.project = projects.Project(parent = self)
+        self.project = None
         self.todoManager = todomgr.TodoManager(parent = self)
         
         self.clipboardFull = False
@@ -136,6 +138,7 @@ class MainWindow(QMainWindow):
         self.actionSettings.triggered.connect(self.settings)
         self.actionAbout.triggered.connect(self.about)
         self.actionNewProject.triggered.connect(self.newProject)
+        self.actionOpenProject.triggered.connect(self.openProject)
         self.actionCloseProject.triggered.connect(self.closeProject)
         self.actionPythonConsole.triggered.connect(self.newPynter)
         self.actionShell.triggered.connect(self.newShell)
@@ -184,18 +187,15 @@ class MainWindow(QMainWindow):
         
         self.tvmProject = QFileSystemModel()
         self.tvmProject.setIconProvider(IconProvider())        
-        self.tvwProject.setModel(self.tvmProject)
-        self.tvwProject.setAnimated(False)
-        self.tvwProject.setIndentation(10)
-        self.tvwProject.setSortingEnabled(True)        
-        for i in range(1, self.tvwProject.header().length()):
-            self.tvwProject.hideColumn(i)
-        self.tvwProject.sortByColumn(0, Qt.AscendingOrder)
         self.tvwProject.setContextMenuPolicy(Qt.CustomContextMenu)        
         self.tvwProject.customContextMenuRequested.connect(self.menuContextProject)
         self.tvwProject.clicked.connect(self.clickedProject)        
         self.tvwProject.doubleClicked.connect(self.doubleClickedProject)        
         self.btnProjectExport.clicked.connect(self.doExportProject)
+        self.btnProjectClose.clicked.connect(self.closeProject)
+        # self.tvmProject.setRootPath(expanduser("~"))        
+        # self.tvwProject.setRootIndex(self.tvmProject.index(expanduser("~")))
+        self.tvwProject.setModel(None)
         
         self.movieWidget = mediaPlayer.MovieWidget()
         self.tabVideoSplitter.addWidget(self.movieWidget)
@@ -237,10 +237,11 @@ class MainWindow(QMainWindow):
         self.clearTableActions()
         self.tblActions.horizontalHeader().setStretchLastSection(True)
 
-        self.lblRepositoryIcon = QLabel()
-        self.lblRepositoryIcon.setPixmap(QPixmap("pix/16x16/Home.png"))
-        self.lblRepository = QLabel("0")
-        self.statusBar.addPermanentWidget(self.lblRepositoryIcon)
+        if settings.db['BSIDE_SHOW_REPOSITORY']:
+            self.lblRepositoryIcon = QLabel()
+            self.lblRepositoryIcon.setPixmap(QPixmap("pix/16x16/Home.png"))
+            self.statusBar.addPermanentWidget(self.lblRepositoryIcon)
+        self.lblRepository = QLabel()
         self.statusBar.addPermanentWidget(self.lblRepository)             
         
         self.lblPythonVersionIcon = QLabel()
@@ -251,7 +252,7 @@ class MainWindow(QMainWindow):
         
         self.lblProjectIcon = QLabel()
         self.lblProjectIcon.setPixmap(QPixmap("pix/16x16/My Documents.png"))
-        self.lblProject = QLabel(self.project.name)
+        self.lblProject = QLabel(const.PROJECT_NONE)
         self.statusBar.addPermanentWidget(self.lblProjectIcon)
         self.statusBar.addPermanentWidget(self.lblProject)
 
@@ -288,7 +289,9 @@ class MainWindow(QMainWindow):
         self.txtOutput.setReadOnly(True)
         self.chkVerboseOutput.stateChanged.connect(self.verboseOutputChanged)
 
-        self.lblProjectName.setText(self.project.name)
+        self.lblProjectName.setText(const.PROJECT_NONE)
+        self.lblProjectStatus.setText("N/A")
+        self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock_gray.png"))
 
         self.restoreSettings()
         # self.btnSaveSettings.clicked.connect(self.backupSettings)
@@ -302,29 +305,38 @@ class MainWindow(QMainWindow):
         if settings.db['BSIDE_OPEN_LAST_WORKSPACE'] == True:
             self.showMessage("Restoring workspace")
             db = workspace.restoreWorkspace()
-            self.project.set(db["PROJECT"])
-            if self.project.open(raw=True):
-                tabs = db["TABS"]
-                for i in range(len(tabs)):
-                    print(tabs[i])
-                    if tabs[i][0] == "Welcome":
-                        self.welcome()
-                    elif tabs[i][0] == "Settings":
-                        self.settings()
-                    elif tabs[i][0] == "WEditor":
-                        self.doEditFile(tabs[i][1])
-                    elif tabs[i][0] == "WMarkdown":
-                        self.doEditFile(tabs[i][1])
-                    elif tabs[i][0] == "WHexedit":
-                        self.doEditFile(tabs[i][1], syntax="binary")
-                    elif tabs[i][0] == "WXInter" or tabs[i][0] == "LXInter" or tabs[i][0] == "WInter":
-                        self.newPynter()
-                    elif tabs[i][0] == "WXShell" or tabs[i][0] == "LXShell" or tabs[i][0] == "WShell":
-                        self.newShell()
-                    elif tabs[i][0] == "TabPIP":
-                        self.doPackagesAction()
-                    elif tabs[i][0] == "Help":
-                        self.about()
+            if db["PROJECT"] is not None:
+                self.tvwProject.setModel(self.tvmProject)
+                self.tvwProject.setAnimated(False)
+                self.tvwProject.setIndentation(10)
+                self.tvwProject.setSortingEnabled(True)        
+                for i in range(1, self.tvwProject.header().length()):
+                    self.tvwProject.hideColumn(i)
+                self.tvwProject.sortByColumn(0, Qt.AscendingOrder)                
+                self.project = projects.Project(parent = self)
+                self.project.set(db["PROJECT"])
+                if self.project.open(raw=True):
+                    tabs = db["TABS"]
+                    for i in range(len(tabs)):
+                        print(tabs[i])
+                        if tabs[i][0] == "Welcome":
+                            self.welcome()
+                        elif tabs[i][0] == "Settings":
+                            self.settings()
+                        elif tabs[i][0] == "WEditor":
+                            self.doEditFile(tabs[i][1])
+                        elif tabs[i][0] == "WMarkdown":
+                            self.doEditFile(tabs[i][1])
+                        elif tabs[i][0] == "WHexedit":
+                            self.doEditFile(tabs[i][1], syntax="binary")
+                        elif tabs[i][0] == "WXInter" or tabs[i][0] == "LXInter" or tabs[i][0] == "WInter":
+                            self.newPynter()
+                        elif tabs[i][0] == "WXShell" or tabs[i][0] == "LXShell" or tabs[i][0] == "WShell":
+                            self.newShell()
+                        elif tabs[i][0] == "TabPIP":
+                            self.doPackagesAction()
+                        elif tabs[i][0] == "Help":
+                            self.about()
                 self.tbwHighRight.setCurrentIndex(db["CURRENT_TAB"])
                 self.tbwLowRight.setCurrentIndex(db["CURRENT_LOW_TAB"])
         else:
@@ -424,23 +436,26 @@ class MainWindow(QMainWindow):
         process = psutil.Process(os.getpid())                
         self.lblMemory.setText("{:.1f}".format(process.memory_info().rss/1024/1024) + " MB ")
         
-        if QApplication.activeWindow() == self:
-            self.focusState = self.HAS_FOCUS
-            if self.previousFocusState == self.HAS_NOT_FOCUS:
-                self.timeNoFocus2 = time.time()
-                self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
-                self.previousFocusState = self.HAS_FOCUS
-            self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock.png"))
-            # self.setWindowOpacity(1.0)
+        if self.project is not None:
+            if QApplication.activeWindow() == self:
+                self.focusState = self.HAS_FOCUS
+                if self.previousFocusState == self.HAS_NOT_FOCUS:
+                    self.timeNoFocus2 = time.time()
+                    self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
+                    self.previousFocusState = self.HAS_FOCUS
+                self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock.png"))
+                # self.setWindowOpacity(1.0)
+            else:
+                self.focusState = self.HAS_NOT_FOCUS
+                if self.previousFocusState == self.HAS_FOCUS:
+                    self.timeNoFocus1 = time.time()
+                    self.previousFocusState = self.HAS_NOT_FOCUS
+                self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock_gray.png"))
+                # self.setWindowOpacity(0.75)
         else:
-            self.focusState = self.HAS_NOT_FOCUS
-            if self.previousFocusState == self.HAS_FOCUS:
-                self.timeNoFocus1 = time.time()
-                self.previousFocusState = self.HAS_NOT_FOCUS
             self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock_gray.png"))
-            # self.setWindowOpacity(0.75)
         
-        if self.bgJob == 0:
+        if self.bgJob == 0 and settings.db['BSIDE_SHOW_REPOSITORY']:
             self.tick = self.tick + 1
             if self.tick == settings.db['BSIDE_TIMER_REPOSITORY']:
                 self.tick = 0
@@ -448,6 +463,19 @@ class MainWindow(QMainWindow):
                     self.lblRepository.setText(utils.getHumanSize(utils.getDirSize2(settings.db['BSIDE_REPOSITORY'])) + " / " + utils.getHumanSize(utils.getDirSize2(settings.db['BACKUP_PATH'])))
                 except:
                     self.lblRepository.setText("REPOSITORY ERROR ")
+
+        # MON TUE THU WED FRI SAT SUN
+        #  0   1   2   3   4   5   6
+        self.aAlarms = [[False, "0123456", 19, 0, "A table !"], [False, "0123456", 16, 10, "Test Alarm"]]
+        for alarm in self.aAlarms:
+            now = datetime.datetime.now()
+            if alarm[0] == True:
+                if str(now.weekday()) in alarm[1]:
+                    hAlarm = now.replace(hour=alarm[2], minute=alarm[3])
+                    delta = int((hAlarm - now).total_seconds())
+                    if delta <= 0:
+                        print(alarm[4])
+                        self.showMessage(alarm[4])
         
         try:
             self.lblClock.setText(datetime.datetime.now().strftime(settings.db['BSIDE_CLOCK_FORMAT']) + " ")
@@ -630,13 +658,15 @@ class MainWindow(QMainWindow):
         if result == QMessageBox.Yes:
             self.timer.stop()
             # Close project
-            self.focusState = self.HAS_FOCUS
-            if self.previousFocusState == self.HAS_NOT_FOCUS:
-                self.timeNoFocus2 = time.time()
-                self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
-                self.previousFocusState = self.HAS_FOCUS
-            self.project.timeNoFocus = self.timeNoFocus
-            self.project.endSession()
+            # if self.project.name != "*NONE":
+            if self.project is not None:
+                self.focusState = self.HAS_FOCUS
+                if self.previousFocusState == self.HAS_NOT_FOCUS:
+                    self.timeNoFocus2 = time.time()
+                    self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
+                    self.previousFocusState = self.HAS_FOCUS
+                self.project.timeNoFocus = self.timeNoFocus
+                self.project.endSession()
             # Close TODO database
             self.curTODO.close()
             self.dbTODO.close()
@@ -996,7 +1026,7 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
 # saveEnv()
 #-------------------------------------------------------------------------------
-    def saveWorspace(self):
+    def saveWorkspace(self):
         for i in range(0, self.tbwHighRight.count()):
             self.closeTabFromIndex(i)
 
@@ -1230,106 +1260,107 @@ class MainWindow(QMainWindow):
 # menuContextProject()
 #-------------------------------------------------------------------------------
     def menuContextProject(self, point):
-        index = self.tvwProject.indexAt(point)
-        self.idxSelectedFile = index
-        filePath = self.tvmProject.filePath(self.idxSelectedFile)
-        isDir = self.tvmProject.isDir(self.idxSelectedFile)
-        isBinary = utils.isBinaryFile(filePath)       
-        
-        # p = vlc.MediaPlayer("resources/sounds/tone01.mp3")
-        # p.play()                
-              
-        menu = QMenu()
-        # Open
-        openAction = QAction(QIcon("pix/16x16/Folder.png"), "Open")
-        menu.addAction(openAction)
-        openAction.triggered.connect(self.doOpenAction)
-        openAction.setEnabled(not isDir)
+        if self.project is not None:
+            index = self.tvwProject.indexAt(point)
+            self.idxSelectedFile = index
+            filePath = self.tvmProject.filePath(self.idxSelectedFile)
+            isDir = self.tvmProject.isDir(self.idxSelectedFile)
+            isBinary = utils.isBinaryFile(filePath)       
 
-        # Open as Hexa
-        openHexaAction = QAction(QIcon("pix/16x16/Folder.png"), "Open as Hexa")
-        menu.addAction(openHexaAction)
-        openHexaAction.triggered.connect(self.doOpenHexaAction)
-        openHexaAction.setEnabled(not isDir)
-        menu.addSeparator()
-        
-        # New...
-        newMenu = QMenu("New...")
-        menu.addMenu(newMenu)
-        # New Module
-        newModuleAction = QAction(QIcon("pix/icons/python2.5.png"), "Python module...")
-        newMenu.addAction(newModuleAction)
-        newModuleAction.triggered.connect(self.project.newModule)
-        # New Folder
-        newFolderAction = QAction(QIcon("pix/16x16/Folder.png"), "Folder...")
-        newMenu.addAction(newFolderAction)
-        newFolderAction.triggered.connect(self.project.newFolder)
-        # New Markdown
-        newMDAction = QAction(QIcon("pix/icons/markdown.png"), "Markdown file...")
-        newMenu.addAction(newMDAction)
-        newMDAction.triggered.connect(self.project.newMDFile)
-        # New XML
-        newXMLAction = QAction(QIcon("pix/icons/xml.png"), "XML file...")
-        newMenu.addAction(newXMLAction)
-        newXMLAction.triggered.connect(self.project.newXMLFile)
-        # New HTML
-        newHTMLAction = QAction(QIcon("pix/icons/text-html.png"), "HTML file...")
-        newMenu.addAction(newHTMLAction)
-        newHTMLAction.triggered.connect(self.project.newHTMLFile)
-        # New Qt UI
-        newQtUIAction = QAction(QIcon("pix/icons/QtUI.png"), "Qt UI file...")
-        newMenu.addAction(newQtUIAction)
-        newQtUIAction.triggered.connect(self.project.newQtUIFile)
-        # New SQL
-        newSQLAction = QAction(QIcon("pix/icons/database.png"), "SQL file...")
-        newMenu.addAction(newSQLAction)
-        newSQLAction.triggered.connect(self.project.newSQLFile)
-        # New File
-        newFileAction = QAction(QIcon("pix/16x16/Document.png"), "Empty file...")
-        newMenu.addAction(newFileAction)
-        newFileAction.triggered.connect(self.project.newFile)
-        
-        
-        # Edit
-        """
-        editAction = QAction(QIcon("pix/16x16/Pen.png"),"Edit")
-        menu.addAction(editAction)
-        editAction.triggered.connect(self.doEditAction)
-        editAction.setEnabled(not isDir and not isBinary)
-        """    
-        # Delete
-        deleteAction = QAction(QIcon("pix/16x16/Trash.png"),"Delete")
-        menu.addAction(deleteAction)
-        deleteAction.triggered.connect(self.doDeleteAction)
-        # Rename
-        renameAction = QAction(QIcon("pix/16x16/Back.png"),"Rename")
-        menu.addAction(renameAction)
-        renameAction.triggered.connect(self.doRenameAction)
-        menu.addSeparator()
-        # Cut
-        cutAction = QAction(QIcon("pix/16x16/Clipboard Cut.png"),"Cut")
-        menu.addAction(cutAction)
-        cutAction.triggered.connect(self.doCutAction)
-        # Copy
-        copyAction = QAction(QIcon("pix/16x16/Clipboard Copy.png"),"Copy")
-        menu.addAction(copyAction)
-        copyAction.triggered.connect(self.doCopyAction)
-        # Paste
-        pasteAction = QAction(QIcon("pix/16x16/Clipboard Paste.png"),"Paste")
-        pasteAction.setEnabled(self.clipboardFull)
-        menu.addAction(pasteAction)
-        pasteAction.triggered.connect(self.doPasteAction)
-        menu.addSeparator()
-        # Project Properties
-        propertiesAction = QAction(QIcon("pix/16x16/Gear.png"),"Project properties")
-        menu.addAction(propertiesAction)
-        propertiesAction.triggered.connect(self.doProjectPropertiesAction)
-        # Close project
-        closeProjectAction = QAction(QIcon("pix/16x16/Close.png"),"Close project")
-        menu.addAction(closeProjectAction)
-        closeProjectAction.triggered.connect(self.doCloseProjectAction)
-        
-        menu.exec_(self.tvwProject.viewport().mapToGlobal(point))     
+            # p = vlc.MediaPlayer("resources/sounds/tone01.mp3")
+            # p.play()                
+
+            menu = QMenu()
+            # Open
+            openAction = QAction(QIcon("pix/16x16/Folder.png"), "Open")
+            menu.addAction(openAction)
+            openAction.triggered.connect(self.doOpenAction)
+            openAction.setEnabled(not isDir)
+
+            # Open as Hexa
+            openHexaAction = QAction(QIcon("pix/16x16/Folder.png"), "Open as Hexa")
+            menu.addAction(openHexaAction)
+            openHexaAction.triggered.connect(self.doOpenHexaAction)
+            openHexaAction.setEnabled(not isDir)
+            menu.addSeparator()
+
+            # New...
+            newMenu = QMenu("New...")
+            menu.addMenu(newMenu)
+            # New Module
+            newModuleAction = QAction(QIcon("pix/icons/python2.5.png"), "Python module...")
+            newMenu.addAction(newModuleAction)
+            newModuleAction.triggered.connect(self.project.newModule)
+            # New Folder
+            newFolderAction = QAction(QIcon("pix/16x16/Folder.png"), "Folder...")
+            newMenu.addAction(newFolderAction)
+            newFolderAction.triggered.connect(self.project.newFolder)
+            # New Markdown
+            newMDAction = QAction(QIcon("pix/icons/markdown.png"), "Markdown file...")
+            newMenu.addAction(newMDAction)
+            newMDAction.triggered.connect(self.project.newMDFile)
+            # New XML
+            newXMLAction = QAction(QIcon("pix/icons/xml.png"), "XML file...")
+            newMenu.addAction(newXMLAction)
+            newXMLAction.triggered.connect(self.project.newXMLFile)
+            # New HTML
+            newHTMLAction = QAction(QIcon("pix/icons/text-html.png"), "HTML file...")
+            newMenu.addAction(newHTMLAction)
+            newHTMLAction.triggered.connect(self.project.newHTMLFile)
+            # New Qt UI
+            newQtUIAction = QAction(QIcon("pix/icons/QtUI.png"), "Qt UI file...")
+            newMenu.addAction(newQtUIAction)
+            newQtUIAction.triggered.connect(self.project.newQtUIFile)
+            # New SQL
+            newSQLAction = QAction(QIcon("pix/icons/database.png"), "SQL file...")
+            newMenu.addAction(newSQLAction)
+            newSQLAction.triggered.connect(self.project.newSQLFile)
+            # New File
+            newFileAction = QAction(QIcon("pix/16x16/Document.png"), "Empty file...")
+            newMenu.addAction(newFileAction)
+            newFileAction.triggered.connect(self.project.newFile)
+
+
+            # Edit
+            """
+            editAction = QAction(QIcon("pix/16x16/Pen.png"),"Edit")
+            menu.addAction(editAction)
+            editAction.triggered.connect(self.doEditAction)
+            editAction.setEnabled(not isDir and not isBinary)
+            """    
+            # Delete
+            deleteAction = QAction(QIcon("pix/16x16/Trash.png"),"Delete")
+            menu.addAction(deleteAction)
+            deleteAction.triggered.connect(self.doDeleteAction)
+            # Rename
+            renameAction = QAction(QIcon("pix/16x16/Back.png"),"Rename")
+            menu.addAction(renameAction)
+            renameAction.triggered.connect(self.doRenameAction)
+            menu.addSeparator()
+            # Cut
+            cutAction = QAction(QIcon("pix/16x16/Clipboard Cut.png"),"Cut")
+            menu.addAction(cutAction)
+            cutAction.triggered.connect(self.doCutAction)
+            # Copy
+            copyAction = QAction(QIcon("pix/16x16/Clipboard Copy.png"),"Copy")
+            menu.addAction(copyAction)
+            copyAction.triggered.connect(self.doCopyAction)
+            # Paste
+            pasteAction = QAction(QIcon("pix/16x16/Clipboard Paste.png"),"Paste")
+            pasteAction.setEnabled(self.clipboardFull)
+            menu.addAction(pasteAction)
+            pasteAction.triggered.connect(self.doPasteAction)
+            menu.addSeparator()
+            # Project Properties
+            propertiesAction = QAction(QIcon("pix/16x16/Gear.png"),"Project properties")
+            menu.addAction(propertiesAction)
+            propertiesAction.triggered.connect(self.doProjectPropertiesAction)
+            # Close project
+            closeProjectAction = QAction(QIcon("pix/16x16/Close.png"),"Close project")
+            menu.addAction(closeProjectAction)
+            closeProjectAction.triggered.connect(self.closeProject)
+
+            menu.exec_(self.tvwProject.viewport().mapToGlobal(point))     
     
 #-------------------------------------------------------------------------------
 # isFileOpen()
@@ -1364,10 +1395,19 @@ class MainWindow(QMainWindow):
                         projectName = os.path.basename(os.path.normpath(os.path.dirname(filepath)))
                         self.showDebug(projectName)
                         if self.lblProject.text() != projectName:
+                            self.tvwProject.setModel(self.tvmProject)
+                            self.tvwProject.setAnimated(False)
+                            self.tvwProject.setIndentation(10)
+                            self.tvwProject.setSortingEnabled(True)        
+                            for i in range(1, self.tvwProject.header().length()):
+                                self.tvwProject.hideColumn(i)
+                            self.tvwProject.sortByColumn(0, Qt.AscendingOrder)
                             myProject = os.path.basename(os.path.normpath(os.path.dirname(filepath)))
                             self.showDebug(myProject)
+                            self.project = projects.Project(parent = self)
                             self.project.set(myProject)
-                            (_, filename) = self.project.open()
+                            # (_, filename) = self.project.open()
+                            self.project.open()
                         else:
                             self.doEditFile(filepath, syntax="xml")
                             self.showMessage("Project %s already open" % projectName)
@@ -1648,18 +1688,15 @@ class MainWindow(QMainWindow):
         for key in fileProps:
             self.outputMessage("%s : %s" % (key, fileProps[key]))
         self.outputMessage("=" * 80)            
-        
-#-------------------------------------------------------------------------------
-# doCloseProjectAction()
-#-------------------------------------------------------------------------------
-    def doCloseProjectAction(self):
-        pass
-    
+            
 #-------------------------------------------------------------------------------
 # doExportProject()
 #-------------------------------------------------------------------------------
     def doExportProject(self):
-        self.project.exportProject()
+        if self.project is not None:
+            self.project.exportProject()
+        else:
+            self.showMessage("No open project")
         
 #-------------------------------------------------------------------------------
 # doProjectPropertiesAction()
@@ -1790,6 +1827,7 @@ class MainWindow(QMainWindow):
     def outputExport(self):
         home = expanduser("~")
         fileName = QFileDialog.getSaveFileName(self, 'Export Output', home, filter='*.txt', options = QFileDialog.DontUseNativeDialog)
+        # fileName = QFileDialog.getOpenFileName(self,    tr("Open Image"), "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"))
         if fileName[0]:
             with open(fileName[0], "w") as fOutput:
                 fOutput.write(self.txtOutput.toPlainText())    
@@ -1885,23 +1923,60 @@ class MainWindow(QMainWindow):
         except:
             pass
         self.btnKillProcess.setEnabled(False)
-        self.showMessage("Return Code : %d" % self.tCmd.returncode)
+        if self.tCmd.returncode is not None:
+            self.showMessage("Return Code : %d" % self.tCmd.returncode)
         self.showMessage("=" * 80)                        
         
 #-------------------------------------------------------------------------------
 # newProject()
 #-------------------------------------------------------------------------------
     def newProject(self):
+        self.project = projects.Project(parent = self)
         if self.project.createNew():
             self.showMessage("Project created")
         else:
+            self.project = None
             self.showMessage("No project")
-            
+
+#-------------------------------------------------------------------------------
+# openProject()
+#-------------------------------------------------------------------------------
+    def openProject(self):
+        home = settings.db['BSIDE_REPOSITORY']
+        filename = QFileDialog.getOpenFileName(self, 'Open Project', home, filter='*.bsix', options = QFileDialog.DontUseNativeDialog)
+        if filename[0]:
+            if self.project is not None:
+                self.project.close()
+            self.tvwProject.setModel(self.tvmProject)
+            self.tvwProject.setAnimated(False)
+            self.tvwProject.setIndentation(10)
+            self.tvwProject.setSortingEnabled(True)        
+            for i in range(1, self.tvwProject.header().length()):
+                self.tvwProject.hideColumn(i)
+            self.tvwProject.sortByColumn(0, Qt.AscendingOrder)
+            projectName = os.path.basename(os.path.normpath(os.path.dirname(filename[0])))
+            self.showDebug(projectName)
+            self.project = projects.Project(parent = self)
+            self.project.set(projectName)
+            self.project.open()
+        
 #-------------------------------------------------------------------------------
 # closeProject()
 #-------------------------------------------------------------------------------
     def closeProject(self):
-        self.project.close()
+        if self.project is not None:
+            self.project.close()
+            # self.tvmProject.setRootPath(expanduser("~"))        
+            # self.tvwProject.setRootIndex(self.tvmProject.index(expanduser("~")))
+            self.tvwProject.setModel(None)
+            self.tbwHighLeft.setCurrentIndex(0)
+            self.lblProject.setText(const.PROJECT_NONE)
+            self.lblProjectName.setText(const.PROJECT_NONE)          
+            self.lblProjectStatus.setText("N/A")
+            self.project = None
+        else:
+            self.showMessage("No open project")
+
             
 #-------------------------------------------------------------------------------
 # switchFullScreen()

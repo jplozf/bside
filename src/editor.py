@@ -52,6 +52,7 @@ class WEditor(QWidget):
         
         css = 'font: %dpt "%s"; background-color: %s;' % (settings.db['EDITOR_FONT_SIZE'],settings.db['EDITOR_FONT'],settings.db['EDITOR_COLOR_BACKGROUND'])
         self.txtEditor.setStyleSheet(css)
+        # self.txtEditor.keyPressEvent = self.editorKeyPressEvent
 
         self.lblRowCol = QLabel("00000 : 00000")
         self.lblFileName = QLabel("*NONE")
@@ -139,7 +140,7 @@ class WEditor(QWidget):
         self.txtEditor.textChanged.connect(self.changedText)
         self.txtEditor.selectionChanged.connect(self.handleSelectionChanged)
         self.txtEditor.cursorPositionChanged.connect(self.cursorPosition)
-        self.txtEditor.setTabStopWidth(self.txtEditor.fontMetrics().width(' ') * 4)
+        self.txtEditor.setTabStopDistance(self.txtEditor.fontMetrics().width(' ') * 4)
         self.cursorPosition()                
         
 #-------------------------------------------------------------------------------
@@ -185,6 +186,11 @@ class WEditor(QWidget):
 # saveFile()
 #-------------------------------------------------------------------------------
     def saveFile(self):
+        # Convert tabs to spaces before saving file
+        s = self.txtEditor.toPlainText()
+        s = s.replace("\t", settings.db['BSIDE_TAB_SPACES'] * ' ')
+        self.txtEditor.setPlainText(s)
+        
         if self.filename is not None:
             with open(self.filename, "w") as pyFile:
                 pyFile.write(self.txtEditor.toPlainText())
@@ -227,7 +233,16 @@ class WEditor(QWidget):
             self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon("pix/silk/icons/bullet_red.png"))
         self.extractFuncs()
         self.displaySize()
-
+                              
+#-------------------------------------------------------------------------------
+# editorKeyPressEvent()
+#-------------------------------------------------------------------------------
+    def editorKeyPressEvent(self, event):
+        super(QCodeEditor.QCodeEditor, self.txtEditor).keyPressEvent(event)
+        print("KEY EVENT")
+        if event.key() == Qt.Key_Tab:
+            print("TAB")
+                
 #-------------------------------------------------------------------------------
 # displaySize()
 #-------------------------------------------------------------------------------
