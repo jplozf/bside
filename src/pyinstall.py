@@ -6,6 +6,7 @@ import shutil
 import os
 import sys
 import time
+import datetime
 from subprocess import Popen, PIPE
 
 import settings
@@ -45,8 +46,8 @@ def initFormEXE(mw):
     mw.lblUPXDir.mousePressEvent = lambda event, widget=mw.txtUPXDir : doClickForPath(event, widget)
     mw.lblSpecPath.mousePressEvent = lambda event, widget=mw.txtSpecPath : doClickForPath(event, widget)
     
-    mw.lblAddData.mousePressEvent = lambda event, widget=mw.lstAddData : doClickForAddSRCDST(event, widget)
-    mw.lblAddBinary.mousePressEvent = lambda event, widget=mw.lstAddBinary : doClickForAddSRCDST(event, widget)
+    mw.lblAddData.mousePressEvent = lambda event, mw=mw : doClickForAddSRCDST(event, mw)
+    mw.lblAddBinary.mousePressEvent = lambda event, mw=mw : doClickForAddSRCDST(event, mw)
    
 #-------------------------------------------------------------------------------
 # doClickForPath()
@@ -59,10 +60,22 @@ def doClickForPath(event, widget):
 #-------------------------------------------------------------------------------
 # doClickForAddSRCDST()
 #-------------------------------------------------------------------------------
-def doClickForAddSRCDST(event, widget):
-    dlg = dialog.DlgAddData(widget)
-    dlg.exec()
-
+def doClickForAddSRCDST(event, mw):
+    dlg = dialog.DlgAddData(mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        src = dlg.txtDataSource.text()
+        dst = dlg.txtDataDest.text()
+        mw.lstAddData.addItem("%s%s%s" % (src, os.pathsep, dst))
+        
+#-------------------------------------------------------------------------------
+# getAddDataOption()
+#-------------------------------------------------------------------------------
+def getAddDataOption(mw):
+    rc = ""
+    for i in range(mw.lstAddData.count()):
+        rc = rc + '--add-data="%s" ' % str(mw.lstAddData.item(i).text())
+    return rc
 
 #-------------------------------------------------------------------------------
 # buildEXE()
@@ -97,8 +110,7 @@ def buildEXE(mw):
     
     if mw.CurrentOS == "Windows":
         name_EXE = name_EXE + ".exe" if name_EXE[-3:].lower() != ".exe" else name_EXE
-        
-        
+                
     if mw.chkCleanBeforeBuild.isChecked():
         utils.deleteFolder(dist_path)
         utils.deleteFolder(work_path)
@@ -146,14 +158,16 @@ def buildCommand(mw):
     key_option = '--key {} '.format(mw.txtKeyBuild.text()) if mw.txtKeyBuild.text() else ''   
     strip_option = '--strip ' if mw.chkStrip.isChecked() else ''
     noupx_option = '--noupx ' if mw.chkNoUPX.isChecked() else ''
+    adddata_option = getAddDataOption(mw)
     
     
-    command_line = 'pyinstaller {}{} {}{}{}{}{}{}{}{}{}{}'.format(\
+    command_line = 'pyinstaller {}{} {}{}{}{}{}{}{}{}{}{}{}'.format(\
     gen_option,\
     source_file,\
     workpath_option,\
     dispath_option,\
     specpath_option,\
+    adddata_option,\
     name_option,\
     upxdir_option,\
     ascii_option,\
@@ -245,10 +259,12 @@ def runCommand2(command, cwd, mw):
 def runCommand(command, cwd, mw, typeRun):    
     global mode
     mode = typeRun
+    
+    mw.setCursor(Qt.WaitCursor)
     mw.btnBuildEXE.setEnabled(False)
     mw.lblLEDBuild.setPixmap(QPixmap("pix/icons/led_red.png"))
     mw.repaint()
-    mw.txtBuildOutput.appendPlainText(settings.db['SHELL_PROMPT'] + " " + command + "\n")
+    mw.txtBuildOutput.appendPlainText("%s%s %s" % (nowPrompt(),settings.db['SHELL_PROMPT'], command))
     global time1
     time1 = time.time()
     mw.btnBreakEXE.setEnabled(True)
@@ -267,14 +283,14 @@ def handleLine(line, mw):
     if line !=  "":
         if line[0] == '1':
             if mode == MODE_BUILD:
-                mw.txtBuildOutput.appendPlainText("%s " % line[1:].rstrip())
+                mw.txtBuildOutput.appendPlainText("%s%s" % (nowPrompt(), line[1:].rstrip()))
             else:
-                mw.txtBuildOutput.appendPlainText("[OUT] %s " % line[1:].rstrip())
+                mw.txtBuildOutput.appendPlainText("%s[OUT] %s" % (nowPrompt(), line[1:].rstrip()))
         elif line[0] == '2':
             if mode == MODE_BUILD:
-                mw.txtBuildOutput.appendPlainText("%s " % line[1:].rstrip())
+                mw.txtBuildOutput.appendPlainText("%s%s" % (nowPrompt(), line[1:].rstrip()))
             else:
-                mw.txtBuildOutput.appendPlainText("[ERR] %s " % line[1:].rstrip())
+                mw.txtBuildOutput.appendPlainText("%s[ERR] %s" % (nowPrompt(), line[1:].rstrip()))
         elif line[0] == 'x':
             killProcess(mw)
 
@@ -295,13 +311,13 @@ def killProcess(mw):
 def finalizeCommand(mw):
     global tCmd
     global time1
-    mw.txtBuildOutput.appendPlainText("")
-    mw.txtBuildOutput.appendPlainText("End of         : %s" % str(tCmd.cmd))
-    mw.txtBuildOutput.appendPlainText("Running PID    : %s" % str(tCmd.process.pid))
-    mw.txtBuildOutput.appendPlainText("Return Code    : %d" % tCmd.returncode)
+    mw.txtBuildOutput.appendPlainText("%s" % nowPrompt())
+    mw.txtBuildOutput.appendPlainText("%sEnd of         : %s" % (nowPrompt(), str(tCmd.cmd)))
+    mw.txtBuildOutput.appendPlainText("%sRunning PID    : %s" % (nowPrompt(), str(tCmd.process.pid)))
+    mw.txtBuildOutput.appendPlainText("%sReturn Code    : %d" % (nowPrompt(), tCmd.returncode))
     time2 = time.time()
-    elapsed = (time2 - time1)*1000.0
-    mw.lblTimeBuild.setText("{:.3f} ms".format(elapsed))
+    elapsed = time2 - time1
+    mw.lblTimeBuild.setText(utils.getHumanTime(elapsed))
 
     mw.lblLEDBuild.setPixmap(QPixmap("pix/icons/led_green.png"))
     mw.lblRCBuild.setText("RC=%d" % tCmd.returncode)
@@ -316,26 +332,34 @@ def finalizeCommand(mw):
             mw.btnRunEXE.setEnabled(True)
             # aEXE = getEXE(os.path.join(source_path,"dist"))
             fInfo = utils.getFileInfo(name_EXE)
-            mw.txtBuildOutput.appendPlainText("")
-            mw.txtBuildOutput.appendPlainText("Executable file info")
-            mw.txtBuildOutput.appendPlainText("====================")
+            mw.txtBuildOutput.appendPlainText("%s" % nowPrompt())
+            mw.txtBuildOutput.appendPlainText("%sExecutable file info" % nowPrompt())
+            mw.txtBuildOutput.appendPlainText("%s====================" % nowPrompt())
             for key, value in fInfo.items():
-                mw.txtBuildOutput.appendPlainText("{}\t{}".format(key, value))
-            mw.txtBuildOutput.appendPlainText("")
+                mw.txtBuildOutput.appendPlainText("{}{}\t{}".format(nowPrompt(), key, value))
+            mw.txtBuildOutput.appendPlainText("%s" % nowPrompt())
             mw.lblRunEXE.setText(name_EXE)
             mw.showMessage("Build completed successfully")
         else:
-            mw.txtBuildOutput.appendPlainText("")
-            mw.txtBuildOutput.appendPlainText("!!! BUILD FAILED !!!")
-            mw.txtBuildOutput.appendPlainText("Retry with checking first the upper right \"Clean\" option.")
-            mw.txtBuildOutput.appendPlainText("")
+            mw.txtBuildOutput.appendPlainText("%s" % nowPrompt())
+            mw.txtBuildOutput.appendPlainText("%s!!! BUILD FAILED !!!" % nowPrompt())
+            mw.txtBuildOutput.appendPlainText("%sRetry with checking first the upper right \"Clean\" option." % nowPrompt())
+            mw.txtBuildOutput.appendPlainText("%s" % nowPrompt())
             mw.btnRunEXE.setEnabled(False)
             mw.lblRunEXE.setText("-")   
             mw.showMessage("Build failed")
+        mw.project.refreshStatus()
     else:
         mw.btnRunEXE.setEnabled(True)
         mw.showMessage("End of runnning builded executable with return code %d" % tCmd.returncode)
+    mw.setCursor(Qt.ArrowCursor)
 
+#-------------------------------------------------------------------------------
+# nowPrompt()
+#-------------------------------------------------------------------------------
+def nowPrompt():
+    now = datetime.datetime.now()
+    return now.strftime(settings.db['OUTPUT_TIMESTAMP'])
 #-------------------------------------------------------------------------------
 # patchChars()
 #-------------------------------------------------------------------------------

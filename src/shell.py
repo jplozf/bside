@@ -22,6 +22,7 @@ import time
 import os
 import subprocess
 
+import utils
 import settings
 import shrealding
 
@@ -126,7 +127,7 @@ class WShell(QWidget):
         self.txtConsoleOut.setStyleSheet(css)
         self.txtConsoleOut.setReadOnly(True)
         
-        self.lblTime = QLabel("0.000 ms")
+        self.lblTime = QLabel("0:00:00.00")
         self.lblTime.setFrameShape(QFrame.Panel)
         self.lblTime.setFrameShadow(QFrame.Sunken)
         self.lblTime.setLineWidth(1)
@@ -280,8 +281,10 @@ class WShell(QWidget):
 #-------------------------------------------------------------------------------
     def finalizeCommand(self):
         self.time2 = time.time()
-        elapsed = (self.time2 - self.time1)*1000.0
-        self.lblTime.setText("{:.3f} ms".format(elapsed))
+        # elapsed = (self.time2 - self.time1)*1000.0
+        # self.lblTime.setText("{:.3f} ms".format(elapsed))
+        elapsed = self.time2 - self.time1
+        self.lblTime.setText(utils.getHumanTime(elapsed))
         
         self.flagBusy = False
         self.btnEnter.setEnabled(True)

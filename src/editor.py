@@ -198,7 +198,7 @@ class WEditor(QWidget):
                 self.dirtyFlag = False
                 self.lblModified.setText("")
                 self.parent.tabBar().setTabTextColor(self.parent.currentIndex(), self.textColor)
-                self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon())
+                # self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon())
         else:
             
             if self.filetype == "python":

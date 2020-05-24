@@ -207,6 +207,16 @@ class DlgPromoteProject(QDialog):
             self.cbxLicense.setCurrentIndex(index)        
         layout.addRow(self.lblLicense, self.cbxLicense)
                 
+        # Encoding
+        self.lblEncoding = QLabel("Encoding")
+        self.cbxEncoding = QComboBox()
+        for f in const.ENCODING:
+            self.cbxEncoding.addItem(f)
+        index = self.cbxEncoding.findText(settings.db['EDITOR_CODEPAGE'])
+        if index >= 0:
+            self.cbxEncoding.setCurrentIndex(index)        
+        layout.addRow(self.lblEncoding, self.cbxEncoding)
+                
         # Buttons
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel, self);
         layout.addWidget(buttonBox)
@@ -312,6 +322,7 @@ class Project():
             if raw == False:
                 mainFile = self.getMainModule(self.path)
                 tabEditor = self.openFile(mainFile)
+                self.parent.txtMainFile.setText(mainFile)
             self.parent.setWindowTitle(self.name + " - " + const.APPLICATION_NAME)
             self.parent.lblProject.setText(self.name)
             if settings.db['PROJECT_DISPLAY_TIME'] == True:
@@ -434,10 +445,10 @@ class Project():
         props.update({'Main module': root.find('main').text})
         props.update({'Encoding': root.find('encoding').text})
         props.update({'Created' : root.find('created').text})
-        props.update({'Modified' : root.find('modified').text})
+        props.update({'Last modified' : root.find('modified').text})
         props.update({'BSide version' : root.find('bside').text})
         props.update({'Size' : str(utils.getHumanSize(utils.getDirSize2(self.path)))})
-        props.update({'Time' : self.getTimeProject()})
+        props.update({'Time spent so far' : self.getTimeProject()})
         return props
     
 #-------------------------------------------------------------------------------
@@ -489,8 +500,11 @@ class Project():
             self.name = os.path.basename(os.path.normpath(dirProject))
             self.path = package
 
+            # Encoding
+            encoding = dialog.cbxEncoding.currentText()
+
             # Project file
-            self.createXMLProjectFile(module)
+            self.createXMLProjectFile(module, encoding)
 
             # Open project
             self.open()

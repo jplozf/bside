@@ -436,7 +436,7 @@ class DlgAddData(QDialog):
         
         boxLayout = QHBoxLayout(self)
         btnRun = QPushButton()
-        icoRun = QIcon("pix/16x16/OK.png")
+        icoRun = QIcon("pix/16x16/Ok.png")
         btnRun.setIcon(icoRun)
         btnCancel = QPushButton()
         icoCancel = QIcon("pix/16x16/Cancel.png")

@@ -133,6 +133,7 @@ class MainWindow(QMainWindow):
         self.actionNewPythonFile.triggered.connect(self.newPythonFile)
         self.actionOpenFile.triggered.connect(self.openFile)
         self.actionSave.triggered.connect(self.saveFile)
+        self.actionSaveAll.triggered.connect(self.saveAll)
         self.actionClose.triggered.connect(self.closeFile)
         self.actionCloseAll.triggered.connect(self.closeAll)
         self.actionSettings.triggered.connect(self.settings)
@@ -920,7 +921,8 @@ class MainWindow(QMainWindow):
                     item.setFont(font)            
                 self.tblStructure.setItem(rowPosition , 2, item)   # Name
                 self.tblStructure.setRowHeight(rowPosition, 20)
-                self.tblStructure.horizontalHeader().setStretchLastSection(True)
+        # self.tblStructure.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        self.tblStructure.horizontalHeader().setStretchLastSection(True)
                 
         self.clearTableActions()
         if hasattr(textBox, "todo"):
@@ -941,6 +943,10 @@ class MainWindow(QMainWindow):
         
         self.tblStructure.resizeColumnsToContents()
         self.tblActions.resizeColumnsToContents()
+        self.tblStructure.horizontalHeader().setStretchLastSection(True)
+        self.tblActions.horizontalHeader().setStretchLastSection(True)
+        self.tblStructure.sortItems(0, Qt.AscendingOrder)
+        self.tblActions.sortItems(0, Qt.AscendingOrder)
             
 #-------------------------------------------------------------------------------
 # tabChange()
@@ -986,6 +992,7 @@ class MainWindow(QMainWindow):
         self.tblStructure.setEditTriggers(QTableWidget.NoEditTriggers)
         self.tblStructure.verticalHeader().setVisible(False)
         self.tblStructure.setColumnHidden(3, True)
+        self.tblStructure.horizontalHeader().setStretchLastSection(True)
 
 #-------------------------------------------------------------------------------
 # clearTableActions()
@@ -1028,7 +1035,6 @@ class MainWindow(QMainWindow):
     def saveWorkspace(self):
         for i in range(0, self.tbwHighRight.count()):
             self.closeTabFromIndex(i)
-
     
 #-------------------------------------------------------------------------------
 # closeTabFromIndex()
@@ -1083,6 +1089,19 @@ class MainWindow(QMainWindow):
                     self.saveFile()
                     self.showMessage("Saving file %s" % tab.filename)
 
+#-------------------------------------------------------------------------------
+# saveAll()
+#-------------------------------------------------------------------------------
+    def saveAll(self):
+        for i in range(0, self.tbwHighRight.count()):
+            tab = self.tbwHighRight.widget(i)
+            self.tbwHighRight.setCurrentIndex(i)
+            if isinstance(tab, editor.WEditor) or isinstance(tab, editor.WMarkdown):
+                if tab.dirtyFlag == True:
+                    tab.saveFile()
+                    self.project.refreshStatus()
+                    self.showMessage("File saved")
+        
 #-------------------------------------------------------------------------------
 # clickedSearchLine()
 #-------------------------------------------------------------------------------
@@ -1542,7 +1561,9 @@ class MainWindow(QMainWindow):
 # doPromoteProjectAction()
 #-------------------------------------------------------------------------------
     def doPromoteProjectAction(self, folder):  
-        print(folder)
+        if self.project is not None:
+            self.project.close()
+        self.project = projects.Project(parent = self)
         self.project.promoteProject(folder)
 
 #-------------------------------------------------------------------------------
@@ -1883,7 +1904,8 @@ class MainWindow(QMainWindow):
         tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())        
         if tabEditor.filename is not None:
             if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
-                tabEditor.saveFile()     
+                # tabEditor.saveFile()     
+                self.saveAll()
             pybin = sys.executable
             script = tabEditor.filename    
             
@@ -1931,7 +1953,7 @@ class MainWindow(QMainWindow):
 # killProcess()
 #-------------------------------------------------------------------------------
     def killProcess(self):        
-        self.showMessage("Killing application PID %s" % str(self.tCmd.process.pid))
+        self.showMessage("Ending application with PID %s" % str(self.tCmd.process.pid))
         self.showMessage("End of script %s" % str(self.tCmd.cmd[2]))
         try:
             self.tCmd.kill()

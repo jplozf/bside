@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
+    <item row="0" column="1">
      <widget class="QSplitter" name="mainSplitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -166,7 +166,11 @@
          </attribute>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="0">
-           <widget class="QTableWidget" name="tblStructure"/>
+           <widget class="QTableWidget" name="tblStructure">
+            <attribute name="horizontalHeaderStretchLastSection">
+             <bool>true</bool>
+            </attribute>
+           </widget>
           </item>
           <item row="1" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -295,7 +299,7 @@
        </widget>
        <widget class="QTabWidget" name="tbwLowRight">
         <property name="currentIndex">
-         <number>4</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tabOutput">
          <attribute name="icon">
@@ -1141,7 +1145,7 @@
                <enum>QFrame::Sunken</enum>
               </property>
               <property name="text">
-               <string>0.000 ms</string>
+               <string>0:00:00.00</string>
               </property>
              </widget>
             </item>
@@ -2130,6 +2134,7 @@
     <addaction name="actionOpenFile"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
+    <addaction name="actionSaveAll"/>
     <addaction name="actionSaveAs"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
@@ -2201,6 +2206,7 @@
    <addaction name="actionNewAnonymousFile"/>
    <addaction name="actionNewPythonFile"/>
    <addaction name="actionSave"/>
+   <addaction name="actionSaveAll"/>
    <addaction name="actionSettings"/>
    <addaction name="actionShell"/>
    <addaction name="actionPythonConsole"/>
@@ -2209,6 +2215,7 @@
    <addaction name="separator"/>
    <addaction name="actionSplitVertical"/>
    <addaction name="actionSplitHorizontal"/>
+   <addaction name="separator"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -2477,6 +2484,15 @@
    </property>
    <property name="text">
     <string>Split Horizontal</string>
+   </property>
+  </action>
+  <action name="actionSaveAll">
+   <property name="icon">
+    <iconset>
+     <normaloff>pix/16x16/Save.png</normaloff>pix/16x16/Save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Save all</string>
    </property>
   </action>
  </widget>

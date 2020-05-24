@@ -90,10 +90,12 @@ class DataView:
         if self._data is not None:
             return self._data
         if self.filename:
-            mode, access  = 'r+', mmap.ACCESS_READ
+            mode, access  = 'r', mmap.ACCESS_READ
+            """
             if not self.readonly:
                 mode = 'w'
                 access |= mmap.ACCESS_WRITE
+            """
             # TODO : manage Windows & Unix OS case
             # TODO : manage empty files
             # TODO : manage readonly=False
@@ -193,6 +195,7 @@ class QHexEditor(QtWidgets.QWidget):
         self.hexview.horizontalHeader().setStretchLastSection(0)
         self.hexview.selectionModel().selectionChanged.connect(self.sel_changed)
         self.open(data, filename, readonly)
+        self.close()
         self.jump()
 
 #-------------------------------------------------------------------------------
