@@ -192,8 +192,13 @@ def copyAllFilesFromTo(src, dest):
 def getPackagesList():            
     installed_packages = pkg_resources.working_set
     installed_packages_list = sorted(["%s, %s" % (i.key, i.version) for i in installed_packages])
-    # print(installed_packages_list)
     return installed_packages_list
+
+#---------------------------------------------------------------------------
+# getPackageInfo()
+#---------------------------------------------------------------------------
+def getPackageInfo(pkg):
+    return pkg_resources.get_distribution(pkg)
 
 #---------------------------------------------------------------------------
 # dateStringToTimeStamp()

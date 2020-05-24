@@ -402,8 +402,7 @@ class PythonHighlighter(QSyntaxHighlighter):
         # Build a QRegExp for each pattern
         self.rules = [(QRegExp(pat), index, fmt)
             for (pat, index, fmt) in rules]
-
-
+            
     def highlightBlock(self, text):
         """Apply syntax highlighting to the given block of text.
         """

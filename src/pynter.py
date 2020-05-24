@@ -13,6 +13,7 @@
 # Imports
 #-------------------------------------------------------------------------------
 import sys
+import subprocess
 import time
 import platform
 from code import InteractiveConsole
@@ -27,6 +28,7 @@ if platform.system() == 'Windows':
 
 import settings
 import utils
+import shrealding
 
 #-------------------------------------------------------------------------------
 # Class ConsoleBuffer
@@ -380,44 +382,199 @@ class TabPIP(QWidget):
             vLayout = QVBoxLayout(self)
             
             self.tblPackages = QTableWidget()
-            self.txtInfoPackage = QPlainTextEdit()
+            self.tblPackages.itemClicked.connect(self.pckClicked)
+            self.tblPackages.setAlternatingRowColors(True)
+            self.txtInfoPackage = QTextEdit()
+            self.txtInfoPackage.setReadOnly(True)
+            self.txtInfoPackage.setAcceptRichText(True)
+            
             hLayout1 = QHBoxLayout(self)
             hLayout1.addWidget(self.tblPackages)
             hLayout1.addWidget(self.txtInfoPackage)
+            hLayout1.setStretch(1,1)
             
             self.txtPackage = QLineEdit()
             self.btnRefresh = QPushButton("Refresh")
+            self.btnRefresh.clicked.connect(self.displayPackagesList)
+            self.chkUser = QCheckBox("user")
+            self.chkUpgrade = QCheckBox("upgrade")
             self.btnInstall = QPushButton("Install")
+            self.btnInstall.clicked.connect(self.installClicked)
             self.btnRemove = QPushButton("Remove")
+            self.btnRemove.clicked.connect(self.removeClicked)
             hLayout2 = QHBoxLayout(self)
             hLayout2.addWidget(self.btnRefresh)
             hLayout2.addWidget(self.txtPackage)            
+            hLayout2.addWidget(self.chkUser)
+            hLayout2.addWidget(self.chkUpgrade)
             hLayout2.addWidget(self.btnInstall)
             hLayout2.addWidget(self.btnRemove)
+            h2Spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum)
+            hLayout2.addItem(h2Spacer)
             
             vLayout.addLayout(hLayout1)            
             vLayout.addLayout(hLayout2)            
+                        
+            self.displayPackagesList()          
+            
+#-------------------------------------------------------------------------------
+# initPackagesList()
+#-------------------------------------------------------------------------------
+    def initPackagesList(self):
+        while (self.tblPackages.rowCount() > 0):
+            self.tblPackages.removeRow(0)
+        self.tblPackages.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        self.tblPackages.setColumnCount(2)
+        self.tblPackages.setHorizontalHeaderLabels(["Package", "Version"])
+        self.tblPackages.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.tblPackages.verticalHeader().setVisible(True)
+            
+#-------------------------------------------------------------------------------
+# displayPackagesList()
+#-------------------------------------------------------------------------------
+    def displayPackagesList(self):
+        self.initPackagesList()
+        # packs = utils.getPackagesList()
+        packs = reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze', '--all']).decode('utf-8')
+        packs = packs.split('\n')
+        packs = [pkg for pkg in packs if pkg != '']
 
-            while (self.tblPackages.rowCount() > 0):
-                self.tblPackages.removeRow(0)
-            self.tblPackages.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
-            self.tblPackages.setColumnCount(2)
-            self.tblPackages.setHorizontalHeaderLabels(["Package", "Version"])
-            self.tblPackages.setEditTriggers(QTableWidget.NoEditTriggers)
-            self.tblPackages.verticalHeader().setVisible(True)
+        for i in range(len(packs)):
+            rowPosition = self.tblPackages.rowCount()
+            self.tblPackages.insertRow(rowPosition)
+            itmPack = packs[i].split("==")
 
-            packs = utils.getPackagesList()
-            for i in range(len(packs)):
-                rowPosition = self.tblPackages.rowCount()
-                self.tblPackages.insertRow(rowPosition)
-                itmPack = packs[i].split(",")
-                
-                item = QTableWidgetItem(itmPack[0])
-                item.setTextAlignment(Qt.AlignVCenter)
-                self.tblPackages.setItem(rowPosition, 0, item)
-                
-                item = QTableWidgetItem(itmPack[1])
-                item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-                self.tblPackages.setItem(rowPosition, 1, item)
-                parent.showDebug(packs[i])
-            self.tblPackages.resizeColumnsToContents()
+            item = QTableWidgetItem(itmPack[0])
+            item.setTextAlignment(Qt.AlignVCenter)
+            self.tblPackages.setItem(rowPosition, 0, item)
+
+            item = QTableWidgetItem(itmPack[1])
+            item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            self.tblPackages.setItem(rowPosition, 1, item)
+            self.parent.showDebug(packs[i])
+        self.tblPackages.resizeColumnsToContents()
+        self.tblPackages.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        
+#-------------------------------------------------------------------------------
+# displayPackageInfo()
+#-------------------------------------------------------------------------------
+    def displayPackageInfo(self, pkg):
+        info = utils.getPackageInfo(pkg)
+        html = ("<h1>%s</h1>" % info.project_name)
+        html = html + ("<style>")
+        html = html + ("table {")
+        html = html + ("border-collapse: separate;")
+        html = html + ("border-spacing: 0 15px;")        
+        html = html + ("}")
+        html = html + ("td {")
+        html = html + ("width: 150px;")
+        html = html + ("text-align: center;")
+        html = html + ("border: 1px solid black;")
+        html = html + ("padding: 5px;")
+        html = html + ("}")
+        html = html + ("</style>")
+        html = html + ("<p>")
+        html = html + ("<table>")
+        html = html + ("<tr><td>Package</td><td>%s</td></tr>" % info.key)
+        html = html + ("<tr><td>Version</td><td>%s</td></tr>" % info.version)
+        html = html + ("<tr><td>Location</td><td>%s</td></tr>" % info.location)
+        html = html + ("<tr><td>Egg</td><td>%s</td></tr>" % info.egg_name())
+        
+        if info.platform is not None:
+            html = html + ("<tr><td>Location</td><td>%s</td></tr>" % info.platform)
+            
+        html = html + ("</table>")
+        html = html + ("</p>")
+        
+        html = html + ("<p>")
+        html = html + ("<table>")
+        extras = info.extras
+        for x in extras:
+            html = html + ("<tr><td>Extras require</td><td>%s</td></tr>" % x)
+            
+        require = info.requires(extras=extras)
+        for r in require:
+            html = html + ("<tr><td>Requirement</td><td>%s</td></tr>" % r)
+        
+        html = html + ("</table>")
+        html = html + ("</p>")
+        
+        self.txtInfoPackage.setText(html)        
+
+#-------------------------------------------------------------------------------
+# pckClicked()
+#-------------------------------------------------------------------------------
+    def pckClicked(self, item):
+        pkg = self.tblPackages.item(item.row(), 0).text()
+        self.txtPackage.setText(pkg)
+        self.displayPackageInfo(pkg)
+
+#-------------------------------------------------------------------------------
+# installClicked()
+#-------------------------------------------------------------------------------
+    def installClicked(self):
+        if self.txtPackage.text() != "":
+            self.installPackage(self.txtPackage.text())
+
+#-------------------------------------------------------------------------------
+# removeClicked()
+#-------------------------------------------------------------------------------
+    def removeClicked(self):
+        if self.txtPackage.text() != "":
+            self.uninstallPackage(self.txtPackage.text())
+
+#-------------------------------------------------------------------------------
+# installPackage()
+#-------------------------------------------------------------------------------
+    def installPackage(self, pkg):
+        cmd = "%s install %s %s %s" % (\
+        settings.db['CONSOLE_PACKAGE_INSTALLER'],\
+        "--upgrade" if self.chkUpgrade.isChecked() else "",\
+        pkg,\
+        "--user" if self.chkUser.isChecked() else ""\
+        )
+        self.parent.tbwLowRight.setCurrentIndex(0)
+        self.parent.showMessage("%s" % cmd)
+        self.tCmd = shrealding.Shreald(self.parent, cmd, "./", shell=True)
+        self.tCmd.linePrinted.connect(self.handleLine)                    
+
+#-------------------------------------------------------------------------------
+# uninstallPackage()
+#-------------------------------------------------------------------------------
+    def uninstallPackage(self, pkg):
+        cmd = "%s uninstall %s -y" % (settings.db['CONSOLE_PACKAGE_INSTALLER'], pkg)
+        self.parent.tbwLowRight.setCurrentIndex(0)
+        self.parent.showMessage("%s" % cmd)
+        self.tCmd = shrealding.Shreald(self.parent, cmd, "./", shell=True)
+        self.tCmd.linePrinted.connect(self.handleLine)                    
+
+#-------------------------------------------------------------------------------
+# handleLine()
+#-------------------------------------------------------------------------------
+    def handleLine(self, line):
+        if line !=  "":
+            if line[0] == '1':
+                self.parent.showMessage("[OUT] %s " % line[1:].rstrip())
+            elif line[0] == '2':
+                self.parent.showMessage("[ERR] %s " % line[1:].rstrip())
+            elif line[0] == 'x':
+                self.killProcess()
+            
+#-------------------------------------------------------------------------------
+# killProcess()
+#-------------------------------------------------------------------------------
+    def killProcess(self):        
+        try:
+            self.tCmd.kill()
+        except:
+            pass
+        self.finalizeCommand()
+        
+#-------------------------------------------------------------------------------
+# finalizeCommand()
+#-------------------------------------------------------------------------------
+    def finalizeCommand(self):
+        if self.tCmd.returncode is not None:
+            self.parent.showMessage("Return Code : %d" % self.tCmd.returncode)
+        self.displayPackagesList()
+        

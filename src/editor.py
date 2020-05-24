@@ -148,6 +148,7 @@ class WEditor(QWidget):
 # doSyntaxChanged()
 #-------------------------------------------------------------------------------
     def doSyntaxChanged(self, i):
+        self.txtEditor.blockSignals(True)
         if self.cbxSyntax.currentIndex() == self.SYNTAX_PYTHON:
             self.highlight = syntax.PythonHighlighter(self.txtEditor.document())
         elif self.cbxSyntax.currentIndex() == self.SYNTAX_XML:
@@ -156,7 +157,8 @@ class WEditor(QWidget):
             self.highlight = syntax.SQLHighlighter(self.txtEditor.document())
         else:
             self.highlight = syntax.TextHighlighter(self.txtEditor.document())
-            
+        self.txtEditor.blockSignals(False)
+        
 #-------------------------------------------------------------------------------
 # copyNameToClipboard()
 #-------------------------------------------------------------------------------
@@ -236,15 +238,6 @@ class WEditor(QWidget):
         self.displaySize()
                               
 #-------------------------------------------------------------------------------
-# editorKeyPressEvent()
-#-------------------------------------------------------------------------------
-    def editorKeyPressEvent(self, event):
-        super(QCodeEditor.QCodeEditor, self.txtEditor).keyPressEvent(event)
-        print("KEY EVENT")
-        if event.key() == Qt.Key_Tab:
-            print("TAB")
-                
-#-------------------------------------------------------------------------------
 # displaySize()
 #-------------------------------------------------------------------------------
     def displaySize(self):
@@ -316,6 +309,10 @@ class WEditor(QWidget):
 # gotoSearch()
 #-------------------------------------------------------------------------------
     def gotoSearch(self):
+        """
+        The GotoSearch widget could be used with a line number or a pattern to search for.
+        """
+        self.txtEditor.blockSignals(True)
         self.lblGotoSearch.setText("")
         if self.txtGotoSearch.text() != "":
             # Deselect all first
@@ -324,10 +321,12 @@ class WEditor(QWidget):
             self.txtEditor.setTextCursor(myCursor)
             
             try:
+                # Is it a line number ?
                 # Goto Line Number
                 goto = int(self.txtGotoSearch.text())
                 self.gotoLine(goto)
             except ValueError:
+                # Is it a pattern to search for ?
                 # reset previous CharFormat (if any)
                 cursor = self.txtEditor.textCursor()
                 prevCursor = self.txtEditor.textCursor()
@@ -348,6 +347,7 @@ class WEditor(QWidget):
                 # Process the displayed document
                 pos = 0
                 match = 0
+                self.window.tblSearch.setRowCount(0)
                 index = regex.indexIn(self.txtEditor.toPlainText(), pos)
                 while (index != -1):
                     # Select the matched text and apply the desired format
@@ -377,6 +377,7 @@ class WEditor(QWidget):
                 self.txtEditor.setTextCursor(prevCursor)
                 self.txtEditor.setFocus()
                 self.window.tbwLowLeft.setCurrentIndex(1)
+        self.txtEditor.blockSignals(False)
 
 #-------------------------------------------------------------------------------
 # handleSelectionChanged()

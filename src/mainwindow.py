@@ -1093,6 +1093,7 @@ class MainWindow(QMainWindow):
 # saveAll()
 #-------------------------------------------------------------------------------
     def saveAll(self):
+        me = self.tbwHighRight.currentIndex()
         for i in range(0, self.tbwHighRight.count()):
             tab = self.tbwHighRight.widget(i)
             self.tbwHighRight.setCurrentIndex(i)
@@ -1101,6 +1102,7 @@ class MainWindow(QMainWindow):
                     tab.saveFile()
                     self.project.refreshStatus()
                     self.showMessage("File saved")
+        self.tbwHighRight.setCurrentIndex(me)
         
 #-------------------------------------------------------------------------------
 # clickedSearchLine()

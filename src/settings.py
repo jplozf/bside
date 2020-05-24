@@ -42,6 +42,7 @@ defaultValues = [
     ['CONSOLE_BANNER', "Hello from BSide"],
     ['CONSOLE_PS1', ">>>"],
     ['CONSOLE_PS2', "..."],
+    ['CONSOLE_PACKAGE_INSTALLER', "pip"],
     ['BSIDE_REPOSITORY', "/media/jpl/JPL004/Projets/Python"],    
     ['BSIDE_DISPLAY_WELCOME', True, "Display welcome screen on start"],
     ['BSIDE_OPEN_LAST_WORKSPACE', True, "Open the last workspace on start"],
