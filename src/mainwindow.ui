@@ -2196,7 +2196,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionBside"/>
    <addaction name="separator"/>
    <addaction name="actionNewProject"/>
    <addaction name="actionOpenProject"/>
@@ -2268,7 +2267,7 @@
   <action name="actionSave">
    <property name="icon">
     <iconset>
-     <normaloff>../../Baggy/src/16x16/Save.png</normaloff>../../Baggy/src/16x16/Save.png</iconset>
+     <normaloff>pix/silk/icons/disk.png</normaloff>pix/silk/icons/disk.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -2441,11 +2440,19 @@
    </property>
   </action>
   <action name="actionPackages">
+   <property name="icon">
+    <iconset>
+     <normaloff>pix/silk/icons/package.png</normaloff>pix/silk/icons/package.png</iconset>
+   </property>
    <property name="text">
     <string>Packages</string>
    </property>
   </action>
   <action name="actionWelcome">
+   <property name="icon">
+    <iconset>
+     <normaloff>pix/silk/icons/drink.png</normaloff>pix/silk/icons/drink.png</iconset>
+   </property>
    <property name="text">
     <string>Welcome</string>
    </property>
@@ -2489,7 +2496,7 @@
   <action name="actionSaveAll">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Save.png</normaloff>pix/16x16/Save.png</iconset>
+     <normaloff>pix/silk/icons/disk_multiple.png</normaloff>pix/silk/icons/disk_multiple.png</iconset>
    </property>
    <property name="text">
     <string>Save all</string>

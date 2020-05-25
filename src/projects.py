@@ -318,9 +318,10 @@ class Project():
             self.parent.tvwProject.setRootIndex(self.parent.tvmProject.index(self.path))
             self.parent.tbwHighLeft.setCurrentIndex(1)
             tabEditor = None
-            mainFile = None
+            mainFile = self.getMainModule(self.path)
+            self.parent.txtMainFile.setText(mainFile)
             if raw == False:
-                mainFile = self.getMainModule(self.path)
+                # mainFile = self.getMainModule(self.path)
                 tabEditor = self.openFile(mainFile)
                 self.parent.txtMainFile.setText(mainFile)
             self.parent.setWindowTitle(self.name + " - " + const.APPLICATION_NAME)

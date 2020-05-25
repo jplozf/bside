@@ -393,6 +393,7 @@ class TabPIP(QWidget):
             hLayout1.addWidget(self.txtInfoPackage)
             hLayout1.setStretch(1,1)
             
+            self.lblPackages = QLabel("0")
             self.txtPackage = QLineEdit()
             self.btnRefresh = QPushButton("Refresh")
             self.btnRefresh.clicked.connect(self.displayPackagesList)
@@ -404,6 +405,7 @@ class TabPIP(QWidget):
             self.btnRemove.clicked.connect(self.removeClicked)
             hLayout2 = QHBoxLayout(self)
             hLayout2.addWidget(self.btnRefresh)
+            hLayout2.addWidget(self.lblPackages)
             hLayout2.addWidget(self.txtPackage)            
             hLayout2.addWidget(self.chkUser)
             hLayout2.addWidget(self.chkUpgrade)
@@ -428,6 +430,7 @@ class TabPIP(QWidget):
         self.tblPackages.setHorizontalHeaderLabels(["Package", "Version"])
         self.tblPackages.setEditTriggers(QTableWidget.NoEditTriggers)
         self.tblPackages.verticalHeader().setVisible(True)
+        self.lblPackages.setText("0")
             
 #-------------------------------------------------------------------------------
 # displayPackagesList()
@@ -452,6 +455,7 @@ class TabPIP(QWidget):
             item.setTextAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             self.tblPackages.setItem(rowPosition, 1, item)
             self.parent.showDebug(packs[i])
+        self.lblPackages.setText(str(len(packs)))
         self.tblPackages.resizeColumnsToContents()
         self.tblPackages.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         

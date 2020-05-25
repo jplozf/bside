@@ -164,11 +164,14 @@ class MainWindow(QMainWindow):
         self.btnKillProcess.clicked.connect(self.killProcess)
         self.btnKillProcess.setEnabled(False)
         
+        self.lblCorner = QLabel()
+        self.lblCorner.setPixmap(QPixmap("pix/bside.png"))
         self.tbwHighRight.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tbwHighRight.customContextMenuRequested.connect(self.openContextMenu)        
         self.tbwHighRight.setTabsClosable(True)
         self.tbwHighRight.tabCloseRequested.connect(self.closeTabFromIndex)
         self.tbwHighRight.currentChanged.connect(self.tabChange)
+        self.tbwHighRight.setCornerWidget(self.lblCorner)
         
         self.tvwModel = QFileSystemModel()
         self.tvwModel.setRootPath(settings.db['BSIDE_REPOSITORY'])   
@@ -268,6 +271,7 @@ class MainWindow(QMainWindow):
         self.statusBar.addPermanentWidget(self.lblClockIcon)
         self.statusBar.addPermanentWidget(self.lblClock)
         
+        self.tbrCorner = QToolBar(self)
         self.lblClockWake = QLabel()
         self.lblClockWake.setPixmap(QPixmap("pix/silk/icons/clock_gray.png"))
         self.lblClockWake.mousePressEvent = self.doClockWake
@@ -277,9 +281,10 @@ class MainWindow(QMainWindow):
         self.lblClockWatch = QLabel()
         self.lblClockWatch.setPixmap(QPixmap("pix/silk/icons/hourglass_gray.png"))
         self.lblClockWatch.mousePressEvent = self.doClockWatch
-        self.statusBar.addPermanentWidget(self.lblClockWake)
-        self.statusBar.addPermanentWidget(self.lblClockTimer)
-        self.statusBar.addPermanentWidget(self.lblClockWatch)
+        self.tbrCorner.addWidget(self.lblClockWake)
+        self.tbrCorner.addWidget(self.lblClockTimer)
+        self.tbrCorner.addWidget(self.lblClockWatch)
+        self.tbwLowRight.setCornerWidget(self.tbrCorner)
         
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerCount)
