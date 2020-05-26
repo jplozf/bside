@@ -31,7 +31,7 @@
         <widget class="QWidget" name="tabRepository">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Document Text.png</normaloff>../../Baggy/src/16x16/Document Text.png</iconset>
+           <normaloff>pix/16x16/Document Text.png</normaloff>pix/16x16/Document Text.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Repository</string>
@@ -45,7 +45,7 @@
         <widget class="QWidget" name="tabProject">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Light.png</normaloff>../../Baggy/src/16x16/Light.png</iconset>
+           <normaloff>pix/16x16/Light.png</normaloff>pix/16x16/Light.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Project</string>
@@ -159,7 +159,7 @@
         <widget class="QWidget" name="tabFunctions">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Recycle.png</normaloff>../../Baggy/src/16x16/Recycle.png</iconset>
+           <normaloff>pix/16x16/Recycle.png</normaloff>pix/16x16/Recycle.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Structure</string>
@@ -234,7 +234,7 @@
         <widget class="QWidget" name="tabSearch">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Search.png</normaloff>../../Baggy/src/16x16/Search.png</iconset>
+           <normaloff>pix/16x16/Search.png</normaloff>pix/16x16/Search.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Search</string>
@@ -255,7 +255,7 @@
         <widget class="QWidget" name="tabActions">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Bug.png</normaloff>../../Baggy/src/16x16/Bug.png</iconset>
+           <normaloff>pix/16x16/Bug.png</normaloff>pix/16x16/Bug.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Actions</string>
@@ -269,7 +269,7 @@
         <widget class="QWidget" name="tabProperties">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Gear.png</normaloff>../../Baggy/src/16x16/Gear.png</iconset>
+           <normaloff>pix/16x16/Gear.png</normaloff>pix/16x16/Gear.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Properties</string>
@@ -304,7 +304,7 @@
         <widget class="QWidget" name="tabOutput">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Computer.png</normaloff>../../Baggy/src/16x16/Computer.png</iconset>
+           <normaloff>pix/16x16/Computer.png</normaloff>pix/16x16/Computer.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Output</string>
@@ -375,7 +375,7 @@
         <widget class="QWidget" name="tabSearchbox">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Search.png</normaloff>../../Baggy/src/16x16/Search.png</iconset>
+           <normaloff>pix/16x16/Search.png</normaloff>pix/16x16/Search.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Search</string>
@@ -436,7 +436,7 @@
         <widget class="QWidget" name="tabVideo">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/User.png</normaloff>../../Baggy/src/16x16/User.png</iconset>
+           <normaloff>pix/16x16/User.png</normaloff>pix/16x16/User.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Focus</string>
@@ -566,7 +566,7 @@
         <widget class="QWidget" name="tabTools">
          <attribute name="icon">
           <iconset>
-           <normaloff>../../Baggy/src/16x16/Attach.png</normaloff>../../Baggy/src/16x16/Attach.png</iconset>
+           <normaloff>pix/16x16/Attach.png</normaloff>pix/16x16/Attach.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Tools</string>
@@ -2439,7 +2439,7 @@
   <action name="actionNewProject">
    <property name="icon">
     <iconset>
-     <normaloff>../../Baggy/src/16x16/My Documents.png</normaloff>../../Baggy/src/16x16/My Documents.png</iconset>
+     <normaloff>pix/16x16/My Documents.png</normaloff>pix/16x16/My Documents.png</iconset>
    </property>
    <property name="text">
     <string>New Project</string>
@@ -2448,7 +2448,7 @@
   <action name="actionOpenProject">
    <property name="icon">
     <iconset>
-     <normaloff>../../Baggy/src/16x16/Folder Open.png</normaloff>../../Baggy/src/16x16/Folder Open.png</iconset>
+     <normaloff>pix/16x16/Folder Open.png</normaloff>pix/16x16/Folder Open.png</iconset>
    </property>
    <property name="text">
     <string>Open Project</string>
@@ -2457,7 +2457,7 @@
   <action name="actionCloseProject">
    <property name="icon">
     <iconset>
-     <normaloff>../../Baggy/src/16x16/Folder Up.png</normaloff>../../Baggy/src/16x16/Folder Up.png</iconset>
+     <normaloff>pix/16x16/Folder Up.png</normaloff>pix/16x16/Folder Up.png</iconset>
    </property>
    <property name="text">
     <string>Close Project</string>
@@ -2471,7 +2471,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset>
-     <normaloff>../../Baggy/src/16x16/Gear.png</normaloff>../../Baggy/src/16x16/Gear.png</iconset>
+     <normaloff>pix/16x16/Gear.png</normaloff>pix/16x16/Gear.png</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -2480,7 +2480,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset>
-     <normaloff>../../Baggy/src/16x16/Info2.png</normaloff>../../Baggy/src/16x16/Info2.png</iconset>
+     <normaloff>pix/16x16/Info2.png</normaloff>pix/16x16/Info2.png</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -2527,7 +2527,7 @@
   <action name="actionPythonHelp">
    <property name="icon">
     <iconset>
-     <normaloff>../../Baggy/src/16x16/Question.png</normaloff>../../Baggy/src/16x16/Question.png</iconset>
+     <normaloff>pix/16x16/Question.png</normaloff>pix/16x16/Question.png</iconset>
    </property>
    <property name="text">
     <string>Python Help</string>

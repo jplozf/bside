@@ -396,8 +396,8 @@ class WEditor(QWidget):
         text = myCursor.selectedText()
         # myCursor.clearSelection()
         # self.txtEditor.setTextCursor(myCursor)
-        self.txtGotoSearch.setText(text)          
-        self.gotoSearch()
+        # self.txtGotoSearch.setText(text)          
+        # self.gotoSearch()
     
 #-------------------------------------------------------------------------------
 # gotoLine()
