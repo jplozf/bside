@@ -496,6 +496,10 @@ class MainWindow(QMainWindow):
             tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
             if isinstance(tab, editor.WEditor):
                 tab.txtGotoSearch.setFocus()
+        if key == Qt.Key_F and event.modifiers() & Qt.ControlModifier:
+            tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
+            if isinstance(tab, editor.WEditor):
+                tab.txtGotoSearch.setFocus()            
         elif key == Qt.Key_F9:
             qApp.exit(MainWindow.EXIT_CODE_REBOOT)
         """

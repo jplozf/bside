@@ -89,7 +89,7 @@ help = help + "<tr bgcolor='#6992c2'><td colspan = 2><center><b>Interface</b></c
 
 help = help + "<tr><td><b>F1</b></td><td>Show this help page</td></tr>"
 help = help + "<tr><td><b>F2</b></td><td>Save the current file</td></tr>"
-help = help + "<tr><td><b>F3</b></td><td>Search & GoTo Line</td></tr>"
+help = help + "<tr><td><b>F3 or Ctrl-F</b></td><td>Search & GoTo Line</td></tr>"
 help = help + "<tr><td><b>F5</b></td><td>Run current script</td></tr>"
 help = help + "<tr><td><b>F6</b></td><td>Open a Python console</td></tr>"
 help = help + "<tr><td><b>Ctrl+N</b></td><td>Open a new blank file</td></tr>"

@@ -84,7 +84,12 @@ class WEditor(QWidget):
         self.lblCodePage= QLabel("Encoding : %s" % encoding)
         self.lblSize = QLabel("0")
         self.txtGotoSearch = QLineEdit()
-        self.lblGotoSearch = QLabel("")
+        self.lblGotoSearch = QLabel("0")
+        self.lblGotoSearch.setAlignment(Qt.AlignCenter)
+        self.chkSearchProject = QCheckBox("Project")
+        self.chkSearchRegex = QCheckBox("Regex")
+        self.chkSearchCase = QCheckBox("Case")
+        
         h1Spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum)
         h2Spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum)
         iSearch = QLabel()
@@ -113,9 +118,13 @@ class WEditor(QWidget):
         # h2Layout.addItem(hSpacer)
         h2Layout.addWidget(iSearch)
         h2Layout.addWidget(self.txtGotoSearch)
-        h2Layout.addWidget(self.lblGotoSearch)        
-        # h2Layout.addWidget(self.lblFileName)        
+        h2Layout.addWidget(self.chkSearchCase)
+        h2Layout.addWidget(self.chkSearchProject)
+        h2Layout.addWidget(self.chkSearchRegex)
+        h2Layout.addWidget(QLabel("Match"))        
+        h2Layout.addWidget(self.lblGotoSearch)                
         h2Layout.addItem(h2Spacer)
+        
         h2Layout.addWidget(self.lblCodePage)
         h2Layout.addWidget(self.lblModified)
         h2Layout.addWidget(self.lblSize)        
@@ -373,7 +382,7 @@ class WEditor(QWidget):
                     match = match + 1
                     
                 self.window.lblSearch.setText("%d : %s" % (match, pattern))
-                self.lblGotoSearch.setText("Match : %d" % match)
+                self.lblGotoSearch.setText("%d" % match)
                 self.txtEditor.setTextCursor(prevCursor)
                 self.txtEditor.setFocus()
                 self.window.tbwLowLeft.setCurrentIndex(1)
@@ -387,7 +396,8 @@ class WEditor(QWidget):
         text = myCursor.selectedText()
         # myCursor.clearSelection()
         # self.txtEditor.setTextCursor(myCursor)
-        # self.txtGotoSearch.setText(text)          
+        self.txtGotoSearch.setText(text)          
+        self.gotoSearch()
     
 #-------------------------------------------------------------------------------
 # gotoLine()
