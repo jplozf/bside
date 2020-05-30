@@ -30,7 +30,8 @@ defaultValues = [
     ['TABS', [['Welcome', None],['About', None]]],
     ['PROJECT', None],
     ['CURRENT_TAB', 0],
-    ['CURRENT_LOW_TAB', 0]
+    ['CURRENT_LOW_TAB', 0],
+    ['MRU_PROJECTS', []]
 ]
 
 #-------------------------------------------------------------------------------
@@ -127,5 +128,8 @@ def saveWorkspace(mw):
         if tTab != None:
             tabs.append(tTab)
     db["TABS"] = tabs
+    
+    db["MRU_PROJECTS"] = mw.mruProjects
+    
     db.sync()
         

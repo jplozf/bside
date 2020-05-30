@@ -234,6 +234,8 @@ class WInter(QWidget):
         self.consoleCopy = QPushButton()
         self.consoleCopy.setIcon(QIcon(QPixmap("pix/16x16/Clipboard Paste.png")))
         self.consoleCopy.clicked.connect(self.copyClipboard)
+        
+        self.consoleVars = QTableWidget()
 
         
         # Console Properties
@@ -266,7 +268,11 @@ class WInter(QWidget):
         
         # Layout the console objects
         vLayout = QVBoxLayout(self)
-        vLayout.addWidget(self.consoleLog)
+        hLayout1 = QHBoxLayout(self)
+        splitter1 = QSplitter(Qt.Horizontal)
+        splitter1.addWidget(self.consoleLog)
+        splitter1.addWidget(self.consoleVars)
+        vLayout.addWidget(splitter1)
         hLayout = QHBoxLayout(self)
         hLayout.addWidget(self.consolePrompt)
         hLayout.addWidget(self.consoleInput)
@@ -336,6 +342,11 @@ class WInter(QWidget):
             self.consolePrompt.setText(self.ps1)
 
 #-------------------------------------------------------------------------------
+# displayVars()
+#-------------------------------------------------------------------------------
+    def displayVars(self):
+        print(self.interpreter.locals)
+#-------------------------------------------------------------------------------
 # send_console_input()
 #-------------------------------------------------------------------------------
     def send_console_input(self):
@@ -348,6 +359,7 @@ class WInter(QWidget):
         self.consoleInput.clear()
         self.interpreter.push_command.emit(str(command))
         self.consoleLog.insertPlainText("> " + str(command) + "\n")
+        self.displayVars()
 
 #-------------------------------------------------------------------------------
 # send_console_log()

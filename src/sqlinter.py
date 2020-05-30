@@ -61,7 +61,7 @@ def runSQL(mw):
     mw.iSQL = mw.iSQL + 1        
     
     try:
-        mw.txtSQLOutput.appendPlainText("%s%s" % (settings.db['SQLITE3_PROMPT'], cmd))
+        mw.txtSQLOutput.append("<br>%s<b>%s</b>" % (settings.db['SQLITE3_PROMPT'], cmd))
         if cmd.startswith("."):
             if cmd.lstrip().upper().startswith(".TABLE"):                
                 mw.curSQLDatabase.execute("SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';")
@@ -75,13 +75,20 @@ def runSQL(mw):
                     mw.curSQLDatabase.execute("SELECT sql FROM sqlite_master WHERE name = '%s';" % table)
                     displayRows(mw, mw.curSQLDatabase.fetchall())
                 except Exception as e:
-                    mw.txtSQLOutput.appendPlainText("An error occurred : %s" % str(e.args[0]))
+                    mw.txtSQLOutput.append("<p style='color:#FF0000;'>%s</p>" % str(e.args[0]))
+            if cmd.lstrip().upper().startswith(".COLUMNS"):                
+                try:
+                    table = cmd.split()[1]
+                    mw.curSQLDatabase.execute("PRAGMA table_info(%s);" % table)
+                    displayRows(mw, mw.curSQLDatabase.fetchall())
+                except Exception as e:
+                    mw.txtSQLOutput.append("<p style='color:#FF0000;'>%s</p>" % str(e.args[0]))
         else:
             mw.curSQLDatabase.execute(cmd)
             if cmd.lstrip().upper().startswith("SELECT"):
                 displayRows(mw, mw.curSQLDatabase.fetchall())
     except sqlite3.Error as e:
-        mw.txtSQLOutput.appendPlainText("An error occurred : %s" % str(e.args[0]))
+        mw.txtSQLOutput.append("<p style='color:#FF0000;'>%s</p>" % str(e.args[0]))
     mw.txtSQLOutput.verticalScrollBar().setValue(mw.txtSQLOutput.verticalScrollBar().maximum())        
     mw.txtSQLInput.selectAll()
         
@@ -89,13 +96,32 @@ def runSQL(mw):
 # displayRows()
 #-------------------------------------------------------------------------------
 def displayRows(mw, rows):
+    html = "<style>"
+    html = html + ("table {")
+    html = html + ("border-collapse: separate;")
+    html = html + ("border-spacing: 0 15px;")        
+    html = html + ("}")
+    html = html + ("td {")
+    html = html + ("width: 150px;")
+    # html = html + ("text-align: center;")
+    html = html + ("border: 1px solid black;")
+    html = html + ("padding: 5px;")
+    html = html + ("}")
+    html = html + ("</style>")
+    html = html + "<p><table>\n"
     for row in rows:
-        out = ""
+        html =  html + "<tr>"
         for field in row:
-            out = out + str(field) + "|"
-        out = out[:-1]
-        mw.txtSQLOutput.appendPlainText(out)
-        mw.txtSQLOutput.verticalScrollBar().setValue(mw.txtSQLOutput.verticalScrollBar().maximum())
+            if type(field) == str:
+                align = "align='left'"
+            else:
+                align = "align='right'"
+            html = html + "<td %s>" % align + str(field) + "</td>"
+        html = html + "</tr>\n"
+    html = html + "</table></p>\n"
+    print(html)
+    mw.txtSQLOutput.append(html)
+    mw.txtSQLOutput.verticalScrollBar().setValue(mw.txtSQLOutput.verticalScrollBar().maximum())
 
 #-------------------------------------------------------------------------------
 # copyClipboard()

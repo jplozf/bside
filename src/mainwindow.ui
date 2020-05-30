@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
+    <item row="0" column="0">
      <widget class="QSplitter" name="mainSplitter">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
@@ -299,7 +299,7 @@
        </widget>
        <widget class="QTabWidget" name="tbwLowRight">
         <property name="currentIndex">
-         <number>1</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tabOutput">
          <attribute name="icon">
@@ -382,9 +382,29 @@
          </attribute>
          <layout class="QGridLayout" name="gridLayout_8">
           <item row="0" column="0">
-           <layout class="QVBoxLayout" name="verticalLayout_12">
-            <item>
+           <widget class="QSplitter" name="splitter_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <widget class="QWidget" name="">
              <layout class="QFormLayout" name="formLayout_4">
+              <property name="fieldGrowthPolicy">
+               <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+              </property>
+              <item row="0" column="0">
+               <widget class="QRadioButton" name="radioButton_5">
+                <property name="text">
+                 <string>RadioButton</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QRadioButton" name="radioButton_6">
+                <property name="text">
+                 <string>RadioButton</string>
+                </property>
+               </widget>
+              </item>
               <item row="2" column="0">
                <widget class="QLabel" name="label_13">
                 <property name="text">
@@ -413,23 +433,10 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="0">
-               <widget class="QRadioButton" name="radioButton_5">
-                <property name="text">
-                 <string>RadioButton</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QRadioButton" name="radioButton_6">
-                <property name="text">
-                 <string>RadioButton</string>
-                </property>
-               </widget>
-              </item>
              </layout>
-            </item>
-           </layout>
+            </widget>
+            <widget class="QListView" name="listView"/>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -578,7 +585,7 @@
              <enum>QTabWidget::South</enum>
             </property>
             <property name="currentIndex">
-             <number>3</number>
+             <number>7</number>
             </property>
             <widget class="QWidget" name="tabColorPicker">
              <attribute name="title">
@@ -810,8 +817,8 @@
               <item row="0" column="0">
                <layout class="QVBoxLayout" name="verticalLayout_7">
                 <item>
-                 <widget class="QPlainTextEdit" name="txtSQLOutput">
-                  <property name="readOnly">
+                 <widget class="QTextEdit" name="txtSQLOutput">
+                  <property name="acceptRichText">
                    <bool>true</bool>
                   </property>
                  </widget>
@@ -828,7 +835,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/16x16/Folder.png</normaloff>pix/16x16/Folder.png</iconset>
+                      <normaloff>pix/icons/database.png</normaloff>pix/icons/database.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>false</bool>
@@ -2268,29 +2275,6 @@
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_File">
-    <property name="title">
-     <string>&amp;File</string>
-    </property>
-    <addaction name="actionNewProject"/>
-    <addaction name="actionOpenProject"/>
-    <addaction name="actionCloseProject"/>
-    <addaction name="separator"/>
-    <addaction name="actionShell"/>
-    <addaction name="actionPythonConsole"/>
-    <addaction name="separator"/>
-    <addaction name="actionNewAnonymousFile"/>
-    <addaction name="actionNewPythonFile"/>
-    <addaction name="actionOpenFile"/>
-    <addaction name="separator"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSaveAll"/>
-    <addaction name="actionSaveAs"/>
-    <addaction name="separator"/>
-    <addaction name="actionClose"/>
-    <addaction name="actionCloseAll"/>
-    <addaction name="actionQuit"/>
-   </widget>
    <widget class="QMenu" name="menuOptions">
     <property name="title">
      <string>Options</string>
@@ -2323,7 +2307,40 @@
     </property>
     <addaction name="actionAddTools"/>
    </widget>
-   <addaction name="menu_File"/>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <widget class="QMenu" name="menuOpenRecentProject">
+     <property name="title">
+      <string>Open Recent Project</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>pix/bside.png</normaloff>pix/bside.png</iconset>
+     </property>
+    </widget>
+    <addaction name="actionNewProject"/>
+    <addaction name="actionOpenProject"/>
+    <addaction name="menuOpenRecentProject"/>
+    <addaction name="actionCloseProject"/>
+    <addaction name="separator"/>
+    <addaction name="actionShell"/>
+    <addaction name="actionPythonConsole"/>
+    <addaction name="separator"/>
+    <addaction name="actionNewAnonymousFile"/>
+    <addaction name="actionNewPythonFile"/>
+    <addaction name="actionOpenFile"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave"/>
+    <addaction name="actionSaveAll"/>
+    <addaction name="actionSaveAs"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
+    <addaction name="actionCloseAll"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuView"/>
    <addaction name="menuOptions"/>
    <addaction name="menuTools"/>

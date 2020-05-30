@@ -25,6 +25,7 @@ from datetime import datetime, timedelta
 from string import Template
 import time
 
+from operator import itemgetter
 import utils
 import const
 import settings
@@ -332,6 +333,7 @@ class Project():
                 self.parent.lblProjectName.setText("%s" % (self.name))
             self.refreshStatus()        
             self.startSession()
+            self.addToMRU()
             return True
         else:
             self.parent.showMessage("Can't find project %s" % self.name)
@@ -362,6 +364,16 @@ class Project():
     def save(self):
         pass
 
+#-------------------------------------------------------------------------------
+# addToMRU()
+#-------------------------------------------------------------------------------
+    def addToMRU(self):
+        if len(self.parent.mruProjects) > 0:
+            if self.name not in (list(map(itemgetter(0) ,self.parent.mruProjects))):
+                self.parent.mruProjects.append([self.name, os.path.join(self.path, const.PROJECT_FILE_NAME)])
+        else:
+            self.parent.mruProjects.append([self.name, os.path.join(self.path, const.PROJECT_FILE_NAME)])
+            
 #-------------------------------------------------------------------------------
 # close()
 #-------------------------------------------------------------------------------

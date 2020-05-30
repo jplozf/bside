@@ -102,6 +102,7 @@ class MainWindow(QMainWindow):
     focusState = HAS_FOCUS
     previousFocusState = HAS_FOCUS
     aAlarms = []
+    mruProjects= []
     
 #-------------------------------------------------------------------------------
 # __init__()
@@ -140,7 +141,7 @@ class MainWindow(QMainWindow):
         self.actionAbout.triggered.connect(self.about)
         self.actionNewProject.triggered.connect(self.newProject)
         self.actionOpenProject.triggered.connect(self.openProject)
-        self.actionCloseProject.triggered.connect(self.closeProject)
+        self.actionCloseProject.triggered.connect(self.closeProject)        
         self.actionPythonConsole.triggered.connect(self.newPynter)
         self.actionShell.triggered.connect(self.newShell)
         self.actionRunScript.triggered.connect(self.runScript)
@@ -310,6 +311,12 @@ class MainWindow(QMainWindow):
         if settings.db['BSIDE_OPEN_LAST_WORKSPACE'] == True:
             self.showMessage("Restoring workspace")
             db = workspace.restoreWorkspace()
+
+            self.mruProjects = db["MRU_PROJECTS"]
+            for p in self.mruProjects:
+                action = self.menuOpenRecentProject.addAction(p[0])
+                action.triggered.connect(lambda chk, item=p[1]: self.openProjectByFilename(item))
+                
             if db["PROJECT"] is not None:
                 self.tvwProject.setModel(self.tvmProject)
                 self.tvwProject.setAnimated(False)
@@ -1993,21 +2000,27 @@ class MainWindow(QMainWindow):
         home = settings.db['BSIDE_REPOSITORY']
         filename = QFileDialog.getOpenFileName(self, 'Open Project', home, filter='*.bsix', options = QFileDialog.DontUseNativeDialog)
         if filename[0]:
-            if self.project is not None:
-                self.project.close()
-            self.tvwProject.setModel(self.tvmProject)
-            self.tvwProject.setAnimated(False)
-            self.tvwProject.setIndentation(10)
-            self.tvwProject.setSortingEnabled(True)        
-            for i in range(1, self.tvwProject.header().length()):
-                self.tvwProject.hideColumn(i)
-            self.tvwProject.sortByColumn(0, Qt.AscendingOrder)
-            projectName = os.path.basename(os.path.normpath(os.path.dirname(filename[0])))
-            self.showDebug(projectName)
-            self.project = projects.Project(parent = self)
-            self.project.set(projectName)
-            self.project.open()
-        
+            self.openProjectByFilename(filename[0])
+    
+#-------------------------------------------------------------------------------
+# openProjectByFilename()
+#-------------------------------------------------------------------------------
+    def openProjectByFilename(self, filename):
+        if self.project is not None:
+            self.project.close()
+        self.tvwProject.setModel(self.tvmProject)
+        self.tvwProject.setAnimated(False)
+        self.tvwProject.setIndentation(10)
+        self.tvwProject.setSortingEnabled(True)        
+        for i in range(1, self.tvwProject.header().length()):
+            self.tvwProject.hideColumn(i)
+        self.tvwProject.sortByColumn(0, Qt.AscendingOrder)
+        projectName = os.path.basename(os.path.normpath(os.path.dirname(filename)))
+        self.showDebug(projectName)
+        self.project = projects.Project(parent = self)
+        self.project.set(projectName)
+        self.project.open()
+    
 #-------------------------------------------------------------------------------
 # closeProject()
 #-------------------------------------------------------------------------------
