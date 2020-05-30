@@ -12,6 +12,10 @@
 #-------------------------------------------------------------------------------
 # Imports
 #-------------------------------------------------------------------------------
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
+
 import os
 import math
 import shutil
@@ -419,3 +423,54 @@ class ThreadedCommand2(object):
             thread.join()
 
         return self.process.returncode
+
+#---------------------------------------------------------------------------
+# Class BigDisplay
+#---------------------------------------------------------------------------
+class BigDisplay(QLabel):
+#---------------------------------------------------------------------------
+# __init__()
+#---------------------------------------------------------------------------
+    def __init__(self, text, chars=25, size=20, bgcolor="#9FB8AD", fgcolor="#000000"):        
+        QLabel.__init__(self, text)
+        self.chars = chars
+        self.bgcolor = bgcolor
+        self.fgcolor = fgcolor
+        self.font = "%dpt Courier" % size
+        # self.setStyleSheet("font: %s; background-color: %s; color: %s; border: 1px solid %s; border-radius: 6px;" % (self.font, self.bgcolor, self.fgcolor, self.fgcolor))
+        self.setStyleSheet("font: %s;" % self.font)
+        self.setText(self.chars * "M")
+        self.maxWidth = self.sizeHint().width()
+        self.maxHeight = self.sizeHint().height()
+        self.setFixedSize(self.maxWidth, self.maxHeight)
+        
+        self.text = text
+        self.setText(self.text)
+        self.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        
+        self._iText = 0
+        self.timer = QTimer()
+        self.timer.timeout.connect(self._refresh)
+        self.timer.start(500)        
+                        
+#---------------------------------------------------------------------------
+# _refresh()
+#---------------------------------------------------------------------------
+    def _refresh(self):
+        if len(self.text) > self.chars:
+            print(self._iText)
+            t = self.text + " " + self.text
+            super().setText(t[self._iText:self._iText+self.chars])
+            self._iText = self._iText + 1
+            if self._iText >= self.chars:
+                self._iText= 0
+        else:
+            super().setText(self.text)
+            
+#---------------------------------------------------------------------------
+# setText()
+#---------------------------------------------------------------------------
+    def setText(self, text):
+        self.text = text
+        super().setText(text)
+        

@@ -12,6 +12,7 @@
 #-------------------------------------------------------------------------------
 # Imports
 #-------------------------------------------------------------------------------
+import re
 import sys
 import subprocess
 import time
@@ -236,7 +237,8 @@ class WInter(QWidget):
         self.consoleCopy.clicked.connect(self.copyClipboard)
         
         self.consoleVars = QTableWidget()
-
+        self.consoleVars.setColumnCount(3)
+        self.consoleVars.setHorizontalHeaderLabels(["Name", "Type", "Value"])
         
         # Console Properties
         self.consoleLog.document().setMaximumBlockCount(500)
@@ -268,7 +270,6 @@ class WInter(QWidget):
         
         # Layout the console objects
         vLayout = QVBoxLayout(self)
-        hLayout1 = QHBoxLayout(self)
         splitter1 = QSplitter(Qt.Horizontal)
         splitter1.addWidget(self.consoleLog)
         splitter1.addWidget(self.consoleVars)
@@ -285,6 +286,10 @@ class WInter(QWidget):
         self.interpreter.push_command.emit('print("' + settings.db['CONSOLE_BANNER'] + '")')
         self.interpreter.push_command.emit('print()')
         self.interpreter.push_command.emit('print()')       
+        
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.displayVars)
+        self.timer.start(500)
         
 #-------------------------------------------------------------------------------
 # copyClipboard()
@@ -345,7 +350,17 @@ class WInter(QWidget):
 # displayVars()
 #-------------------------------------------------------------------------------
     def displayVars(self):
-        print(self.interpreter.locals)
+        vars = self.interpreter.locals
+        self.consoleVars.setRowCount(0)
+        for key, value in vars.items():
+            rowPosition = self.consoleVars.rowCount()
+            self.consoleVars.insertRow(rowPosition)
+            s = str(type(value))                    
+            self.consoleVars.setItem(rowPosition , 0, QTableWidgetItem(key))
+            self.consoleVars.setItem(rowPosition , 1, QTableWidgetItem(re.findall(r"'([^']*)'", s)[0]))
+            self.consoleVars.setItem(rowPosition , 2, QTableWidgetItem(str(value)))
+        self.consoleVars.horizontalHeader().setStretchLastSection(True)
+        
 #-------------------------------------------------------------------------------
 # send_console_input()
 #-------------------------------------------------------------------------------
@@ -359,7 +374,7 @@ class WInter(QWidget):
         self.consoleInput.clear()
         self.interpreter.push_command.emit(str(command))
         self.consoleLog.insertPlainText("> " + str(command) + "\n")
-        self.displayVars()
+        # self.displayVars()
 
 #-------------------------------------------------------------------------------
 # send_console_log()
@@ -375,7 +390,10 @@ class WInter(QWidget):
 
         # Insert text
         self.consoleLog.insertPlainText(output)
-
+        
+        if output.isprintable() == True:
+            self.window.lblBigDisplay.setText(str(output))
+        
         # Move scrollbar
         self.scrollbar.setValue(self.scrollbar.maximum())
 

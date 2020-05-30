@@ -172,8 +172,13 @@ class MainWindow(QMainWindow):
         self.tbwHighRight.setTabsClosable(True)
         self.tbwHighRight.tabCloseRequested.connect(self.closeTabFromIndex)
         self.tbwHighRight.currentChanged.connect(self.tabChange)
-        self.tbwHighRight.setCornerWidget(self.lblCorner)
         
+        self.lblBigDisplay = utils.BigDisplay("BSide")
+        if settings.db['BSIDE_BIG_DISPLAY'] == True:
+            self.tbwHighRight.setCornerWidget(self.lblBigDisplay)
+        else:
+            self.tbwHighRight.setCornerWidget(self.lblCorner)
+            
         self.tvwModel = QFileSystemModel()
         self.tvwModel.setRootPath(settings.db['BSIDE_REPOSITORY'])   
         self.tvwModel.setIconProvider(IconProvider())

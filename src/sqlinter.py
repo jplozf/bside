@@ -119,7 +119,6 @@ def displayRows(mw, rows):
             html = html + "<td %s>" % align + str(field) + "</td>"
         html = html + "</tr>\n"
     html = html + "</table></p>\n"
-    print(html)
     mw.txtSQLOutput.append(html)
     mw.txtSQLOutput.verticalScrollBar().setValue(mw.txtSQLOutput.verticalScrollBar().maximum())
 
