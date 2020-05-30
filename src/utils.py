@@ -458,7 +458,6 @@ class BigDisplay(QLabel):
 #---------------------------------------------------------------------------
     def _refresh(self):
         if len(self.text) > self.chars:
-            print(self._iText)
             t = self.text + " " + self.text
             super().setText(t[self._iText:self._iText+self.chars])
             self._iText = self._iText + 1

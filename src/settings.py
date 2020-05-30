@@ -55,6 +55,7 @@ defaultValues = [
     ['BSIDE_TIMER_REPOSITORY', 10],
     ['BSIDE_SHOW_REPOSITORY', False],
     ['BSIDE_BIG_DISPLAY', False],
+    ['BSIDE_BIG_DISPLAY_WIDTH', 25],
     ['BSIDE_MRU_PROJECTS', 5],
     ['BSIDE_QTDESIGNER_PATH', "/usr/bin/designer"],    
     ['THEME_ALTERNATE', ["#efefef","#000000","#ffffff","#f7f7f7","#ffffdc","#000000","#000000","#efefef","#000000","#ffffff","#0000ff","#308cc6","#ffffff"]],
