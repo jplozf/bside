@@ -438,7 +438,7 @@ class BigDisplay(QLabel):
         self.fgcolor = fgcolor
         self.font = "%dpt Courier" % size
         # self.setStyleSheet("font: %s; background-color: %s; color: %s; border: 1px solid %s; border-radius: 6px;" % (self.font, self.bgcolor, self.fgcolor, self.fgcolor))
-        self.setStyleSheet("font: %s;" % self.font)
+        self.setStyleSheet("font: %s; color: %s;" % (self.font, self.fgcolor))
         self.setText(self.chars * "M")
         self.maxWidth = self.sizeHint().width()
         self.maxHeight = self.sizeHint().height()

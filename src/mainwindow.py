@@ -173,7 +173,7 @@ class MainWindow(QMainWindow):
         self.tbwHighRight.tabCloseRequested.connect(self.closeTabFromIndex)
         self.tbwHighRight.currentChanged.connect(self.tabChange)
         
-        self.lblBigDisplay = utils.BigDisplay("BSide", chars=int(settings.db['BSIDE_BIG_DISPLAY_WIDTH']))
+        self.lblBigDisplay = utils.BigDisplay("BSide", chars=int(settings.db['BSIDE_BIG_DISPLAY_WIDTH']), fgcolor=settings.db['BSIDE_BIG_DISPLAY_COLOR'])
         if settings.db['BSIDE_BIG_DISPLAY'] == True:
             self.tbwHighRight.setCornerWidget(self.lblBigDisplay)
         else:
