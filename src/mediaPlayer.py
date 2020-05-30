@@ -33,6 +33,7 @@ class MovieWidget(QWidget):
     def __init__(self, parent=None):
         super(MovieWidget, self).__init__(parent)
         mini = True
+        self.parent = parent
         self.isVideoAvailable = False
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         
@@ -151,10 +152,11 @@ class MovieWidget(QWidget):
 #-------------------------------------------------------------------------------
     def openFile(self):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open Media", QDir.homePath(), "All Files (*);;Movies (*.avi *.mp4);;Music (*.mp3 *.ogg)", options = QFileDialog.DontUseNativeDialog)
-        if fileName != '':
+        if fileName != '':            
+            self.mediaSource = os.path.splitext(os.path.basename(fileName))[0]
             self.mediaPlayer.setMedia(QMediaContent(QUrl.fromLocalFile(fileName)))
             self.errorLabel.setText(os.path.splitext(os.path.basename(fileName))[0])
-            self.lblFile.setText(" " + os.path.splitext(os.path.basename(fileName))[0])
+            self.lblFile.setText(" " + self.mediaSource)
             self.playButton.setEnabled(True)
             self.playAction.setEnabled(True)
             self.closeAction.setEnabled(True)
@@ -167,6 +169,7 @@ class MovieWidget(QWidget):
         url, ok = QInputDialog.getText(self, 'Open Stream', 'URL of stream :')
         if ok:
             if url != '':
+                self.mediaSource = url
                 self.mediaPlayer.setMedia(QMediaContent(QUrl(url)))
                 self.errorLabel.setText(url)
                 self.lblFile.setText(" " + url)
@@ -194,6 +197,7 @@ class MovieWidget(QWidget):
             self.mediaPlayer.pause()
         else:
             self.mediaPlayer.play()
+            self.parent.lblBigDisplay.setText(self.mediaSource)
     
 #-------------------------------------------------------------------------------
 # playForce()
@@ -342,6 +346,7 @@ class VideoWindow(QMainWindow):
             self.mediaPlayer.pause()
         else:
             self.mediaPlayer.play()
+            self.lblBigDisplay.setText(str(self.mediaPlayer.media().request()))
 
 #-------------------------------------------------------------------------------
 # mediaStateChanged()
