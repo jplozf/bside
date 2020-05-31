@@ -15,7 +15,7 @@
  
 ## Authors
 
-- Main developper : **Jean-Pierre Liguori**
+- Main developper : [**Jean-Pierre Liguori**](http://www.ozf.fr/#bside)
 
 
 ## License
