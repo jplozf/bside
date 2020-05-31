@@ -273,6 +273,7 @@ class WInter(QWidget):
         splitter1 = QSplitter(Qt.Horizontal)
         splitter1.addWidget(self.consoleLog)
         splitter1.addWidget(self.consoleVars)
+        splitter1.setStretchFactor(0, 2)
         vLayout.addWidget(splitter1)
         hLayout = QHBoxLayout(self)
         hLayout.addWidget(self.consolePrompt)
@@ -392,7 +393,7 @@ class WInter(QWidget):
         self.consoleLog.insertPlainText(output)
         
         if output.isprintable() == True:
-            self.window.lblBigDisplay.setText(str(output))
+            self.window.bigDisplay(str(output))
         
         # Move scrollbar
         self.scrollbar.setValue(self.scrollbar.maximum())

@@ -223,12 +223,11 @@ class MainWindow(QMainWindow):
         self.btnBrowseMainFile.clicked.connect(lambda: pyinstall.browseMainFile(self))
         self.btnRunEXE.clicked.connect(lambda: pyinstall.runEXE(self))
         
-        lorem.initFormLorem(self)
+        self.showMessage("%s %s %s" % (const.APPLICATION_NAME, const.VERSION, const.COPYRIGHT))
         
-        pyinstall.initFormEXE(self)
-        
-        sqlinter.initFormSQL(self)
-        
+        lorem.initFormLorem(self)        
+        pyinstall.initFormEXE(self)        
+        sqlinter.initFormSQL(self)        
         toolsbase64.initBase64(self)
         
         self.setTabsText(self.tbwLowLeft, settings.db['TAB_LOW_LEFT_NAMES'])
@@ -359,10 +358,37 @@ class MainWindow(QMainWindow):
                             self.about()
                 self.tbwHighRight.setCurrentIndex(db["CURRENT_TAB"])
                 self.tbwLowRight.setCurrentIndex(db["CURRENT_LOW_TAB"])
+                self.tbwHighLeft.setCurrentIndex(1)
+            else:
+                tabs = db["TABS"]
+                for i in range(len(tabs)):
+                    print(tabs[i])
+                    if tabs[i][0] == "Welcome":
+                        self.welcome()
+                    elif tabs[i][0] == "Settings":
+                        self.settings()
+                    elif tabs[i][0] == "WEditor":
+                        self.doEditFile(tabs[i][1])
+                    elif tabs[i][0] == "WMarkdown":
+                        self.doEditFile(tabs[i][1])
+                    elif tabs[i][0] == "WHexedit":
+                        self.doEditFile(tabs[i][1], syntax="binary")
+                    elif tabs[i][0] == "WXInter" or tabs[i][0] == "LXInter" or tabs[i][0] == "WInter":
+                        self.newPynter()
+                    elif tabs[i][0] == "WXShell" or tabs[i][0] == "LXShell" or tabs[i][0] == "WShell":
+                        self.newShell()
+                    elif tabs[i][0] == "TabPIP":
+                        self.doPackagesAction()
+                    elif tabs[i][0] == "Help":
+                        self.about()
+            self.tbwHighRight.setCurrentIndex(db["CURRENT_TAB"])
+            self.tbwLowRight.setCurrentIndex(db["CURRENT_LOW_TAB"])                
+            self.tbwHighLeft.setCurrentIndex(0)
         else:
             if settings.db['BSIDE_DISPLAY_WELCOME'] == True:
                 self.welcome()
             self.tbwHighRight.setCurrentIndex(0) 
+        self.bigDisplay("BSide")
             
 #-------------------------------------------------------------------------------
 # splitHorizontalResize()
@@ -653,6 +679,12 @@ class MainWindow(QMainWindow):
         self.showMessage("Settings saved")
         
 #-------------------------------------------------------------------------------
+# bigDisplay()
+#-------------------------------------------------------------------------------
+    def bigDisplay(self, msg):
+        self.lblBigDisplay.setText(msg)
+        
+#-------------------------------------------------------------------------------
 # showMessage()
 #-------------------------------------------------------------------------------
     def showMessage(self, msg):
@@ -803,7 +835,8 @@ class MainWindow(QMainWindow):
         tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
         if isinstance(tab, editor.WEditor) or isinstance(tab, editor.WMarkdown):
             tab.saveFile()
-            self.project.refreshStatus()
+            if self.project is not None:
+                self.project.refreshStatus()
             self.showMessage("File saved")
         else:
             self.showMessage("Nothing to save")
@@ -947,6 +980,8 @@ class MainWindow(QMainWindow):
                 self.tblStructure.setRowHeight(rowPosition, 20)
         # self.tblStructure.horizontalHeader().setResizeMode(QHeaderView.Stretch)
         self.tblStructure.horizontalHeader().setStretchLastSection(True)
+        lines = textBox.txtEditor.document().blockCount()
+        self.lblStructureLines.setText("%d line%s" % (lines, "s" if lines > 1 else ""))
                 
         self.clearTableActions()
         if hasattr(textBox, "todo"):
@@ -1124,7 +1159,8 @@ class MainWindow(QMainWindow):
             if isinstance(tab, editor.WEditor) or isinstance(tab, editor.WMarkdown):
                 if tab.dirtyFlag == True:
                     tab.saveFile()
-                    self.project.refreshStatus()
+                    if self.project is not None:
+                        self.project.refreshStatus()
                     self.showMessage("File saved")
         self.tbwHighRight.setCurrentIndex(me)
         

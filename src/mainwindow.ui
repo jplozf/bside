@@ -175,7 +175,7 @@
           <item row="1" column="0">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QLabel" name="label">
+             <widget class="QLabel" name="lblStructureLines">
               <property name="text">
                <string>Sort by</string>
               </property>
@@ -386,7 +386,7 @@
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <widget class="QWidget" name="">
+            <widget class="QWidget" name="layoutWidget">
              <layout class="QFormLayout" name="formLayout_4">
               <property name="fieldGrowthPolicy">
                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>

@@ -8,6 +8,9 @@ import sys
 import time
 import datetime
 from subprocess import Popen, PIPE
+from importlib import util
+import tempfile
+from os.path import splitext
 
 import settings
 import utils
@@ -48,7 +51,7 @@ def initFormEXE(mw):
     
     mw.lblAddData.mousePressEvent = lambda event, mw=mw : doClickForAddSRCDST(event, mw)
     mw.lblAddBinary.mousePressEvent = lambda event, mw=mw : doClickForAddSRCDST(event, mw)
-   
+       
 #-------------------------------------------------------------------------------
 # doClickForPath()
 #-------------------------------------------------------------------------------
@@ -183,9 +186,13 @@ def buildCommand(mw):
 # browseMainFile()
 #-------------------------------------------------------------------------------
 def browseMainFile(mw):
-    filename = QFileDialog.getOpenFileName(mw, 'Open main file', '', 'Python sources (*.py);;All files (*.*)', options = QFileDialog.DontUseNativeDialog)[0]
+    filename = QFileDialog.getOpenFileName(mw, 'Open main file', '', 'Specification files (*.spec);;Python sources (*.py);;All files (*.*)', options = QFileDialog.DontUseNativeDialog)[0]
     if filename != None:
         mw.txtMainFile.setText(filename)
+        _, extension = splitext(filename)
+        if extension == ".spec":
+            # readSpecFile(filename)
+            pass
 
 #-------------------------------------------------------------------------------
 # runEXE()
@@ -360,6 +367,7 @@ def finalizeCommand(mw):
 def nowPrompt():
     now = datetime.datetime.now()
     return now.strftime(settings.db['OUTPUT_TIMESTAMP'])
+
 #-------------------------------------------------------------------------------
 # patchChars()
 #-------------------------------------------------------------------------------
@@ -370,44 +378,21 @@ def patchChars(s):
     for item in foo:
         ret.append(myChars.get(item, item)) # Try to get from dict, otherwise keep value
     return(" ".join(ret))
+
+#-------------------------------------------------------------------------------
+# loadPythonFile()
+#-------------------------------------------------------------------------------
+def loadPythonFile(name, path):
+    spec = util.spec_from_file_location(name, path)
+    module = util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
     
-"""
-                    cmd = (pybin, "-u", script, dlg.params)
-                    self.btnKillProcess.setEnabled(True)
-                    self.tbwLowRight.setCurrentIndex(0)
-                    QGuiApplication.processEvents()                     
-                    # self.tCmd = shrealding.Shreald(self, "%s -u %s" % (pybin, script))
-                    self.tCmd = shrealding.Shreald(self, cmd, os.path.dirname(script))
-                    self.tCmd.linePrinted.connect(self.handleLine)                    
-            else:
-                self.showMessage("Cancel running script %s" % script)   
-
 #-------------------------------------------------------------------------------
-# handleLine()
+# readSpecFile()
 #-------------------------------------------------------------------------------
-    def handleLine(self, line):
-        if line !=  "":
-            # print("Handle %s" % line)
-            if line[0] == '1':
-                self.showMessage("[OUT] %s " % line[1:].rstrip())
-            elif line[0] == '2':
-                self.showMessage("[ERR] %s " % line[1:].rstrip())
-            elif line[0] == 'x':
-                self.killProcess()
-            
-#-------------------------------------------------------------------------------
-# killProcess()
-#-------------------------------------------------------------------------------
-    def killProcess(self):        
-        self.showMessage("Killing application PID %s" % str(self.tCmd.process.pid))
-        self.showMessage("End of script %s" % str(self.tCmd.cmd[2]))
-        try:
-            self.tCmd.kill()
-        except:
-            pass
-        self.btnKillProcess.setEnabled(False)
-        self.showMessage("Return Code : %d" % self.tCmd.returncode)
-        self.showMessage("=" * 80)                        
-        
-
-"""        
+def readSpecFile(specfile):
+    pyfile = shutil.copy(specfile, os.path.join(tempfile.gettempdir(),"spec.py"))
+    specmodule = loadPythonFile("spec", pyfile)
+    print(specmodule.a.datas)
+    

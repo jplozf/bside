@@ -197,7 +197,7 @@ class MovieWidget(QWidget):
             self.mediaPlayer.pause()
         else:
             self.mediaPlayer.play()
-            self.parent.lblBigDisplay.setText(self.mediaSource)
+            self.parent.bigDisplay(self.mediaSource)
     
 #-------------------------------------------------------------------------------
 # playForce()
@@ -346,7 +346,6 @@ class VideoWindow(QMainWindow):
             self.mediaPlayer.pause()
         else:
             self.mediaPlayer.play()
-            self.lblBigDisplay.setText(str(self.mediaPlayer.media().request()))
 
 #-------------------------------------------------------------------------------
 # mediaStateChanged()
