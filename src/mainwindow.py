@@ -1706,7 +1706,8 @@ class MainWindow(QMainWindow):
                         self.closeTabFromIndex(fop[1], force=True)
                     rc = utils.deleteFile(filePath)
                 if rc:
-                    self.project.refreshStatus()
+                    if self.project is not None:
+                        self.project.refreshStatus()
                     self.showMessage("Object [%s] deleted" % os.path.basename(filePath))
                 else:
                     self.showMessage("Unable to delete object [%s]" % os.path.basename(filePath))
