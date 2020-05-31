@@ -388,7 +388,7 @@ class MainWindow(QMainWindow):
             if settings.db['BSIDE_DISPLAY_WELCOME'] == True:
                 self.welcome()
             self.tbwHighRight.setCurrentIndex(0) 
-        self.bigDisplay("BSide")
+        self.bigDisplay("%s %s" % (const.APPLICATION_NAME, const.VERSION))
             
 #-------------------------------------------------------------------------------
 # splitHorizontalResize()

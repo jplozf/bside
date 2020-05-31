@@ -15,7 +15,7 @@
 AUTHOR    = "Jean-Pierre Liguori"
 COPYRIGHT = "Copyright 2019-2020, JPL"
 LICENSE   = "GPL"
-VERSION   = "1.0.1"
+VERSION   = "0.9.a"
 EMAIL     = "jpl@ozf.fr"
 
 ORGANIZATION_NAME   = "Open Zero Factory"
