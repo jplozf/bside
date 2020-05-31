@@ -21,3 +21,38 @@
 ## License
 
 - This project is licensed under the GNU General Public License - see the [LICENSE.md](LICENSE.md) file for details
+
+## Features
+
+### Code editor
+
+- Python syntax
+- XML syntax
+- SQL syntax
+- Code structure
+
+### Project organization
+
+### Markdown editor
+
+### Hexadecimal viewer
+
+### Shell console
+
+### Python console
+
+### Packages management 
+
+### SQLite3 console
+
+### PyInstaller GUI
+
+### TODO list
+
+### Multimedia embedded player
+
+### Repository backup
+
+### External tools support
+
+
