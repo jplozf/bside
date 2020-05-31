@@ -12,7 +12,7 @@
 #-------------------------------------------------------------------------------
 # Global Constants
 #-------------------------------------------------------------------------------
-AUTHOR    = "Jean-Pierre Liguori"
+AUTHOR    = "J.-P. Liguori"
 COPYRIGHT = "Copyright 2019-2020, J.-P. Liguori"
 LICENSE   = "GPL"
 VERSION   = "0.9.a"
