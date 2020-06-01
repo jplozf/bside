@@ -17,7 +17,7 @@
  
 ## Authors
 
-- Main developper : [**J.-P. Liguori**](http://www.ozf.fr/#bside)
+- Main developer : [**J.-P. Liguori**](http://www.ozf.fr/#bside)
 - Help wanted...
 
 ## License
