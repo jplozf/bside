@@ -1,6 +1,6 @@
-# Bside | *the Boundless and Smart IDE for Python*
+# BSide | *the Boundless and Smart IDE for Python*
 
-![Tux, the Linux mascot](src/pix/bside.png)
+![BSide logo](src/pix/bside.png)
 
 ## Summary
 
