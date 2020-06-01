@@ -43,7 +43,7 @@
 * Multimedia embedded player
 * External tools support
 * Theme and dark mode support
-* And more to come :
+* More to come :
 	- Logs tail viewer
 	- RSS feeds viewer
 	- XML tree viewer
@@ -54,7 +54,7 @@
 	- Daily project summary
 	- StackOverflow searches
 	- Repository backup
-* 
+* And why not...
 
 ## Wish list
 
