@@ -68,5 +68,11 @@
 - Code folding
 - Minimap view
 
+## Source of inspiration and tribute
+
+- [Monkey Studio IDE](https://monkeystudio.pasnox.com/)
+- [tIDE Java IDE](https://sites.google.com/site/tidejava/home)
+
+
 
 
