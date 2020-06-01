@@ -124,6 +124,7 @@ class WShell(QWidget):
         # self.txtCommand.setFont(QFont('Courier', 10))
         
         self.txtConsoleOut = QTextEdit()
+        self.txtConsoleOut.setAcceptRichText(True)
         self.txtConsoleOut.setStyleSheet(css)
         self.txtConsoleOut.setReadOnly(True)
         
@@ -237,14 +238,14 @@ class WShell(QWidget):
         elif command[1:2] == ":":
             self.CurrentDrive = command[0:2].upper()
             self.CurrentDir = os.sep
-            self.txtConsoleOut.append(settings.db['SHELL_PROMPT'] + command)
+            self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
             self.finalizeCommand()
         elif command[0:3] == "cd ":
             self.CurrentDir = os.path.abspath(command[3:])
-            self.txtConsoleOut.append(settings.db['SHELL_PROMPT'] + command)
+            self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
             self.finalizeCommand()
         else:
-            self.txtConsoleOut.append(settings.db['SHELL_PROMPT'] + command)
+            self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
             self.time1 = time.time()
             self.btnBreak.setEnabled(True)
             QGuiApplication.processEvents()                     

@@ -20,6 +20,7 @@ import platform
 import subprocess
 import tempfile
 
+import const
 import editor
 import scratch
 
@@ -312,7 +313,7 @@ def doAction(mw, i):
     doThis = doThis.replace("[RANDOM_NAME]", scratch.getRandomName(extension=""))
     doThis = doThis.replace("[TEMPDIR]", tempfile.gettempdir())
     doThis = doThis.replace("[PATHSEP]", os.path.sep)
-    doThis = doThis.replace("[PROJECT]", mw.project.name)
+    doThis = doThis.replace("[PROJECT]", const.PROJECT_NONE if mw.project is None else mw.project.name)
     doThis = doThis.replace("[HOME]", os.path.expanduser("~"))
     
     print("ACTION %s : %s" % (str(i), doThis))
