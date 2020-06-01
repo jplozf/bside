@@ -1,5 +1,7 @@
 # Bside | *the Boundless and Smart IDE for Python*
 
+![Tux, the Linux mascot](src/pix/bside.png)
+
 ## Summary
 
 - BSide aims to be the Boundless and Smart IDE for Python.
