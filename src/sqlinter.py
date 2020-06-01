@@ -1,3 +1,17 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#===============================================================================
+#                                                       ____      _     _      
+#                                                      | __ ) ___(_) __| | ___ 
+#                                                      |  _ \/ __| |/ _` |/ _ \
+#                                                      | |_) \__ \ | (_| |  __/
+#                                                      |____/|___/_|\__,_|\___|
+#                         
+#============================================================(C) JPL 2020=======
+
+#-------------------------------------------------------------------------------
+# Imports
+#-------------------------------------------------------------------------------
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -66,23 +80,46 @@ def runSQL(mw):
             if cmd.lstrip().upper().startswith(".TABLE"):                
                 mw.curSQLDatabase.execute("SELECT name FROM sqlite_master WHERE type ='table' AND name NOT LIKE 'sqlite_%';")
                 displayRows(mw, mw.curSQLDatabase.fetchall())
-            if cmd.lstrip().upper().startswith(".DATABASE"):                
+            elif cmd.lstrip().upper().startswith(".DATABASE"):                
                 mw.curSQLDatabase.execute("PRAGMA database_list;")
                 displayRows(mw, mw.curSQLDatabase.fetchall())
-            if cmd.lstrip().upper().startswith(".SCHEMA"):                
+            elif cmd.lstrip().upper().startswith(".SCHEMA"):                
                 try:
                     table = cmd.split()[1]
                     mw.curSQLDatabase.execute("SELECT sql FROM sqlite_master WHERE name = '%s';" % table)
                     displayRows(mw, mw.curSQLDatabase.fetchall())
                 except Exception as e:
                     mw.txtSQLOutput.append("<p style='color:#FF0000;'>%s</p>" % str(e.args[0]))
-            if cmd.lstrip().upper().startswith(".COLUMNS"):                
+            elif cmd.lstrip().upper().startswith(".COLUMNS"):                
                 try:
                     table = cmd.split()[1]
                     mw.curSQLDatabase.execute("PRAGMA table_info(%s);" % table)
                     displayRows(mw, mw.curSQLDatabase.fetchall())
                 except Exception as e:
                     mw.txtSQLOutput.append("<p style='color:#FF0000;'>%s</p>" % str(e.args[0]))
+            else:
+                html = "<style>"
+                html = html + ("table {")
+                html = html + ("border-collapse: separate;")
+                html = html + ("border-spacing: 0 15px;")        
+                html = html + ("}")
+                html = html + ("td {")
+                html = html + ("width: 150px;")
+                # html = html + ("text-align: center;")
+                html = html + ("border: 1px solid black;")
+                html = html + ("padding: 5px;")
+                html = html + ("}")
+                html = html + ("</style>")
+                html = html + """
+                Supported dot commands are the following :
+                <table>
+                <tr><td><b>.TABLE</b></td><td>List all tables available in the current database</td></tr>
+                <tr><td><b>.DATABASE</b></td><td>List names and files of attached databases</td></tr>
+                <tr><td><b>.SCHEMA</b> [table]</td><td>Show the CREATE statements for the matching table</td></tr>
+                <tr><td><b>.COLUMNS</b> [table]</td><td>Show the columns types for the matching table</td></tr>
+                </table>
+                """
+                mw.txtSQLOutput.append(html)
         else:
             mw.curSQLDatabase.execute(cmd)
             if cmd.lstrip().upper().startswith("SELECT"):

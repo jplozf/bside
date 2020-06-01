@@ -4,7 +4,7 @@
 
 - BSide aims to be the Boundless and Smart IDE for Python.
 - BSide is cross platform, tested on Linux and Windows.
-- BSide is written using Python 3.x and PyQt.
+- BSide is written using Python 3.x and PyQt5.
 
 ## Built with
 
@@ -16,43 +16,55 @@
 ## Authors
 
 - Main developper : [**J.-P. Liguori**](http://www.ozf.fr/#bside)
-
+- Help wanted...
 
 ## License
 
-- This project is licensed under the GNU General Public License - see the [LICENSE.md](LICENSE.md) file for details
+- This project is licensed under the GNU General Public License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## Features
 
-### Code editor
+* Code editor
+	- Python syntax highlighting
+	- XML syntax highlighting
+	- SQL syntax highlighting
+	- Code structure summary access
+* Project wizard
+* Markdown editor
+* Hexadecimal viewer
+* OS shell console
+* Python console
+* Python packages management 
+* SQLite3 console
+* PyInstaller GUI
+* TODO list management
+* Multimedia embedded player
+* External tools support
+* Theme and dark mode support
+* And more to come :
+	- Logs tail viewer
+	- RSS feeds viewer
+	- XML tree viewer
+	- Hashes generator
+	- Pictures viewer
+	- Alarms, timer and stopwatch timer
+	- Snippets management
+	- Daily project summary
+	- StackOverflow searches
+	- Repository backup
+* 
 
-- Python syntax
-- XML syntax
-- SQL syntax
-- Code structure
+## Wish list
 
-### Project organization
+*These features will be the subject of future versions; they are not currently being developed.*
 
-### Markdown editor
+- Virtual environment support
+- Git support
+- I18N support
+- Enhanced debug support
+- Instant messaging
+- Code folding
+- Minimap view
 
-### Hexadecimal viewer
-
-### Shell console
-
-### Python console
-
-### Packages management 
-
-### SQLite3 console
-
-### PyInstaller GUI
-
-### TODO list
-
-### Multimedia embedded player
-
-### Repository backup
-
-### External tools support
 
 

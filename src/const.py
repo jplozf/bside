@@ -24,7 +24,7 @@ APPLICATION_NAME    = "BSide"
 
 BLAHBLAH_01 = "BSide aims to be the Boundless and Smart IDE for Python."
 BLAHBLAH_02 = "BSide is cross platform, tested on Linux and Windows."
-BLAHBLAH_03 = "BSide is written using Python 3.x and PyQt."
+BLAHBLAH_03 = "BSide is written using Python 3.x and PyQt5."
 
 APP_FOLDER = ".bside"
 CONFIG_FILE = "config"
