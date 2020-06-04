@@ -19,7 +19,19 @@ from PyQt5.QtGui import *
 import platform
 import os
 from datetime import date
+import pkg_resources
 
+import utils
+import editor
+
+
+#-------------------------------------------------------------------------------
+# class DlgAddMedia
+#-------------------------------------------------------------------------------
+class DlgAddMedia(QDialog):
+    def __init__(self):
+        pass
+    
 #-------------------------------------------------------------------------------
 # class DlgProperties
 #-------------------------------------------------------------------------------
@@ -123,9 +135,10 @@ RO Created File
         self.txtFilename.textChanged.connect(self.doChangeName)
         formLayout.addRow("File name", self.txtFilename)
         
-        self.txtProject = QLineEdit(projectName)
-        self.txtProject.setReadOnly(True)
-        formLayout.addRow("Project", self.txtProject)
+        if projectName is not None:
+            self.txtProject = QLineEdit(projectName)
+            self.txtProject.setReadOnly(True)
+            formLayout.addRow("Project", self.txtProject)
         
         self.hBox = QHBoxLayout()
         self.txtFolder = QLineEdit()
@@ -471,3 +484,165 @@ print("d3 =", d3)
 d4 = today.strftime("%b-%d-%Y")
 print("d4 =", d4)
 """        
+#-------------------------------------------------------------------------------
+# newModule()
+#-------------------------------------------------------------------------------
+def newModule(mw, path):
+    dlg = DlgNewObject(None, path, "module", "new.py", mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        mw.showMessage("Create module %s" % dlg.rname)    
+        if not os.path.isfile(dlg.rname):
+            module = "resources/templates/newfiles/new.py"
+            utils.copyFile(pkg_resources.resource_filename(__name__, module), dlg.rname)            
+            mw.showMessage("New module %s created" % dlg.rname)
+        else:
+            mw.showMessage("Module %s already exists" % dlg.rname)
+        openFile(mw, dlg.rname, "python")
+
+#-------------------------------------------------------------------------------
+# newXMLFile()
+#-------------------------------------------------------------------------------
+def newXMLFile(mw, path):
+    dlg = DlgNewObject(None, path, "XML file", "new.xml", mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        mw.showMessage("Create XML %s" % dlg.rname)            
+        if not os.path.isfile(dlg.rname):
+            xml = "resources/templates/newfiles/new.xml"
+            utils.copyFile(pkg_resources.resource_filename(__name__, xml), dlg.rname)            
+            mw.showMessage("New XML %s created" % dlg.rname)
+        else:
+            mw.showMessage("XML %s already exists" % dlg.rname)
+        openFile(mw, dlg.rname, "xml")
+
+#-------------------------------------------------------------------------------
+# newHTMLFile()
+#-------------------------------------------------------------------------------
+def newHTMLFile(mw, path):
+    dlg = DlgNewObject(None, path, "HTML file", "new.html", mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        mw.showMessage("Create HTML %s" % dlg.rname)            
+        if not os.path.isfile(dlg.rname):
+            html = "resources/templates/newfiles/new.html"
+            utils.copyFile(pkg_resources.resource_filename(__name__, html), dlg.rname)            
+            mw.showMessage("New HTML %s created" % dlg.rname)
+        else:
+            mw.showMessage("HTML %s already exists" % dlg.rname)
+        openFile(mw, dlg.rname, "html")
+
+#-------------------------------------------------------------------------------
+# newMDFile()
+#-------------------------------------------------------------------------------
+def newMDFile(mw, path):
+    dlg = DlgNewObject(None, path, "MarkDown file", "new.md", mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        mw.showMessage("Create Markdown %s" % dlg.rname)            
+        if not os.path.isfile(dlg.rname):
+            md = "resources/templates/newfiles/new.md"
+            utils.copyFile(pkg_resources.resource_filename(__name__, md), dlg.rname)            
+            mw.showMessage("New Markdown %s created" % dlg.rname)
+        else:
+            mw.showMessage("Markdown %s already exists" % dlg.rname)
+        openFile(mw, dlg.rname, "md")
+
+#-------------------------------------------------------------------------------
+# newQtUIFile()
+#-------------------------------------------------------------------------------
+def newQtUIFile(mw, path):
+    dlg = DlgNewObject(None, path, "Qt UI file", "new.ui", mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        mw.showMessage("Create UI %s" % dlg.rname)            
+        if not os.path.isfile(dlg.rname):
+            ui = "resources/templates/newfiles/new.ui"
+            utils.copyFile(pkg_resources.resource_filename(__name__, ui), dlg.rname)            
+            mw.showMessage("New Qt UI %s created" % dlg.rname)
+        else:
+            mw.showMessage("Qt UI %s already exists" % dlg.rname)
+        openFile(mw, dlg.rname, "xml")
+
+#-------------------------------------------------------------------------------
+# newSQLFile()
+#-------------------------------------------------------------------------------
+def newSQLFile(mw, path):
+    dlg = DlgNewObject(None, path, "SQL file", "new.sql", mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        mw.showMessage("Create SQL %s" % dlg.rname)            
+        if not os.path.isfile(dlg.rname):
+            sql = "resources/templates/newfiles/new.sql"
+            utils.copyFile(pkg_resources.resource_filename(__name__, sql), dlg.rname)            
+            mw.showMessage("New SQL %s created" % dlg.rname)
+        else:
+            mw.showMessage("SQL %s already exists" % dlg.rname)
+        openFile(mw, dlg.rname, "sql")
+
+#-------------------------------------------------------------------------------
+# newFile()
+#-------------------------------------------------------------------------------
+def newFile(mw, path):
+    dlg = DlgNewObject(None, path, "file", "newfile", mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        mw.showMessage("Create file %s" % dlg.rname)            
+        if utils.createFile(os.path.dirname(dlg.rname), os.path.basename(dlg.rname)):                
+            mw.showMessage("New file %s created" % dlg.rname)
+            openFile(mw, dlg.rname, "text")
+        else:
+            mw.showMessage("Can't create %s" % dlg.rname)
+
+#-------------------------------------------------------------------------------
+# newFolder()
+#-------------------------------------------------------------------------------
+def newFolder(mw, path):
+    dlg = DlgNewObject(None, path, "folder", "newfolder", mw)
+    result = dlg.exec()
+    if result == QDialog.Accepted:
+        mw.showMessage("Create folder %s" % dlg.rname)            
+        if utils.createDirectory(os.path.dirname(dlg.rname), os.path.basename(dlg.rname)):                
+            mw.showMessage("New folder %s created" % dlg.rname)
+        else:
+            mw.showMessage("Can't create %s" % dlg.rname)
+
+#-------------------------------------------------------------------------------
+# openFile()
+#-------------------------------------------------------------------------------
+def openFile(mw, name, filetype="python"):
+    extension = os.path.splitext(name)[1]
+    icon = None
+    if extension == ".py":
+        icon = "pix/icons/text-x-python.png"
+    elif extension == ".xml":
+        icon = "pix/icons/application-xml.png"
+    elif extension == ".html":
+        icon = "pix/icons/text-html.png"
+    elif extension == ".sql":
+        icon = "pix/icons/database.png"
+    elif extension == ".md":
+        icon = "pix/icons/markdown.png"
+    elif extension == ".ui":
+        icon = "pix/icons/QtUI.png"
+    else:
+        icon = "pix/icons/text-icon.png"
+
+    if mw.isFileOpen(name)[0] == False:
+        if filetype == "md":
+            tabEditor = editor.WMarkdown(filename=name, parent=mw.tbwHighRight, window=mw)
+        else:
+            tabEditor = editor.WEditor(filename=name, parent=mw.tbwHighRight, window=mw, filetype=filetype)        
+        bname = os.path.basename(name)
+        mw.tbwHighRight.addTab(tabEditor, bname)
+        idxTab = mw.tbwHighRight.count() - 1
+        mw.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
+        mw.tbwHighRight.setCurrentIndex(idxTab)               
+
+        # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
+        mw.showMessage("Editing %s" % name)         
+
+        return tabEditor
+    else:
+        mw.showMessage("File %s already open" % name)         
+            

@@ -80,7 +80,12 @@ def saveWorkspace(mw):
     if not os.path.exists(appDir):
         os.makedirs(appDir)
     dbFileName = os.path.join(os.path.join(appDir, const.WORKSPACE_FILE))
-    db = shelve.open(dbFileName, writeback=True)
+    try:
+        db = shelve.open(dbFileName, writeback=True)
+    except:
+        os.remove(dbFileName)
+        db = shelve.open(dbFileName, writeback=True)
+        mw.showMessage("Workspace file corrupted, cleaning it")
 
     # Save mw current tab index
     db["CURRENT_TAB"] = mw.tbwHighRight.currentIndex()

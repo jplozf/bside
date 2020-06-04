@@ -17,8 +17,11 @@ import psutil
 import queue
 import subprocess
 import threading
+import time
 
 from PyQt5.QtCore import QThread, pyqtSignal
+
+import settings
 
 #-------------------------------------------------------------------------------
 # Class Shreald
@@ -82,7 +85,11 @@ class Shreald(QThread):
         # print("enqueue", flush=True)
         for line in iter(stream.readline, b''):
             # print("enqueue %s" % line.decode('utf-8'), flush=True)
-            queue.put(str(type) + line.decode('utf-8'))
+            #-------------------------------------------------------------------
+            # TODO : FIX THE CODEPAGE !!!
+            # queue.put(str(type) + line.decode('utf-8'))
+            queue.put(str(type) + line.decode(settings.db['SHELL_CODEPAGE']))
+            #-------------------------------------------------------------------
             # queue.put(str(type) + line)
         stream.flush()
         stream.close()
@@ -92,6 +99,8 @@ class Shreald(QThread):
 #-------------------------------------------------------------------------------
     def enqueueProcess(self, process, queue):
         self.returncode = process.wait()
+        # let's add some ignition delay to let time to complete the output
+        time.sleep(0.3)
         queue.put('x')
         self.mw.bgJob = self.mw.bgJob - 1
         

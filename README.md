@@ -72,7 +72,3 @@
 
 - [Monkey Studio IDE](https://monkeystudio.pasnox.com/)
 - [tIDE Java IDE](https://sites.google.com/site/tidejava/home)
-
-
-
-

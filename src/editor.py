@@ -486,7 +486,7 @@ class WMarkdown(QWidget):
             self.highlight = syntax.PythonHighlighter(self.txtEditor.document())
             with open(filename, encoding=encoding) as pyFile:
                 self.txtEditor.setPlainText(str(pyFile.read()))
-            os.chdir(os.path.dirname(filename))
+            # os.chdir(os.path.dirname(filename))
             self.txtMarkdown.setText(markdown.markdown(self.txtEditor.toPlainText(), extensions=settings.db['EDITOR_MD_EXTENSIONS']))
         
         self.txtGotoSearch.returnPressed.connect(self.gotoSearch)

@@ -64,8 +64,9 @@ def resource_path(relative_path):
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
+    rp = os.path.join(base_path, relative_path)
+    # print("RP=%s" % rp)
+    return rp
 
 #-------------------------------------------------------------------------------
 # Class MainWindow
@@ -166,7 +167,7 @@ class MainWindow(QMainWindow):
         self.btnKillProcess.setEnabled(False)
         
         self.lblCorner = QLabel()
-        self.lblCorner.setPixmap(QPixmap("pix/bside.png"))
+        self.lblCorner.setPixmap(QPixmap(resource_path("pix/bside.png")))
         self.tbwHighRight.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tbwHighRight.customContextMenuRequested.connect(self.openContextMenu)        
         self.tbwHighRight.setTabsClosable(True)
@@ -250,44 +251,44 @@ class MainWindow(QMainWindow):
 
         if settings.db['BSIDE_SHOW_REPOSITORY']:
             self.lblRepositoryIcon = QLabel()
-            self.lblRepositoryIcon.setPixmap(QPixmap("pix/16x16/Home.png"))
+            self.lblRepositoryIcon.setPixmap(QPixmap(resource_path("pix/16x16/Home.png")))
             self.statusBar.addPermanentWidget(self.lblRepositoryIcon)
         self.lblRepository = QLabel()
         self.statusBar.addPermanentWidget(self.lblRepository)             
         
         self.lblPythonVersionIcon = QLabel()
-        self.lblPythonVersionIcon.setPixmap(QPixmap("pix/icons/python2.5.png"))
+        self.lblPythonVersionIcon.setPixmap(QPixmap(resource_path("pix/icons/python2.5.png")))
         self.lblPythonVersion = QLabel(platform.python_version())
         self.statusBar.addPermanentWidget(self.lblPythonVersionIcon)
         self.statusBar.addPermanentWidget(self.lblPythonVersion)
         
         self.lblProjectIcon = QLabel()
-        self.lblProjectIcon.setPixmap(QPixmap("pix/16x16/My Documents.png"))
+        self.lblProjectIcon.setPixmap(QPixmap(resource_path("pix/16x16/My Documents.png")))
         self.lblProject = QLabel(const.PROJECT_NONE)
         self.statusBar.addPermanentWidget(self.lblProjectIcon)
         self.statusBar.addPermanentWidget(self.lblProject)
 
         self.lblMemoryIcon = QLabel()
-        self.lblMemoryIcon.setPixmap(QPixmap("pix/16x16/Stats.png"))
+        self.lblMemoryIcon.setPixmap(QPixmap(resource_path("pix/16x16/Stats.png")))
         self.lblMemory = QLabel()
         self.statusBar.addPermanentWidget(self.lblMemoryIcon)
         self.statusBar.addPermanentWidget(self.lblMemory)
 
         self.lblClockIcon = QLabel()
-        self.lblClockIcon.setPixmap(QPixmap("pix/16x16/Clock.png"))
+        self.lblClockIcon.setPixmap(QPixmap(resource_path("pix/16x16/Clock.png")))
         self.lblClock = QLabel()
         self.statusBar.addPermanentWidget(self.lblClockIcon)
         self.statusBar.addPermanentWidget(self.lblClock)
         
         self.tbrCorner = QToolBar(self)
         self.lblClockWake = QLabel()
-        self.lblClockWake.setPixmap(QPixmap("pix/silk/icons/clock_gray.png"))
+        self.lblClockWake.setPixmap(QPixmap(resource_path("pix/silk/icons/clock_gray.png")))
         self.lblClockWake.mousePressEvent = self.doClockWake
         self.lblClockTimer = QLabel()
-        self.lblClockTimer.setPixmap(QPixmap("pix/silk/icons/time_gray.png"))
+        self.lblClockTimer.setPixmap(QPixmap(resource_path("pix/silk/icons/time_gray.png")))
         self.lblClockTimer.mousePressEvent = self.doClockTimer
         self.lblClockWatch = QLabel()
-        self.lblClockWatch.setPixmap(QPixmap("pix/silk/icons/hourglass_gray.png"))
+        self.lblClockWatch.setPixmap(QPixmap(resource_path("pix/silk/icons/hourglass_gray.png")))
         self.lblClockWatch.mousePressEvent = self.doClockWatch
         self.tbrCorner.addWidget(self.lblClockWake)
         self.tbrCorner.addWidget(self.lblClockTimer)
@@ -304,7 +305,7 @@ class MainWindow(QMainWindow):
 
         self.lblProjectName.setText(const.PROJECT_NONE)
         self.lblProjectStatus.setText("N/A")
-        self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock_gray.png"))
+        self.lblFocusMode.setPixmap(QPixmap(resource_path("pix/16x16/Clock_gray.png")))
 
         self.restoreSettings()
         # self.btnSaveSettings.clicked.connect(self.backupSettings)
@@ -312,8 +313,11 @@ class MainWindow(QMainWindow):
         tools.initMenuTools(self)
         
         focusFileName = os.path.join(os.path.join(self.appDir, const.FOCUS_FILE))
-        with open(focusFileName, 'r') as focusFile:
-            self.txtFocus.setPlainText(str(focusFile.read()))
+        try:
+            with open(focusFileName, 'r') as focusFile:
+                self.txtFocus.setPlainText(str(focusFile.read()))
+        except:
+            pass
         
         if settings.db['BSIDE_OPEN_LAST_WORKSPACE'] == True:
             self.showMessage("Restoring workspace")
@@ -489,17 +493,17 @@ class MainWindow(QMainWindow):
                     self.timeNoFocus2 = time.time()
                     self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
                     self.previousFocusState = self.HAS_FOCUS
-                self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock.png"))
+                self.lblFocusMode.setPixmap(QPixmap(resource_path("pix/16x16/Clock.png")))
                 # self.setWindowOpacity(1.0)
             else:
                 self.focusState = self.HAS_NOT_FOCUS
                 if self.previousFocusState == self.HAS_FOCUS:
                     self.timeNoFocus1 = time.time()
                     self.previousFocusState = self.HAS_NOT_FOCUS
-                self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock_gray.png"))
+                self.lblFocusMode.setPixmap(QPixmap(resource_path("pix/16x16/Clock_gray.png")))
                 # self.setWindowOpacity(0.75)
         else:
-            self.lblFocusMode.setPixmap(QPixmap("pix/16x16/Clock_gray.png"))
+            self.lblFocusMode.setPixmap(QPixmap(resource_path("pix/16x16/Clock_gray.png")))
         
         if self.bgJob == 0 and settings.db['BSIDE_SHOW_REPOSITORY']:
             self.tick = self.tick + 1
@@ -788,7 +792,7 @@ class MainWindow(QMainWindow):
             txtHelp = helpme.TabHelp(parent=self.tbwHighRight)        
             self.tbwHighRight.addTab(txtHelp, "About")
             idxTab = self.tbwHighRight.count() - 1
-            self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/silk/icons/information.png"))
+            self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/information.png")))
             self.tbwHighRight.setCurrentIndex(idxTab)        
         self.showMessage("About")
 
@@ -806,7 +810,7 @@ class MainWindow(QMainWindow):
             txtWelcome = helpme.TabWelcome(parent=self.tbwHighRight)        
             self.tbwHighRight.addTab(txtWelcome, "Welcome")
             idxTab = self.tbwHighRight.count() - 1
-            self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/silk/icons/drink.png"))
+            self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/drink.png")))
             self.tbwHighRight.setCurrentIndex(idxTab)        
         self.showMessage("Welcome")
 
@@ -824,7 +828,7 @@ class MainWindow(QMainWindow):
             tabSettings = settings.TabSettings(parent=self.tbwHighRight)        
             self.tbwHighRight.addTab(tabSettings, "Settings")
             idxTab = self.tbwHighRight.count() - 1
-            self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/silk/icons/cog.png"))
+            self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/cog.png")))
             self.tbwHighRight.setCurrentIndex(idxTab)
         self.showMessage("Settings")
 
@@ -857,7 +861,7 @@ class MainWindow(QMainWindow):
             name = os.path.basename(filename)
             self.tbwHighRight.addTab(tabEditor, name)
             idxTab = self.tbwHighRight.count() - 1
-            self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/python2.5.png"))
+            self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/python2.5.png")))
             self.tbwHighRight.setCurrentIndex(idxTab)               
             
             tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
@@ -875,7 +879,7 @@ class MainWindow(QMainWindow):
         self.tbwHighRight.addTab(textBox, name)
         self.noname = self.noname + 1
         idxTab = self.tbwHighRight.count() - 1
-        self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/text-x-python.png"))
+        self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/text-x-python.png")))
         self.tbwHighRight.setCurrentIndex(idxTab)               
         
         textBox.txtEditor.textChanged.connect(lambda x=textBox: self.textChange(x))
@@ -901,7 +905,7 @@ class MainWindow(QMainWindow):
         self.tbwHighRight.addTab(pyBox, name)
         self.nopyth = self.nopyth + 1
         idxTab = self.tbwHighRight.count() - 1
-        self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/python2.5.png"))
+        self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/python2.5.png")))
         self.tbwHighRight.setCurrentIndex(idxTab)               
         # pyBox.consoleInput.setFocus()
         self.showMessage("New Python Interpreter")
@@ -927,7 +931,7 @@ class MainWindow(QMainWindow):
         self.tbwHighRight.addTab(shBox, name)
         self.noshell = self.noshell + 1
         idxTab = self.tbwHighRight.count() - 1
-        self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/utilities-terminal-6.png"))
+        self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/utilities-terminal-6.png")))
         self.tbwHighRight.setCurrentIndex(idxTab)                       
         # shBox.txtCommand.setFocus()
         self.showMessage("New Shell")
@@ -959,13 +963,13 @@ class MainWindow(QMainWindow):
                 item_hidden = QTableWidgetItem()    
                 item.setTextAlignment(Qt.AlignHCenter)
                 if i[2] == "class":
-                    item.setIcon(QIcon("pix/icons/class.png"))
+                    item.setIcon(QIcon(resource_path("pix/icons/class.png")))
                     item_hidden.setText("class")
                 elif i[2] == "function":
-                    item.setIcon(QIcon("pix/icons/function.png"))
+                    item.setIcon(QIcon(resource_path("pix/icons/function.png")))
                     item_hidden.setText("function")
                 elif i[2] == "var":
-                    item.setIcon(QIcon("pix/icons/var.png"))                                    
+                    item.setIcon(QIcon(resource_path("pix/icons/var.png")))
                     item_hidden.setText("var")
                 self.tblStructure.setItem(rowPosition , 3, item_hidden)   # Type
                 self.tblStructure.setItem(rowPosition , 1, item)   # Type
@@ -1276,61 +1280,98 @@ class MainWindow(QMainWindow):
               
         menu = QMenu()
         # Open
-        openAction = QAction(QIcon("pix/16x16/Folder.png"),"Open")
+        openAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")),"Open")
         menu.addAction(openAction)
         openAction.triggered.connect(self.doOpenAction)
         openAction.setEnabled(not isDir)
         
         # Open as Hexa
-        openHexaAction = QAction(QIcon("pix/16x16/Folder.png"),"Open as Hexa")
+        openHexaAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")),"Open as Hexa")
         menu.addAction(openHexaAction)
         openHexaAction.triggered.connect(self.doOpenHexaAction)
         openHexaAction.setEnabled(not isDir)
 
         # Promote to Project
-        promoteProjectAction = QAction(QIcon("pix/16x16/Folder.png"),"Promote to Project")
+        promoteProjectAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")),"Promote to Project")
         menu.addAction(promoteProjectAction)
         promoteProjectAction.triggered.connect(lambda x, folder=filePath : self.doPromoteProjectAction(folder))
         promoteProjectAction.setEnabled(isDir and not os.path.isfile(os.path.join(filePath, const.PROJECT_FILE_NAME)))
         menu.addSeparator()
 
+        """
         # New
         newAction = QAction(QIcon("pix/16x16/Pen.png"),"New")
         menu.addAction(newAction)
         newAction.triggered.connect(self.doNewAction)
-        
+        """
+        # New...
+        newFileMenu = QMenu("New...")
+        menu.addMenu(newFileMenu)
+        # New Module
+        newFileModuleAction = QAction(QIcon(resource_path("pix/icons/python2.5.png")), "Python module...")
+        newFileMenu.addAction(newFileModuleAction)
+        newFileModuleAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newModule(mw, path))
+        # New Folder
+        newFileFolderAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")), "Folder...")
+        newFileMenu.addAction(newFileFolderAction)
+        newFileFolderAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newFolder(mw, path))
+        # New Markdown
+        newFileMDAction = QAction(QIcon(resource_path("pix/icons/markdown.png")), "Markdown file...")
+        newFileMenu.addAction(newFileMDAction)
+        newFileMDAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newMDFile(mw, path))
+        # New XML
+        newFileXMLAction = QAction(QIcon(resource_path("pix/icons/xml.png")), "XML file...")
+        newFileMenu.addAction(newFileXMLAction)
+        newFileXMLAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newXMLFile(mw, path))
+        # New HTML
+        newFileHTMLAction = QAction(QIcon(resource_path("pix/icons/text-html.png")), "HTML file...")
+        newFileMenu.addAction(newFileHTMLAction)
+        newFileHTMLAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newHTMLFile(mw, path))
+        # New Qt UI
+        newFileQtUIAction = QAction(QIcon(resource_path("pix/icons/QtUI.png")), "Qt UI file...")
+        newFileMenu.addAction(newFileQtUIAction)
+        newFileQtUIAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newQtUIFile(mw, path))
+        # New SQL
+        newFileSQLAction = QAction(QIcon(resource_path("pix/icons/database.png")), "SQL file...")
+        newFileMenu.addAction(newFileSQLAction)
+        newFileSQLAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newSQLFile(mw, path))
+        # New File
+        newFileFileAction = QAction(QIcon(resource_path("pix/16x16/Document.png")), "Empty file...")
+        newFileMenu.addAction(newFileFileAction)
+        newFileFileAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newFile(mw, path))
+
         # Edit
         """
-        editAction = QAction(QIcon("pix/16x16/Pen.png"),"Edit")
+        editAction = QAction(QIcon(resource_path("pix/16x16/Pen.png")),"Edit")
         menu.addAction(editAction)
         editAction.triggered.connect(self.doEditAction)
         editAction.setEnabled(not isDir and not isBinary)
         """    
         # Delete
-        deleteAction = QAction(QIcon("pix/16x16/Trash.png"),"Delete")
+        deleteAction = QAction(QIcon(resource_path("pix/16x16/Trash.png")),"Delete")
         menu.addAction(deleteAction)
         deleteAction.triggered.connect(self.doDeleteAction)
         # Rename
-        renameAction = QAction(QIcon("pix/16x16/Back.png"),"Rename")
+        renameAction = QAction(QIcon(resource_path("pix/16x16/Back.png")),"Rename")
         menu.addAction(renameAction)
         renameAction.triggered.connect(self.doRenameAction)
         menu.addSeparator()
         # Cut
-        cutAction = QAction(QIcon("pix/16x16/Clipboard Cut.png"),"Cut")
+        cutAction = QAction(QIcon(resource_path("pix/16x16/Clipboard Cut.png")),"Cut")
         menu.addAction(cutAction)
         cutAction.triggered.connect(self.doCutAction)
         # Copy
-        copyAction = QAction(QIcon("pix/16x16/Clipboard Copy.png"),"Copy")
+        copyAction = QAction(QIcon(resource_path("pix/16x16/Clipboard Copy.png")),"Copy")
         menu.addAction(copyAction)
         copyAction.triggered.connect(self.doCopyAction)
         # Paste
-        pasteAction = QAction(QIcon("pix/16x16/Clipboard Paste.png"),"Paste")
+        pasteAction = QAction(QIcon(resource_path("pix/16x16/Clipboard Paste.png")),"Paste")
         pasteAction.setEnabled(self.clipboardFull)
         menu.addAction(pasteAction)
         pasteAction.triggered.connect(self.doPasteAction)
         menu.addSeparator()
         # Properties
-        propertiesAction = QAction(QIcon("pix/16x16/Gear.png"),"Properties")
+        propertiesAction = QAction(QIcon(resource_path("pix/16x16/Gear.png")),"Properties")
         menu.addAction(propertiesAction)
         propertiesAction.triggered.connect(self.doPropertiesAction)
         
@@ -1352,13 +1393,13 @@ class MainWindow(QMainWindow):
 
             menu = QMenu()
             # Open
-            openAction = QAction(QIcon("pix/16x16/Folder.png"), "Open")
+            openAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")), "Open")
             menu.addAction(openAction)
             openAction.triggered.connect(self.doOpenAction)
             openAction.setEnabled(not isDir)
 
             # Open as Hexa
-            openHexaAction = QAction(QIcon("pix/16x16/Folder.png"), "Open as Hexa")
+            openHexaAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")), "Open as Hexa")
             menu.addAction(openHexaAction)
             openHexaAction.triggered.connect(self.doOpenHexaAction)
             openHexaAction.setEnabled(not isDir)
@@ -1368,75 +1409,75 @@ class MainWindow(QMainWindow):
             newMenu = QMenu("New...")
             menu.addMenu(newMenu)
             # New Module
-            newModuleAction = QAction(QIcon("pix/icons/python2.5.png"), "Python module...")
+            newModuleAction = QAction(QIcon(resource_path("pix/icons/python2.5.png")), "Python module...")
             newMenu.addAction(newModuleAction)
             newModuleAction.triggered.connect(self.project.newModule)
             # New Folder
-            newFolderAction = QAction(QIcon("pix/16x16/Folder.png"), "Folder...")
+            newFolderAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")), "Folder...")
             newMenu.addAction(newFolderAction)
             newFolderAction.triggered.connect(self.project.newFolder)
             # New Markdown
-            newMDAction = QAction(QIcon("pix/icons/markdown.png"), "Markdown file...")
+            newMDAction = QAction(QIcon(resource_path("pix/icons/markdown.png")), "Markdown file...")
             newMenu.addAction(newMDAction)
             newMDAction.triggered.connect(self.project.newMDFile)
             # New XML
-            newXMLAction = QAction(QIcon("pix/icons/xml.png"), "XML file...")
+            newXMLAction = QAction(QIcon(resource_path("pix/icons/xml.png")), "XML file...")
             newMenu.addAction(newXMLAction)
             newXMLAction.triggered.connect(self.project.newXMLFile)
             # New HTML
-            newHTMLAction = QAction(QIcon("pix/icons/text-html.png"), "HTML file...")
+            newHTMLAction = QAction(QIcon(resource_path("pix/icons/text-html.png")), "HTML file...")
             newMenu.addAction(newHTMLAction)
             newHTMLAction.triggered.connect(self.project.newHTMLFile)
             # New Qt UI
-            newQtUIAction = QAction(QIcon("pix/icons/QtUI.png"), "Qt UI file...")
+            newQtUIAction = QAction(QIcon(resource_path("pix/icons/QtUI.png")), "Qt UI file...")
             newMenu.addAction(newQtUIAction)
             newQtUIAction.triggered.connect(self.project.newQtUIFile)
             # New SQL
-            newSQLAction = QAction(QIcon("pix/icons/database.png"), "SQL file...")
+            newSQLAction = QAction(QIcon(resource_path("pix/icons/database.png")), "SQL file...")
             newMenu.addAction(newSQLAction)
             newSQLAction.triggered.connect(self.project.newSQLFile)
             # New File
-            newFileAction = QAction(QIcon("pix/16x16/Document.png"), "Empty file...")
+            newFileAction = QAction(QIcon(resource_path("pix/16x16/Document.png")), "Empty file...")
             newMenu.addAction(newFileAction)
             newFileAction.triggered.connect(self.project.newFile)
 
 
             # Edit
             """
-            editAction = QAction(QIcon("pix/16x16/Pen.png"),"Edit")
+            editAction = QAction(QIcon(resource_path("pix/16x16/Pen.png")),"Edit")
             menu.addAction(editAction)
             editAction.triggered.connect(self.doEditAction)
             editAction.setEnabled(not isDir and not isBinary)
             """    
             # Delete
-            deleteAction = QAction(QIcon("pix/16x16/Trash.png"),"Delete")
+            deleteAction = QAction(QIcon(resource_path("pix/16x16/Trash.png")),"Delete")
             menu.addAction(deleteAction)
             deleteAction.triggered.connect(self.doDeleteAction)
             # Rename
-            renameAction = QAction(QIcon("pix/16x16/Back.png"),"Rename")
+            renameAction = QAction(QIcon(resource_path("pix/16x16/Back.png")),"Rename")
             menu.addAction(renameAction)
             renameAction.triggered.connect(self.doRenameAction)
             menu.addSeparator()
             # Cut
-            cutAction = QAction(QIcon("pix/16x16/Clipboard Cut.png"),"Cut")
+            cutAction = QAction(QIcon(resource_path("pix/16x16/Clipboard Cut.png")),"Cut")
             menu.addAction(cutAction)
             cutAction.triggered.connect(self.doCutAction)
             # Copy
-            copyAction = QAction(QIcon("pix/16x16/Clipboard Copy.png"),"Copy")
+            copyAction = QAction(QIcon(resource_path("pix/16x16/Clipboard Copy.png")),"Copy")
             menu.addAction(copyAction)
             copyAction.triggered.connect(self.doCopyAction)
             # Paste
-            pasteAction = QAction(QIcon("pix/16x16/Clipboard Paste.png"),"Paste")
+            pasteAction = QAction(QIcon(resource_path("pix/16x16/Clipboard Paste.png")),"Paste")
             pasteAction.setEnabled(self.clipboardFull)
             menu.addAction(pasteAction)
             pasteAction.triggered.connect(self.doPasteAction)
             menu.addSeparator()
             # Project Properties
-            propertiesAction = QAction(QIcon("pix/16x16/Gear.png"),"Project properties")
+            propertiesAction = QAction(QIcon(resource_path("pix/16x16/Gear.png")),"Project properties")
             menu.addAction(propertiesAction)
             propertiesAction.triggered.connect(self.doProjectPropertiesAction)
             # Close project
-            closeProjectAction = QAction(QIcon("pix/16x16/Close.png"),"Close project")
+            closeProjectAction = QAction(QIcon(resource_path("pix/16x16/Close.png")),"Close project")
             menu.addAction(closeProjectAction)
             closeProjectAction.triggered.connect(self.closeProject)
 
@@ -1527,7 +1568,7 @@ class MainWindow(QMainWindow):
                             name = os.path.basename(filename)
                             self.tbwHighRight.addTab(tabEditor, name)
                             idxTab = self.tbwHighRight.count() - 1
-                            self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/markdown.png"))
+                            self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/markdown.png")))
                             self.tbwHighRight.setCurrentIndex(idxTab)               
 
                             # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
@@ -1535,19 +1576,19 @@ class MainWindow(QMainWindow):
                         icon = None
                         if extension == ".py":
                             tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python", encoding=encoding)                    
-                            icon = "pix/icons/text-x-python.png"
+                            icon = resource_path("pix/icons/text-x-python.png")
                         elif extension == ".xml":
                             tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml", encoding=encoding)
-                            icon = "pix/icons/application-xml.png"
+                            icon = resource_path("pix/icons/application-xml.png")
                         elif extension == ".html":
                             tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="html", encoding=encoding)                    
-                            icon = "pix/icons/text-html.png"
+                            icon = resource_path("pix/icons/text-html.png")
                         elif extension == ".sql":
                             tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="sql", encoding=encoding)                    
-                            icon = "pix/icons/database.png"
+                            icon = resource_path("pix/icons/database.png")
                         else:
                             tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="text", encoding=encoding)                    
-                            icon = "pix/icons/text-icon.png"
+                            icon = resource_path("pix/icons/text-icon.png")
                         if tabEditor != None:
                             name = os.path.basename(filename)
                             self.tbwHighRight.addTab(tabEditor, name)
@@ -1563,7 +1604,7 @@ class MainWindow(QMainWindow):
                         name = os.path.basename(filename)
                         self.tbwHighRight.addTab(tabEditor, name)
                         idxTab = self.tbwHighRight.count() - 1
-                        self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/binary-icon.png"))
+                        self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/binary-icon.png")))
                         self.tbwHighRight.setCurrentIndex(idxTab)               
 
                         # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
@@ -1573,12 +1614,12 @@ class MainWindow(QMainWindow):
                         name = os.path.basename(filename)
                         self.tbwHighRight.addTab(tabEditor, name)
                         idxTab = self.tbwHighRight.count() - 1
-                        self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/icons/markdown.png"))
+                        self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/markdown.png")))
                         self.tbwHighRight.setCurrentIndex(idxTab)               
 
                         # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))        
                 elif syntax == "python":
-                    icon = "pix/icons/text-x-python.png"
+                    icon = resource_path("pix/icons/text-x-python.png")
                     tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
@@ -1586,7 +1627,7 @@ class MainWindow(QMainWindow):
                     self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
                     self.tbwHighRight.setCurrentIndex(idxTab)               
                 elif syntax == "xml":
-                    icon = "pix/icons/application-xml.png"
+                    icon = resource_path("pix/icons/application-xml.png")
                     tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml", encoding=encoding)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
@@ -1594,7 +1635,7 @@ class MainWindow(QMainWindow):
                     self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
                     self.tbwHighRight.setCurrentIndex(idxTab)               
                 elif syntax == "html":
-                    icon = "pix/icons/text-html.png"
+                    icon = resource_path("pix/icons/text-html.png")
                     tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
@@ -1602,7 +1643,7 @@ class MainWindow(QMainWindow):
                     self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
                     self.tbwHighRight.setCurrentIndex(idxTab)               
                 else:
-                    icon = "pix/icons/text-icon.png"
+                    icon = resource_path("pix/icons/text-icon.png")
                     tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
@@ -1817,7 +1858,7 @@ class MainWindow(QMainWindow):
             tabPackages = pynter.TabPIP(self)        
             self.tbwHighRight.addTab(tabPackages, "Packages")
             idxTab = self.tbwHighRight.count() - 1
-            self.tbwHighRight.setTabIcon(idxTab, QIcon("pix/silk/icons/package.png"))
+            self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/package.png")))
             self.tbwHighRight.setCurrentIndex(idxTab)               
         self.showMessage("Packages management")
 
@@ -2138,25 +2179,25 @@ class IconProvider(QFileIconProvider):
 #-------------------------------------------------------------------------------
     def icon(self, fileInfo):
         if fileInfo.isDir():
-            return QIcon("pix/16x16/Folder.png") 
+            return QIcon(resource_path("pix/16x16/Folder.png"))
         if fileInfo.suffix() == "py":
-            return QIcon("pix/icons/python.png") 
+            return QIcon(resource_path("pix/icons/python.png"))
         if fileInfo.suffix() == "md":
-            return QIcon("pix/icons/markdown.png") 
+            return QIcon(resource_path("pix/icons/markdown.png"))
         if fileInfo.suffix() == "xml":
-            return QIcon("pix/icons/xml.png") 
+            return QIcon(resource_path("pix/icons/xml.png"))
         if fileInfo.suffix() == "ui":
-            return QIcon("pix/icons/QtUI.png") 
+            return QIcon(resource_path("pix/icons/QtUI.png"))
         if fileInfo.suffix() == "db":
-            return QIcon("pix/icons/database.png") 
+            return QIcon(resource_path("pix/icons/database.png"))
         if fileInfo.suffix() == "sql":
-            return QIcon("pix/icons/database.png") 
+            return QIcon(resource_path("pix/icons/database.png"))
         if fileInfo.suffix() == "zip":
-            return QIcon("pix/icons/zip.png") 
+            return QIcon(resource_path("pix/icons/zip.png"))
         if fileInfo.suffix() == "txt":
-            return QIcon("pix/icons/txt.png") 
+            return QIcon(resource_path("pix/icons/txt.png"))
         if fileInfo.suffix() == "bsix":
-            return QIcon("pix/bside.png") 
+            return QIcon(resource_path("pix/bside.png"))
         return QFileIconProvider.icon(self, fileInfo)
     
     """
