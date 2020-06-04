@@ -84,13 +84,7 @@ class Shreald(QThread):
     def enqueueStream(self, stream, queue, type):
         # print("enqueue", flush=True)
         for line in iter(stream.readline, b''):
-            # print("enqueue %s" % line.decode('utf-8'), flush=True)
-            #-------------------------------------------------------------------
-            # TODO : FIX THE CODEPAGE !!!
-            # queue.put(str(type) + line.decode('utf-8'))
             queue.put(str(type) + line.decode(settings.db['SHELL_CODEPAGE']))
-            #-------------------------------------------------------------------
-            # queue.put(str(type) + line)
         stream.flush()
         stream.close()
 

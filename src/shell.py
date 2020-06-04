@@ -230,6 +230,7 @@ class WShell(QWidget):
         command = str(self.txtCommand.text()).strip()        
         # if self.chkClearConsole.isChecked():
         #     self.txtConsoleOut.setText("")
+        self.time1 = time.time()
         if command == "cls" or command == "clear":
             self.txtConsoleOut.setText("")            
             self.finalizeCommand()
@@ -241,12 +242,14 @@ class WShell(QWidget):
             self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
             self.finalizeCommand()
         elif command[0:3] == "cd ":
+            #-------------------------------------------------------------------
+            # TODO : Fix the directory navigation
             self.CurrentDir = os.path.abspath(command[3:])
+            #-------------------------------------------------------------------
             self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
             self.finalizeCommand()
         else:
             self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
-            self.time1 = time.time()
             self.btnBreak.setEnabled(True)
             QGuiApplication.processEvents()                     
             self.tCmd = shrealding.Shreald(self.parent, command, self.CurrentDir, shell=True)
@@ -294,7 +297,8 @@ class WShell(QWidget):
         if platform.system() == 'Windows':
             self.lblCDR.setText(self.CurrentDrive)
         self.lblPWD.setText(self.CurrentDir)
-        self.lblRC.setText("RC=%d" % self.tCmd.returncode)
+        if self.tCmd.returncode is not None:
+            self.lblRC.setText("RC=%d" % self.tCmd.returncode)
         self.txtCommand.setEnabled(True)
         self.txtCommand.selectAll()
         self.txtCommand.setFocus()
