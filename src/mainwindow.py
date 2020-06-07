@@ -131,29 +131,7 @@ class MainWindow(QMainWindow):
         self.bgColor = "#ffffff"
         self.fgColor = "#000000"
         
-        self.actionQuit.triggered.connect(self.close)
-        self.actionNewPythonFile.triggered.connect(self.newPythonFile)
-        self.actionOpenFile.triggered.connect(self.openFile)
-        self.actionSave.triggered.connect(self.saveFile)
-        self.actionSaveAll.triggered.connect(self.saveAll)
-        self.actionClose.triggered.connect(self.closeFile)
-        self.actionCloseAll.triggered.connect(self.closeAll)
-        self.actionSettings.triggered.connect(self.settings)
-        self.actionAbout.triggered.connect(self.about)
-        self.actionNewProject.triggered.connect(self.newProject)
-        self.actionOpenProject.triggered.connect(self.openProject)
-        self.actionCloseProject.triggered.connect(self.closeProject)        
-        self.actionPythonConsole.triggered.connect(self.newPynter)
-        self.actionShell.triggered.connect(self.newShell)
-        self.actionRunScript.triggered.connect(self.runScript)
-        self.actionShowFullScreen.triggered.connect(self.switchFullScreen)
-        self.actionPythonHelp.triggered.connect(self.helpPython)
-        self.actionScratchFile.triggered.connect(self.scratchFile)
-        self.actionPackages.triggered.connect(self.doPackagesAction)
-        self.actionWelcome.triggered.connect(self.welcome)
-        self.actionAddTools.triggered.connect(lambda x, mw=self : tools.manageTools(mw))
-        self.actionSplitHorizontal.triggered.connect(self.splitHorizontalResize)
-        self.actionSplitVertical.triggered.connect(self.splitVerticalResize)        
+        self.setToolbar()
         
         self.txtBackgroundColor.setText(self.bgColor)
         self.txtForegroundColor.setText(self.fgColor)
@@ -393,7 +371,132 @@ class MainWindow(QMainWindow):
                 self.welcome()
             self.tbwHighRight.setCurrentIndex(0) 
         self.bigDisplay("%s %s" % (const.APPLICATION_NAME, const.VERSION))
+
+#-------------------------------------------------------------------------------
+# setToolbar()
+#-------------------------------------------------------------------------------
+    def setToolbar(self):
+        self.actionQuit.triggered.connect(self.close)
+        self.actionNewPythonFile.triggered.connect(self.newPythonFile)
+        self.actionOpenFile.triggered.connect(self.openFile)
+        self.actionSave.triggered.connect(self.saveFile)
+        self.actionSaveAll.triggered.connect(self.saveAll)
+        self.actionClose.triggered.connect(self.closeFile)
+        self.actionCloseAll.triggered.connect(self.closeAll)
+        self.actionSettings.triggered.connect(self.settings)
+        self.actionAbout.triggered.connect(self.about)
+        self.actionNewProject.triggered.connect(self.newProject)
+        self.actionOpenProject.triggered.connect(self.openProject)
+        self.actionCloseProject.triggered.connect(self.closeProject)        
+        self.actionPythonConsole.triggered.connect(self.newPynter)
+        self.actionShell.triggered.connect(self.newShell)
+        self.actionRunScript.triggered.connect(self.runScript)
+        self.actionShowFullScreen.triggered.connect(self.switchFullScreen)
+        self.actionPythonHelp.triggered.connect(self.helpPython)
+        self.actionScratchFile.triggered.connect(self.scratchFile)
+        self.actionPackages.triggered.connect(self.doPackagesAction)
+        self.actionWelcome.triggered.connect(self.welcome)
+        self.actionAddTools.triggered.connect(lambda x, mw=self : tools.manageTools(mw))
+        self.actionSplitHorizontal.triggered.connect(self.splitHorizontalResize)
+        self.actionSplitVertical.triggered.connect(self.splitVerticalResize)        
+        
+        # Clean up
+        for action in self.toolBar.actions():
+            self.toolBar.removeAction(action)
             
+        # New Project
+        self.toolBar.addAction(self.actionNewProject)
+        
+        # New Scratch Fileex
+        self.toolBar.addAction(self.actionScratchFile)
+        
+        #-----------------------------------------------------------------------
+        # New... Button
+        #-----------------------------------------------------------------------
+        filePath = expanduser("~")
+        tlbNewFile = QToolButton(self)
+        tlbNewFile.setIcon(QIcon(resource_path("pix/16x16/Document.png")))
+        # tlbNewFile.setText("New...")
+        newFileMenu = QMenu(tlbNewFile)
+
+        # New Scratch File
+        newFileScratchAction = QAction(QIcon(resource_path("pix/16x16/Document Graph.png")), "Scratch file", self)
+        newFileMenu.addAction(newFileScratchAction)
+        newFileScratchAction.triggered.connect(self.scratchFile)
+        # New Module
+        newFileModuleAction = QAction(QIcon(resource_path("pix/icons/python2.5.png")), "Module...", self)
+        newFileMenu.addAction(newFileModuleAction)
+        newFileModuleAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newModule(mw, path))
+        # New Folder
+        newFileFolderAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")), "Folder...", self)
+        newFileMenu.addAction(newFileFolderAction)
+        newFileFolderAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newFolder(mw, path))
+        # New Markdown
+        newFileMDAction = QAction(QIcon(resource_path("pix/icons/markdown.png")), "Markdown file...", self)
+        newFileMenu.addAction(newFileMDAction)
+        newFileMDAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newMDFile(mw, path))
+        # New XML
+        newFileXMLAction = QAction(QIcon(resource_path("pix/icons/xml.png")), "XML file...", self)
+        newFileMenu.addAction(newFileXMLAction)
+        newFileXMLAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newXMLFile(mw, path))
+        # New HTML
+        newFileHTMLAction = QAction(QIcon(resource_path("pix/icons/text-html.png")), "HTML file...", self)
+        newFileMenu.addAction(newFileHTMLAction)
+        newFileHTMLAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newHTMLFile(mw, path))
+        # New Qt UI
+        newFileQtUIAction = QAction(QIcon(resource_path("pix/icons/QtUI.png")), "Qt UI file...", self)
+        newFileMenu.addAction(newFileQtUIAction)
+        newFileQtUIAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newQtUIFile(mw, path))
+        # New SQL
+        newFileSQLAction = QAction(QIcon(resource_path("pix/icons/database.png")), "SQL file...", self)
+        newFileMenu.addAction(newFileSQLAction)
+        newFileSQLAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newSQLFile(mw, path))
+        # New File
+        newFileFileAction = QAction(QIcon(resource_path("pix/16x16/Document.png")), "Empty file...", self)
+        newFileMenu.addAction(newFileFileAction)
+        newFileFileAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newFile(mw, path))
+        
+        # newFileMenu.setDefaultAction(newFileModuleAction)
+        # tlbNewFile.setIcon(QIcon(resource_path("pix/16x16/Document.png")))
+        tlbNewFile.setMenu(newFileMenu)
+        # tlbNewFile.addAction(newFileModuleAction)
+        tlbNewFile.setPopupMode(QToolButton.InstantPopup)
+
+        self.toolBar.addWidget(tlbNewFile)
+        
+        # Save
+        self.toolBar.addAction(self.actionSave)
+        
+        # Save All
+        self.toolBar.addAction(self.actionSaveAll)
+        
+        self.toolBar.addSeparator()
+        
+        # Shell
+        self.toolBar.addAction(self.actionShell)
+        
+        # Python Console
+        self.toolBar.addAction(self.actionPythonConsole)
+        
+        #-----------------------------------------------------------------------
+        # Run & Build Button
+        # -> Run Script
+        # -> Build (PyInstaller)
+        # -> Clean dist
+        # -> Clean dist & build
+        # -> Generate requirements.txt
+        #-----------------------------------------------------------------------
+        # Run Script
+        self.toolBar.addAction(self.actionRunScript)
+        
+        self.toolBar.addSeparator()
+        
+        # Split Horizontal
+        self.toolBar.addAction(self.actionSplitHorizontal)
+
+        # Split Vertical
+        self.toolBar.addAction(self.actionSplitVertical)
+
 #-------------------------------------------------------------------------------
 # splitHorizontalResize()
 #-------------------------------------------------------------------------------
