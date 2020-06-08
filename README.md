@@ -75,6 +75,13 @@
 
 ## Screenshots
 
+### Windows version
 ![BSide Screenshot #1](src/pix/screenshots/bside_001.png)
 ![BSide Screenshot #2](src/pix/screenshots/bside_002.png)
 ![BSide Screenshot #3](src/pix/screenshots/bside_003.png)
+
+### Linux version
+![BSide Screenshot #4](src/pix/screenshots/bside_004.png)
+![BSide Screenshot #5](src/pix/screenshots/bside_005.png)
+![BSide Screenshot #6](src/pix/screenshots/bside_006.png)
+![BSide Screenshot #7](src/pix/screenshots/bside_007.png)
