@@ -463,6 +463,7 @@ class MainWindow(QMainWindow):
         tlbNewFile.setPopupMode(QToolButton.InstantPopup)
 
         self.toolBar.addWidget(tlbNewFile)
+        #-----------------------------------------------------------------------
         
         # Save
         self.toolBar.addAction(self.actionSave)
@@ -487,7 +488,23 @@ class MainWindow(QMainWindow):
         # -> Generate requirements.txt
         #-----------------------------------------------------------------------
         # Run Script
-        self.toolBar.addAction(self.actionRunScript)
+        # self.toolBar.addAction(self.actionRunScript)
+        tlbBuildRun = QToolButton(self)
+        tlbBuildRun.setIcon(QIcon(resource_path("pix/16x16/Player Play.png")))
+        buildRunMenu = QMenu(tlbBuildRun)
+        # Run Script
+        runScriptAction = QAction(QIcon(resource_path("pix/16x16/Player Play.png")), "Run Script...", self)
+        buildRunMenu.addAction(runScriptAction)
+        runScriptAction.triggered.connect(self.runScript)
+        # Clean up
+        cleanUpAction = QAction(QIcon(resource_path("pix/16x16/Recycle.png")), "Clean up", self)
+        buildRunMenu.addAction(cleanUpAction)
+        cleanUpAction.triggered.connect(lambda _ : pyinstall.cleanUp)
+
+        tlbBuildRun.setMenu(buildRunMenu)
+        tlbBuildRun.setPopupMode(QToolButton.InstantPopup)        
+        self.toolBar.addWidget(tlbBuildRun)
+        #-----------------------------------------------------------------------
         
         self.toolBar.addSeparator()
         
@@ -2108,40 +2125,43 @@ class MainWindow(QMainWindow):
 # runScript()
 #-------------------------------------------------------------------------------
     def runScript(self):
-        tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())        
-        if tabEditor.filename is not None:
-            if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
-                # tabEditor.saveFile()     
-                self.saveAll()
-            pybin = sys.executable
-            script = tabEditor.filename    
-            
-            dlg = dialog.DlgRunScript(script)
-            dlg.exec()
-            if dlg.result() != 0:
-                self.showMessage("=" * 80)
-                self.showMessage("Run script %s" % script)
-                self.showMessage("Parameters [%s]" % dlg.params)
-                self.showMessage("External Shell %s" % str(dlg.externalShell))
-                cmd = "%s %s %s" % (pybin, script, dlg.params)
-                if dlg.externalShell == True:
-                    self.btnKillProcess.setEnabled(False)
-                    if platform.system() == 'Windows':
-                        os.system("start /wait cmd /c \"%s & pause\"" % cmd)
+        tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())       
+        try:
+            if tabEditor.filename is not None:
+                if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
+                    # tabEditor.saveFile()     
+                    self.saveAll()
+                pybin = sys.executable
+                script = tabEditor.filename    
+
+                dlg = dialog.DlgRunScript(script)
+                dlg.exec()
+                if dlg.result() != 0:
+                    self.showMessage("=" * 80)
+                    self.showMessage("Run script %s" % script)
+                    self.showMessage("Parameters [%s]" % dlg.params)
+                    self.showMessage("External Shell %s" % str(dlg.externalShell))
+                    cmd = "%s %s %s" % (pybin, script, dlg.params)
+                    if dlg.externalShell == True:
+                        self.btnKillProcess.setEnabled(False)
+                        if platform.system() == 'Windows':
+                            os.system("start /wait cmd /c \"%s & pause\"" % cmd)
+                        else:
+                            os.system("gnome-terminal -e 'bash -c \"%s; echo; read -p Paused\"'" % cmd)
+                        self.showMessage("End of running script %s" % script)
+                        self.showMessage("=" * 80)                
                     else:
-                        os.system("gnome-terminal -e 'bash -c \"%s; echo; read -p Paused\"'" % cmd)
-                    self.showMessage("End of running script %s" % script)
-                    self.showMessage("=" * 80)                
+                        cmd = (pybin, "-u", script, dlg.params)
+                        self.btnKillProcess.setEnabled(True)
+                        self.tbwLowRight.setCurrentIndex(0)
+                        QGuiApplication.processEvents()                     
+                        # self.tCmd = shrealding.Shreald(self, "%s -u %s" % (pybin, script))
+                        self.tCmd = shrealding.Shreald(self, cmd, os.path.dirname(script))
+                        self.tCmd.linePrinted.connect(self.handleLine)                    
                 else:
-                    cmd = (pybin, "-u", script, dlg.params)
-                    self.btnKillProcess.setEnabled(True)
-                    self.tbwLowRight.setCurrentIndex(0)
-                    QGuiApplication.processEvents()                     
-                    # self.tCmd = shrealding.Shreald(self, "%s -u %s" % (pybin, script))
-                    self.tCmd = shrealding.Shreald(self, cmd, os.path.dirname(script))
-                    self.tCmd.linePrinted.connect(self.handleLine)                    
-            else:
-                self.showMessage("Cancel running script %s" % script)   
+                    self.showMessage("Cancel running script %s" % script)   
+        except:
+            self.showMessage("Can't run this as a script")   
 
 #-------------------------------------------------------------------------------
 # handleLine()

@@ -132,19 +132,20 @@ class WEditor(QWidget):
         
         self.dirtyFlag = False
         if filename is not None:
-            if self.filetype == "python":
-                self.highlight = syntax.PythonHighlighter(self.txtEditor.document())
-                self.cbxSyntax.setCurrentIndex(self.SYNTAX_PYTHON)
-            elif self.filetype == "xml" or self.filetype == "html":
-                self.highlight = syntax.XMLHighlighter(self.txtEditor.document())
-                self.cbxSyntax.setCurrentIndex(self.SYNTAX_XML)
-            elif self.filetype == "sql":
-                self.highlight = syntax.SQLHighlighter(self.txtEditor.document())
-                self.cbxSyntax.setCurrentIndex(self.SYNTAX_SQL)
-            with open(filename, encoding=encoding) as pyFile:
-                self.txtEditor.setPlainText(str(pyFile.read()))
-                self.extractFuncs()
-                self.displaySize()
+            if os.path.exists(filename):
+                if self.filetype == "python":
+                    self.highlight = syntax.PythonHighlighter(self.txtEditor.document())
+                    self.cbxSyntax.setCurrentIndex(self.SYNTAX_PYTHON)
+                elif self.filetype == "xml" or self.filetype == "html":
+                    self.highlight = syntax.XMLHighlighter(self.txtEditor.document())
+                    self.cbxSyntax.setCurrentIndex(self.SYNTAX_XML)
+                elif self.filetype == "sql":
+                    self.highlight = syntax.SQLHighlighter(self.txtEditor.document())
+                    self.cbxSyntax.setCurrentIndex(self.SYNTAX_SQL)
+                with open(filename, encoding=encoding) as pyFile:
+                    self.txtEditor.setPlainText(str(pyFile.read()))
+                    self.extractFuncs()
+                    self.displaySize()
         
         self.txtGotoSearch.returnPressed.connect(self.gotoSearch)
         self.txtEditor.textChanged.connect(self.changedText)

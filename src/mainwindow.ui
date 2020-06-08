@@ -154,7 +154,7 @@
        </widget>
        <widget class="QTabWidget" name="tbwLowLeft">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tabFunctions">
          <attribute name="icon">
@@ -231,6 +231,20 @@
           </item>
          </layout>
         </widget>
+        <widget class="QWidget" name="tabActions">
+         <attribute name="icon">
+          <iconset>
+           <normaloff>pix/16x16/Bug.png</normaloff>pix/16x16/Bug.png</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>Actions</string>
+         </attribute>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="0" column="0">
+           <widget class="QTableWidget" name="tblActions"/>
+          </item>
+         </layout>
+        </widget>
         <widget class="QWidget" name="tabSearch">
          <attribute name="icon">
           <iconset>
@@ -249,20 +263,6 @@
              <string>None</string>
             </property>
            </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tabActions">
-         <attribute name="icon">
-          <iconset>
-           <normaloff>pix/16x16/Bug.png</normaloff>pix/16x16/Bug.png</iconset>
-         </attribute>
-         <attribute name="title">
-          <string>Actions</string>
-         </attribute>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="0" column="0">
-           <widget class="QTableWidget" name="tblActions"/>
           </item>
          </layout>
         </widget>

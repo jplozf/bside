@@ -129,8 +129,7 @@ def buildEXE(mw):
         name_EXE = name_EXE + ".exe" if name_EXE[-3:].lower() != ".exe" else name_EXE
                 
     if mw.chkCleanBeforeBuild.isChecked():
-        utils.deleteFolder(dist_path)
-        utils.deleteFolder(work_path)
+        cleanUp(mw)
         
     command_line = buildCommand(mw)    
     mw.showMessage("Building with %s" % command_line)
@@ -138,6 +137,15 @@ def buildEXE(mw):
     runCommand(command_line, source_path, mw, MODE_BUILD)
     mw.project.refreshStatus()
 
+#-------------------------------------------------------------------------------
+# cleanUp()
+#-------------------------------------------------------------------------------
+def cleanUp(mw):
+    dist_path = mw.txtDistPath.text() if mw.txtDistPath.text() else os.path.join(source_path, "dist")
+    work_path = mw.txtWorkPath.text() if mw.txtWorkPath.text() else os.path.join(source_path, "build")
+    utils.deleteFolder(dist_path)
+    utils.deleteFolder(work_path)
+    
 #-------------------------------------------------------------------------------
 # isEXE()
 #-------------------------------------------------------------------------------

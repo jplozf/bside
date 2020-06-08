@@ -72,3 +72,9 @@
 
 - [Monkey Studio IDE](https://monkeystudio.pasnox.com/)
 - [tIDE Java IDE](https://sites.google.com/site/tidejava/home)
+
+## Screenshots
+
+![BSide Screenshot #1](src/pix/screenshots/bside_001.png)
+![BSide Screenshot #2](src/pix/screenshots/bside_002.png)
+![BSide Screenshot #3](src/pix/screenshots/bside_003.png)
