@@ -29,6 +29,7 @@ from os.path import expanduser
 from os import path
 import sqlite3
 import time
+from lxml import etree
 
 import settings
 import const
@@ -373,6 +374,40 @@ class MainWindow(QMainWindow):
         self.bigDisplay("%s %s" % (const.APPLICATION_NAME, const.VERSION))
 
 #-------------------------------------------------------------------------------
+# parseXML()
+#------------------------------------------------------------------------------- 
+    def parseXML(self, parent, node):
+        for element in node:
+            item = QStandardItem()
+            item.setIcon(QIcon(resource_path("pix/silk/icons/note.png")))
+            if element.text is not None:
+                text = element.text
+                text = text.replace("\r","")
+                text = text.replace("\n","")
+                text = text.strip()
+                text = (" (%s)" % text) if text.isprintable() else ""
+            else:
+                text = ""
+            item.setData("%s%s" % (element.tag, text), Qt.DisplayRole)
+            for key, value in element.attrib.items():
+                aitem = QStandardItem()
+                aitem.setIcon(QIcon(resource_path("pix/silk/icons/comment.png")))
+                aitem.setData("%s → %s" % (key, value), Qt.DisplayRole)
+                item.appendRow(aitem)
+            self.parseXML(item, element)
+            parent.appendRow(item)
+            
+#-------------------------------------------------------------------------------
+# displayXMLasTree()
+#-------------------------------------------------------------------------------
+    def displayXMLasTree(self, xml, treeview):
+        mdl = QStandardItemModel()
+        mdl.setColumnCount(1)
+        mdl.setHeaderData(0, Qt.Horizontal, xml.tag);
+        treeview.setModel(mdl)
+        self.parseXML(mdl, xml)
+        
+#-------------------------------------------------------------------------------
 # setToolbar()
 #-------------------------------------------------------------------------------
     def setToolbar(self):
@@ -404,10 +439,13 @@ class MainWindow(QMainWindow):
         for action in self.toolBar.actions():
             self.toolBar.removeAction(action)
             
+        #  Open File
+        self.toolBar.addAction(self.actionOpenFile)
+        
         # New Project
         self.toolBar.addAction(self.actionNewProject)
         
-        # New Scratch Fileex
+        # New Scratch File
         self.toolBar.addAction(self.actionScratchFile)
         
         #-----------------------------------------------------------------------
@@ -969,7 +1007,7 @@ class MainWindow(QMainWindow):
 # openFile()
 #-------------------------------------------------------------------------------
     def openFile(self):
-        filename = QFileDialog.getOpenFileName(self, 'Open file', '', 'Python sources (*.py);;XML files (*.xml)')[0]
+        filename = QFileDialog.getOpenFileName(self, 'Open file', '', 'Python sources (*.py);;XML files (*.xml);;All files (*.*)')[0]
         self.openFileFromName(filename)
 
 #-------------------------------------------------------------------------------
@@ -977,6 +1015,10 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
     def openFileFromName(self, filename):
         if filename != "":            
+            extension = os.path.splitext(filename.lower())[1]
+            print(extension)
+            
+            # TODO : Fix the type opening
             tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python")        
             name = os.path.basename(filename)
             self.tbwHighRight.addTab(tabEditor, name)
@@ -987,6 +1029,10 @@ class MainWindow(QMainWindow):
             tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
             self.showMessage("Opening %s" % filename)   
             tabEditor.txtEditor.setFocus()
+                        
+            if extension == ".xml":
+                self.displayXMLasTree(etree.parse(filename).getroot(), self.tvwProperties)
+                
         else:
             self.showMessage("Open cancelled")
 

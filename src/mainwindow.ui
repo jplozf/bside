@@ -154,7 +154,7 @@
        </widget>
        <widget class="QTabWidget" name="tbwLowLeft">
         <property name="currentIndex">
-         <number>1</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tabFunctions">
          <attribute name="icon">
@@ -276,7 +276,7 @@
          </attribute>
          <layout class="QGridLayout" name="gridLayout_12">
           <item row="0" column="0">
-           <widget class="QTableWidget" name="tblProperties"/>
+           <widget class="QTreeView" name="tvwProperties"/>
           </item>
          </layout>
         </widget>

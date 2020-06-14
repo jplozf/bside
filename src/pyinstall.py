@@ -135,7 +135,8 @@ def buildEXE(mw):
     mw.showMessage("Building with %s" % command_line)
     mw.tbwBuild.setCurrentIndex(0)
     runCommand(command_line, source_path, mw, MODE_BUILD)
-    mw.project.refreshStatus()
+    if mw.project is not None:
+        mw.project.refreshStatus()
 
 #-------------------------------------------------------------------------------
 # cleanUp()
@@ -377,7 +378,8 @@ def finalizeCommand(mw):
             mw.btnRunEXE.setEnabled(False)
             mw.lblRunEXE.setText("-")   
             mw.showMessage("Build failed")
-        mw.project.refreshStatus()
+        if mw.project is not None:
+            mw.project.refreshStatus()
     else:
         mw.btnRunEXE.setEnabled(True)
         mw.showMessage("End of runnning builded executable with return code %d" % tCmd.returncode)
