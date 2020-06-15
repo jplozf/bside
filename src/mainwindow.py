@@ -401,11 +401,16 @@ class MainWindow(QMainWindow):
 # displayXMLasTree()
 #-------------------------------------------------------------------------------
     def displayXMLasTree(self, xml, treeview):
-        mdl = QStandardItemModel()
-        mdl.setColumnCount(1)
-        mdl.setHeaderData(0, Qt.Horizontal, xml.tag);
-        treeview.setModel(mdl)
-        self.parseXML(mdl, xml)
+        self.mdlProperties = QStandardItemModel()
+        self.mdlProperties.setColumnCount(1)
+        self.mdlProperties.setHeaderData(0, Qt.Horizontal, xml.tag);
+        treeview.setModel(self.mdlProperties)
+        try:
+            self.parseXML(self.mdlProperties, xml)
+        except:
+            if hasattr(self, 'mdlProperties'):
+                self.mdlProperties.clear()
+            self.showMessage(const.MSG_BAD_XML)
         
 #-------------------------------------------------------------------------------
 # setToolbar()
@@ -1031,8 +1036,13 @@ class MainWindow(QMainWindow):
             tabEditor.txtEditor.setFocus()
                         
             if extension == ".xml":
-                self.displayXMLasTree(etree.parse(filename).getroot(), self.tvwProperties)
-                
+                try:
+                    xml = etree.parse(filename).getroot()
+                    self.displayXMLasTree(xml, self.tvwProperties)
+                except:
+                    if hasattr(self, 'mdlProperties'):
+                        self.mdlProperties.clear()
+                    self.showMessage(const.MSG_BAD_XML)
         else:
             self.showMessage("Open cancelled")
 
@@ -1192,6 +1202,17 @@ class MainWindow(QMainWindow):
                     self.actionRunScript.setEnabled(True)
                 else:
                     self.actionRunScript.setEnabled(False)
+                if os.path.splitext(tabEditor.filename)[1] == ".xml":
+                    try:
+                        xml = etree.parse(tabEditor.filename).getroot()
+                        self.displayXMLasTree(xml, self.tvwProperties)
+                    except:
+                        if hasattr(self, 'mdlProperties'):
+                            self.mdlProperties.clear()
+                        self.showMessage(const.MSG_BAD_XML)
+                else:
+                    if hasattr(self, 'mdlProperties'):
+                        self.mdlProperties.clear()
             else:
                     self.actionRunScript.setEnabled(False)            
         else:
@@ -1967,13 +1988,29 @@ class MainWindow(QMainWindow):
         fSize = self.tvwModel.size(self.idxSelectedFile)
         lastModified = self.tvwModel.lastModified(self.idxSelectedFile)
         
+        xml = "<properties>"
+        
         fileProps = {}
         fileProps.update({'Name': fileName})
+        xml = xml + ("<name>%s</name>" % fileName)
+        
         fileProps.update({'Path': filePath})
+        xml = xml + ("<path>%s</path>" % filePath)
+        
         # fileProps.update({'type': "Directory" if isDir == True else "File"})
         fileProps.update({'Type': fType})
+        xml = xml + ("<type>%s</type>" % fType)
+        
         fileProps.update({'Size': "%d (%s)" % (fSize, utils.getHumanSize(fSize))})
+        xml = xml + ("<size>%d</size>" % fSize)
+        
         fileProps.update({'Last modified': lastModified.toString(Qt.DefaultLocaleLongDate)})
+        xml = xml + ("<modified>%s</modified>" % lastModified.toString(Qt.DefaultLocaleLongDate))
+        
+        xml = xml + "</properties>"
+        
+        self.displayXMLasTree(etree.fromstring(xml), self.tvwProperties)
+        
         dlg = dialog.DlgProperties(fileProps)
         dlg.exec()
 
@@ -1982,6 +2019,8 @@ class MainWindow(QMainWindow):
         for key in fileProps:
             self.outputMessage("%s : %s" % (key, fileProps[key]))
         self.outputMessage("=" * 80)            
+        
+        
             
 #-------------------------------------------------------------------------------
 # doProjectPropertiesAction()

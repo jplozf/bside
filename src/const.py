@@ -44,6 +44,8 @@ PROJECT_NONE = "NONE"
 THEME_DARK = ["#353535","#ffffff","#191919","#353535","#ffffff","#ffffff","#ffffff","#353535","#ffffff","#ff0000","#2a82da","#2a82da","#000000"]
 THEME_LIGHT = ["#efefef","#000000","#ffffff","#f7f7f7","#ffffdc","#000000","#000000","#efefef","#000000","#ffffff","#0000ff","#308cc6","#ffffff"]
 
+MSG_BAD_XML = "Bad XML, can't parse this."
+
 ENCODING = ['ascii',
 'big5',
 'big5hkscs',
