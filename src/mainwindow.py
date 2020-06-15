@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #===============================================================================
-#                                                       ____      _     _      
-#                                                      | __ ) ___(_) __| | ___ 
+#                                                       ____      _     _
+#                                                      | __ ) ___(_) __| | ___
 #                                                      |  _ \/ __| |/ _` |/ _ \
 #                                                      | |_) \__ \ | (_| |  __/
 #                                                      |____/|___/_|\__,_|\___|
-#                         
+#
 #============================================================(C) JPL 2019=======
 
 #-------------------------------------------------------------------------------
@@ -92,7 +92,7 @@ class MainWindow(QMainWindow):
     aSQL = []
     iSQL = 0
     tools = []
-    lastBackup = datetime.datetime(1970,1,1,0,0)    
+    lastBackup = datetime.datetime(1970,1,1,0,0)
     lastProject = None
     debug = False
     tick = 0
@@ -105,54 +105,54 @@ class MainWindow(QMainWindow):
     previousFocusState = HAS_FOCUS
     aAlarms = []
     mruProjects= []
-    
+
 #-------------------------------------------------------------------------------
 # __init__()
 #-------------------------------------------------------------------------------
     def __init__(self, parent = None):
         QMainWindow.__init__( self, parent )
         uic.loadUi(resource_path('mainwindow.ui'), self)
-        
+
         self.appDir = os.path.join(os.path.expanduser("~"), const.APP_FOLDER)
         if not os.path.exists(self.appDir):
             os.makedirs(self.appDir)
-        
+
         self.dbTODO = sqlite3.connect(os.path.join(self.appDir, const.TODO_DATABASE))
         self.curTODO = self.dbTODO.cursor()
-        
+
         self.dbSQLDatabase = sqlite3.connect(self.SQLDatabase)
         self.curSQLDatabase = self.dbSQLDatabase.cursor()
 
         # self.project = projects.Project(parent = self)
         self.project = None
         self.todoManager = todomgr.TodoManager(parent = self)
-        
+
         self.clipboardFull = False
         self.tabNames = {}
         self.bgColor = "#ffffff"
         self.fgColor = "#000000"
-        
+
         self.setToolbar()
-        
+
         self.txtBackgroundColor.setText(self.bgColor)
         self.txtForegroundColor.setText(self.fgColor)
         self.btnBackgroundColor.clicked.connect(self.colorBackgroundPicker)
         self.btnForegroundColor.clicked.connect(self.colorForegroundPicker)
         self.btnSwapColors.clicked.connect(self.swapColors)
-               
+
         self.btnExportOutput.clicked.connect(self.outputExport)
         self.btnClearOutput.clicked.connect(self.outputClear)
         self.btnKillProcess.clicked.connect(self.killProcess)
         self.btnKillProcess.setEnabled(False)
-        
+
         self.lblCorner = QLabel()
         self.lblCorner.setPixmap(QPixmap(resource_path("pix/bside.png")))
         self.tbwHighRight.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.tbwHighRight.customContextMenuRequested.connect(self.openContextMenu)        
+        self.tbwHighRight.customContextMenuRequested.connect(self.openContextMenu)
         self.tbwHighRight.setTabsClosable(True)
         self.tbwHighRight.tabCloseRequested.connect(self.closeTabFromIndex)
         self.tbwHighRight.currentChanged.connect(self.tabChange)
-        
+
         self.lblBigDisplay = utils.BigDisplay(\
                 "BSide",\
                 chars=int(settings.db['BSIDE_BIG_DISPLAY_WIDTH']),\
@@ -161,62 +161,62 @@ class MainWindow(QMainWindow):
             self.tbwHighRight.setCornerWidget(self.lblBigDisplay)
         else:
             self.tbwHighRight.setCornerWidget(self.lblCorner)
-            
+
         self.tvwModel = QFileSystemModel()
-        self.tvwModel.setRootPath(settings.db['BSIDE_REPOSITORY'])   
+        self.tvwModel.setRootPath(settings.db['BSIDE_REPOSITORY'])
         self.tvwModel.setIconProvider(IconProvider())
-        self.tvwRepository.setModel(self.tvwModel)        
+        self.tvwRepository.setModel(self.tvwModel)
         self.tvwRepository.setRootIndex(self.tvwModel.index(settings.db['BSIDE_REPOSITORY']))
         self.tvwRepository.setAnimated(False)
         self.tvwRepository.setIndentation(10)
-        self.tvwRepository.setSortingEnabled(True)        
+        self.tvwRepository.setSortingEnabled(True)
         for i in range(1, self.tvwRepository.header().length()):
             self.tvwRepository.hideColumn(i)
         self.tvwRepository.sortByColumn(0, Qt.AscendingOrder)
-        self.tvwRepository.setContextMenuPolicy(Qt.CustomContextMenu)        
+        self.tvwRepository.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tvwRepository.customContextMenuRequested.connect(self.menuContextTree)
-        self.tvwRepository.clicked.connect(self.clickedTreeView)        
-        self.tvwRepository.doubleClicked.connect(self.doubleClickedTreeView)        
-        
+        self.tvwRepository.clicked.connect(self.clickedTreeView)
+        self.tvwRepository.doubleClicked.connect(self.doubleClickedTreeView)
+
         self.tvmProject = QFileSystemModel()
-        self.tvmProject.setIconProvider(IconProvider())        
-        self.tvwProject.setContextMenuPolicy(Qt.CustomContextMenu)        
+        self.tvmProject.setIconProvider(IconProvider())
+        self.tvwProject.setContextMenuPolicy(Qt.CustomContextMenu)
         self.tvwProject.customContextMenuRequested.connect(self.menuContextProject)
-        self.tvwProject.clicked.connect(self.clickedProject)        
-        self.tvwProject.doubleClicked.connect(self.doubleClickedProject)        
+        self.tvwProject.clicked.connect(self.clickedProject)
+        self.tvwProject.doubleClicked.connect(self.doubleClickedProject)
         self.btnProjectExport.clicked.connect(self.doExportProject)
         self.btnProjectClose.clicked.connect(self.closeProject)
         self.btnProjectProperties.clicked.connect(self.doProjectPropertiesAction)
         self.tvwProject.setModel(None)
-        
+
         self.movieWidget = mediaPlayer.MovieWidget(self)
         self.tabVideoSplitter.addWidget(self.movieWidget)
         self.tbwLowRight.currentChanged.connect(self.onChangeLowRight)
-        
+
         # self.txtFocus.textChanged.connect(self.changeFocusText)
         self.txtFocus.installEventFilter(self)
         self.txtFocus.setStyleSheet("QWidget {font-family: %s; font-size: %spx}" % (settings.db['FOCUS_FONT_FAMILY'], settings.db['FOCUS_FONT_SIZE']))
-        
+
         self.btnBuildEXE.clicked.connect(self.doBuildEXE)
         self.lblRCBuild.setFont(QFont('Courier', 10))
         self.lblTimeBuild.setFont(QFont('Courier', 10))
         self.btnBrowseMainFile.clicked.connect(lambda: pyinstall.browseMainFile(self))
         self.btnRunEXE.clicked.connect(lambda: pyinstall.runEXE(self))
-        
+
         self.showMessage("%s %s %s" % (const.APPLICATION_NAME, const.VERSION, const.COPYRIGHT))
-        
-        lorem.initFormLorem(self)        
-        pyinstall.initFormEXE(self)        
-        sqlinter.initFormSQL(self)        
+
+        lorem.initFormLorem(self)
+        pyinstall.initFormEXE(self)
+        sqlinter.initFormSQL(self)
         toolsbase64.initBase64(self)
-        
+
         self.setTabsText(self.tbwLowLeft, settings.db['TAB_LOW_LEFT_NAMES'])
         self.setTabsText(self.tbwLowRight, settings.db['TAB_LOW_RIGHT_NAMES'])
-                
+
         self.tblSearch.clicked.connect(self.clickedSearchLine)
         self.clearTableSearch()
         self.tblSearch.horizontalHeader().setStretchLastSection(True)
-        
+
         self.tblStructure.clicked.connect(self.clickedStructure)
         self.clearTableStructure()
         self.tblStructure.horizontalHeader().setStretchLastSection(True)
@@ -233,14 +233,14 @@ class MainWindow(QMainWindow):
             self.lblRepositoryIcon.setPixmap(QPixmap(resource_path("pix/16x16/Home.png")))
             self.statusBar.addPermanentWidget(self.lblRepositoryIcon)
         self.lblRepository = QLabel()
-        self.statusBar.addPermanentWidget(self.lblRepository)             
-        
+        self.statusBar.addPermanentWidget(self.lblRepository)
+
         self.lblPythonVersionIcon = QLabel()
         self.lblPythonVersionIcon.setPixmap(QPixmap(resource_path("pix/icons/python2.5.png")))
         self.lblPythonVersion = QLabel(platform.python_version())
         self.statusBar.addPermanentWidget(self.lblPythonVersionIcon)
         self.statusBar.addPermanentWidget(self.lblPythonVersion)
-        
+
         self.lblProjectIcon = QLabel()
         self.lblProjectIcon.setPixmap(QPixmap(resource_path("pix/16x16/My Documents.png")))
         self.lblProject = QLabel(const.PROJECT_NONE)
@@ -258,7 +258,7 @@ class MainWindow(QMainWindow):
         self.lblClock = QLabel()
         self.statusBar.addPermanentWidget(self.lblClockIcon)
         self.statusBar.addPermanentWidget(self.lblClock)
-        
+
         self.tbrCorner = QToolBar(self)
         self.lblClockWake = QLabel()
         self.lblClockWake.setPixmap(QPixmap(resource_path("pix/silk/icons/clock_gray.png")))
@@ -273,11 +273,11 @@ class MainWindow(QMainWindow):
         self.tbrCorner.addWidget(self.lblClockTimer)
         self.tbrCorner.addWidget(self.lblClockWatch)
         self.tbwLowRight.setCornerWidget(self.tbrCorner)
-        
+
         self.timer = QTimer()
         self.timer.timeout.connect(self.timerCount)
         self.timer.start(settings.db['BSIDE_TIMER_INFO'])
-        
+
         self.txtOutput.setStyleSheet(settings.db['OUTPUT_STYLE'])
         self.txtOutput.setReadOnly(True)
         self.chkVerboseOutput.stateChanged.connect(self.verboseOutputChanged)
@@ -290,14 +290,14 @@ class MainWindow(QMainWindow):
         # self.btnSaveSettings.clicked.connect(self.backupSettings)
         # self.btnCancelSettings.clicked.connect(self.cancelSettings)
         tools.initMenuTools(self)
-        
+
         focusFileName = os.path.join(os.path.join(self.appDir, const.FOCUS_FILE))
         try:
             with open(focusFileName, 'r') as focusFile:
                 self.txtFocus.setPlainText(str(focusFile.read()))
         except:
             pass
-        
+
         if settings.db['BSIDE_OPEN_LAST_WORKSPACE'] == True:
             self.showMessage("Restoring workspace")
             db = workspace.restoreWorkspace()
@@ -306,15 +306,15 @@ class MainWindow(QMainWindow):
             for p in self.mruProjects:
                 action = self.menuOpenRecentProject.addAction(p[0])
                 action.triggered.connect(lambda chk, item=p[1]: self.openProjectByFilename(item))
-                
+
             if db["PROJECT"] is not None:
                 self.tvwProject.setModel(self.tvmProject)
                 self.tvwProject.setAnimated(False)
                 self.tvwProject.setIndentation(10)
-                self.tvwProject.setSortingEnabled(True)        
+                self.tvwProject.setSortingEnabled(True)
                 for i in range(1, self.tvwProject.header().length()):
                     self.tvwProject.hideColumn(i)
-                self.tvwProject.sortByColumn(0, Qt.AscendingOrder)                
+                self.tvwProject.sortByColumn(0, Qt.AscendingOrder)
                 self.project = projects.Project(parent = self)
                 self.project.set(db["PROJECT"])
                 if self.project.open(raw=True):
@@ -365,17 +365,17 @@ class MainWindow(QMainWindow):
                     elif tabs[i][0] == "Help":
                         self.about()
             self.tbwHighRight.setCurrentIndex(db["CURRENT_TAB"])
-            self.tbwLowRight.setCurrentIndex(db["CURRENT_LOW_TAB"])                
+            self.tbwLowRight.setCurrentIndex(db["CURRENT_LOW_TAB"])
             self.tbwHighLeft.setCurrentIndex(0)
         else:
             if settings.db['BSIDE_DISPLAY_WELCOME'] == True:
                 self.welcome()
-            self.tbwHighRight.setCurrentIndex(0) 
+            self.tbwHighRight.setCurrentIndex(0)
         self.bigDisplay("%s %s" % (const.APPLICATION_NAME, const.VERSION))
 
 #-------------------------------------------------------------------------------
 # parseXML()
-#------------------------------------------------------------------------------- 
+#-------------------------------------------------------------------------------
     def parseXML(self, parent, node):
         for element in node:
             item = QStandardItem()
@@ -396,7 +396,7 @@ class MainWindow(QMainWindow):
                 item.appendRow(aitem)
             self.parseXML(item, element)
             parent.appendRow(item)
-            
+
 #-------------------------------------------------------------------------------
 # displayXMLasTree()
 #-------------------------------------------------------------------------------
@@ -411,7 +411,7 @@ class MainWindow(QMainWindow):
             if hasattr(self, 'mdlProperties'):
                 self.mdlProperties.clear()
             self.showMessage(const.MSG_BAD_XML)
-        
+
 #-------------------------------------------------------------------------------
 # setToolbar()
 #-------------------------------------------------------------------------------
@@ -427,7 +427,7 @@ class MainWindow(QMainWindow):
         self.actionAbout.triggered.connect(self.about)
         self.actionNewProject.triggered.connect(self.newProject)
         self.actionOpenProject.triggered.connect(self.openProject)
-        self.actionCloseProject.triggered.connect(self.closeProject)        
+        self.actionCloseProject.triggered.connect(self.closeProject)
         self.actionPythonConsole.triggered.connect(self.newPynter)
         self.actionShell.triggered.connect(self.newShell)
         self.actionRunScript.triggered.connect(self.runScript)
@@ -438,21 +438,21 @@ class MainWindow(QMainWindow):
         self.actionWelcome.triggered.connect(self.welcome)
         self.actionAddTools.triggered.connect(lambda x, mw=self : tools.manageTools(mw))
         self.actionSplitHorizontal.triggered.connect(self.splitHorizontalResize)
-        self.actionSplitVertical.triggered.connect(self.splitVerticalResize)        
-        
+        self.actionSplitVertical.triggered.connect(self.splitVerticalResize)
+
         # Clean up
         for action in self.toolBar.actions():
             self.toolBar.removeAction(action)
-            
+
         #  Open File
         self.toolBar.addAction(self.actionOpenFile)
-        
+
         # New Project
         self.toolBar.addAction(self.actionNewProject)
-        
+
         # New Scratch File
         self.toolBar.addAction(self.actionScratchFile)
-        
+
         #-----------------------------------------------------------------------
         # New... Button
         #-----------------------------------------------------------------------
@@ -498,7 +498,7 @@ class MainWindow(QMainWindow):
         newFileFileAction = QAction(QIcon(resource_path("pix/16x16/Document.png")), "Empty file...", self)
         newFileMenu.addAction(newFileFileAction)
         newFileFileAction.triggered.connect(lambda _, mw=self, path=filePath : dialog.newFile(mw, path))
-        
+
         # newFileMenu.setDefaultAction(newFileModuleAction)
         # tlbNewFile.setIcon(QIcon(resource_path("pix/16x16/Document.png")))
         tlbNewFile.setMenu(newFileMenu)
@@ -507,21 +507,21 @@ class MainWindow(QMainWindow):
 
         self.toolBar.addWidget(tlbNewFile)
         #-----------------------------------------------------------------------
-        
+
         # Save
         self.toolBar.addAction(self.actionSave)
-        
+
         # Save All
         self.toolBar.addAction(self.actionSaveAll)
-        
+
         self.toolBar.addSeparator()
-        
+
         # Shell
         self.toolBar.addAction(self.actionShell)
-        
+
         # Python Console
         self.toolBar.addAction(self.actionPythonConsole)
-        
+
         #-----------------------------------------------------------------------
         # Run & Build Button
         # -> Run Script
@@ -545,12 +545,12 @@ class MainWindow(QMainWindow):
         cleanUpAction.triggered.connect(lambda _ : pyinstall.cleanUp)
 
         tlbBuildRun.setMenu(buildRunMenu)
-        tlbBuildRun.setPopupMode(QToolButton.InstantPopup)        
+        tlbBuildRun.setPopupMode(QToolButton.InstantPopup)
         self.toolBar.addWidget(tlbBuildRun)
         #-----------------------------------------------------------------------
-        
+
         self.toolBar.addSeparator()
-        
+
         # Split Horizontal
         self.toolBar.addAction(self.actionSplitHorizontal)
 
@@ -572,7 +572,7 @@ class MainWindow(QMainWindow):
         else:
             self.rightSplitter.setSizes(self.sizesHorizontal)
             self.fullSplitHorizontal = False
-    
+
 #-------------------------------------------------------------------------------
 # splitVerticalResize()
 #-------------------------------------------------------------------------------
@@ -593,19 +593,19 @@ class MainWindow(QMainWindow):
 # doClockWake()
 #-------------------------------------------------------------------------------
     def doClockWake(self, event):
-        self.showMessage("WAKE")       
+        self.showMessage("WAKE")
 
 #-------------------------------------------------------------------------------
 # doClockTimer()
 #-------------------------------------------------------------------------------
     def doClockTimer(self, event):
-        self.showMessage("TIMER")       
+        self.showMessage("TIMER")
 
 #-------------------------------------------------------------------------------
 # doClockWatch()
 #-------------------------------------------------------------------------------
     def doClockWatch(self, event):
-        self.showMessage("WATCH")       
+        self.showMessage("WATCH")
 
 #-------------------------------------------------------------------------------
 # eventFilter()
@@ -639,16 +639,16 @@ class MainWindow(QMainWindow):
                     else:
                         self.iSQL = 0
                     self.txtSQLInput.setText(self.aSQL[self.iSQL])
-                
+
         return QWidget.eventFilter(self, source, event)
 
 #-------------------------------------------------------------------------------
 # timerCount()
 #-------------------------------------------------------------------------------
     def timerCount(self):
-        process = psutil.Process(os.getpid())                
+        process = psutil.Process(os.getpid())
         self.lblMemory.setText("{:.1f}".format(process.memory_info().rss/1024/1024) + " MB ")
-        
+
         if self.project is not None:
             if QApplication.activeWindow() == self:
                 self.focusState = self.HAS_FOCUS
@@ -667,7 +667,7 @@ class MainWindow(QMainWindow):
                 # self.setWindowOpacity(0.75)
         else:
             self.lblFocusMode.setPixmap(QPixmap(resource_path("pix/16x16/Clock_gray.png")))
-        
+
         if self.bgJob == 0 and settings.db['BSIDE_SHOW_REPOSITORY']:
             self.tick = self.tick + 1
             if self.tick == settings.db['BSIDE_TIMER_REPOSITORY']:
@@ -689,25 +689,25 @@ class MainWindow(QMainWindow):
                     if delta <= 0:
                         print(alarm[4])
                         self.showMessage(alarm[4])
-        
+
         try:
             self.lblClock.setText(datetime.datetime.now().strftime(settings.db['BSIDE_CLOCK_FORMAT']) + " ")
         except:
             self.lblClock.setText("INVALID ")
-        
+
 #-------------------------------------------------------------------------------
 # keyPressEvent()
 #-------------------------------------------------------------------------------
     def keyPressEvent(self, event):
         key = event.key()
-        if key == Qt.Key_F3:            
+        if key == Qt.Key_F3:
             tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
             if isinstance(tab, editor.WEditor):
                 tab.txtGotoSearch.setFocus()
         if key == Qt.Key_F and event.modifiers() & Qt.ControlModifier:
             tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
             if isinstance(tab, editor.WEditor):
-                tab.txtGotoSearch.setFocus()            
+                tab.txtGotoSearch.setFocus()
         elif key == Qt.Key_F9:
             qApp.exit(MainWindow.EXIT_CODE_REBOOT)
         """
@@ -716,7 +716,7 @@ class MainWindow(QMainWindow):
         elif key == Qt.Key_F10:
             self.close()
         """
-    
+
 #-------------------------------------------------------------------------------
 # __del__()
 #-------------------------------------------------------------------------------
@@ -739,27 +739,27 @@ class MainWindow(QMainWindow):
             with open(os.path.join(self.appDir, const.TOOLS_FILE), "rb") as fp:
                 self.tools = pickle.load(fp)
         except:
-            pass        
+            pass
         #
         try:
             with open(os.path.join(self.appDir, const.HISTORY_FILE), "rb") as fp:
                 self.aCommands = pickle.load(fp)
                 self.iCommands = len(self.aCommands)
         except:
-            pass        
+            pass
         #
         try:
             with open(os.path.join(self.appDir, const.HISTORY_SQL), "rb") as fp:
                 self.aSQL = pickle.load(fp)
                 self.iSQL = len(self.aSQL)
         except:
-            pass        
+            pass
         #
         try:
             with open(os.path.join(self.appDir, const.BACKUP_STAMP), "rb") as fp:
                 self.lastBackup = pickle.load(fp)
         except:
-            pass        
+            pass
         #
         regSettings = QSettings()
         size = regSettings.value('MainWindow/Size', QSize(600,500))
@@ -781,7 +781,7 @@ class MainWindow(QMainWindow):
                     self.mainSplitter.restoreState(mainSplitterSettings)
                 except:
                     try:
-                        self.mainSplitter.restoreState(mainSplitterSettings.toPyObject())    
+                        self.mainSplitter.restoreState(mainSplitterSettings.toPyObject())
                     except:
                         pass
             # leftSplitter
@@ -791,7 +791,7 @@ class MainWindow(QMainWindow):
                     self.leftSplitter.restoreState(leftSplitterSettings)
                 except:
                     try:
-                        self.leftSplitter.restoreState(leftSplitterSettings.toPyObject())    
+                        self.leftSplitter.restoreState(leftSplitterSettings.toPyObject())
                     except:
                         pass
             # rightSplitter
@@ -801,7 +801,7 @@ class MainWindow(QMainWindow):
                     self.rightSplitter.restoreState(rightSplitterSettings)
                 except:
                     try:
-                        self.rightSplitter.restoreState(rightSplitterSettings.toPyObject())    
+                        self.rightSplitter.restoreState(rightSplitterSettings.toPyObject())
                     except:
                         pass
         except:
@@ -813,44 +813,44 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
     def backupSettings(self):
         with open(os.path.join(self.appDir, const.HISTORY_FILE), "wb") as fp:
-            pickle.dump(self.aCommands, fp)        
+            pickle.dump(self.aCommands, fp)
         #
         with open(os.path.join(self.appDir, const.HISTORY_SQL), "wb") as fp:
-            pickle.dump(self.aSQL, fp)        
+            pickle.dump(self.aSQL, fp)
         #
         with open(os.path.join(self.appDir, const.TOOLS_FILE), "wb") as fp:
-            pickle.dump(self.tools, fp)        
+            pickle.dump(self.tools, fp)
         #
         with open(os.path.join(self.appDir, const.BACKUP_STAMP), "wb") as fp:
-            pickle.dump(self.lastBackup, fp)        
+            pickle.dump(self.lastBackup, fp)
         #
         regSettings = QSettings()
         regSettings.setValue("MainWindow/Size", self.size())
         regSettings.setValue("MainWindow/Position", self.pos())
         regSettings.setValue("MainWindow/WindowState", self.saveState())
-        
+
         # mainSplitter
         mainSplitterSettings = self.mainSplitter.saveState()
         if mainSplitterSettings:
-            regSettings.setValue("MainWindow/mainSplitterSettings", self.mainSplitter.saveState())     
+            regSettings.setValue("MainWindow/mainSplitterSettings", self.mainSplitter.saveState())
         # leftSplitter
         leftSplitterSettings = self.leftSplitter.saveState()
         if leftSplitterSettings:
-            regSettings.setValue("MainWindow/leftSplitterSettings", self.leftSplitter.saveState())     
+            regSettings.setValue("MainWindow/leftSplitterSettings", self.leftSplitter.saveState())
         # rightSplitter
         rightSplitterSettings = self.rightSplitter.saveState()
         if rightSplitterSettings:
-            regSettings.setValue("MainWindow/rightSplitterSettings", self.rightSplitter.saveState())     
-            
+            regSettings.setValue("MainWindow/rightSplitterSettings", self.rightSplitter.saveState())
+
         settings.db.sync()
         self.showMessage("Settings saved")
-        
+
 #-------------------------------------------------------------------------------
 # bigDisplay()
 #-------------------------------------------------------------------------------
     def bigDisplay(self, msg):
         self.lblBigDisplay.setText(msg)
-        
+
 #-------------------------------------------------------------------------------
 # showMessage()
 #-------------------------------------------------------------------------------
@@ -864,7 +864,7 @@ class MainWindow(QMainWindow):
     def showDebug(self, msg):
         if self.debug == True:
             self.showMessage("[DEBUG] %s" % msg)
-        
+
 #-------------------------------------------------------------------------------
 # outputMessage()
 #-------------------------------------------------------------------------------
@@ -872,51 +872,60 @@ class MainWindow(QMainWindow):
         now = datetime.datetime.now()
         self.txtOutput.appendPlainText(now.strftime(settings.db['OUTPUT_TIMESTAMP']) + msg)
         self.txtOutput.moveCursor(QTextCursor.End)
-        
+
 #-------------------------------------------------------------------------------
 # closeEvent()
 #-------------------------------------------------------------------------------
     def closeEvent(self, event):
-        result = QMessageBox.question(self, "Confirm Exit", "Are you sure you want to quit ?", QMessageBox.Yes | QMessageBox.No)        
-        if result == QMessageBox.Yes:
-            self.timer.stop()
-            # Close project
-            # if self.project.name != "*NONE":
-            if self.project is not None:
-                self.focusState = self.HAS_FOCUS
-                if self.previousFocusState == self.HAS_NOT_FOCUS:
-                    self.timeNoFocus2 = time.time()
-                    self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
-                    self.previousFocusState = self.HAS_FOCUS
-                self.project.timeNoFocus = self.timeNoFocus
-                self.project.endSession()
-            # Close TODO database
-            self.curTODO.close()
-            self.dbTODO.close()
-            # Close SQL database
-            self.curSQLDatabase.close()
-            self.dbSQLDatabase.close()
-            # Check for modified files not saved
-            # Save the current files or project open
-            for i in reversed(range(self.tbwHighRight.count())):
-                tab = self.tbwHighRight.widget(i)
-                if isinstance(tab, editor.WEditor) or isinstance(tab, editor.WMarkdown):
-                    self.saveTabFromIndex(i)
-            if self.isFullScreen():
-                self.showMaximized()
-            if settings.db['BACKUP_ENABLED'] == True:
-                try:
-                    self.lastBackup = backup.backupRepository(self.lastBackup, self)
-                except:
-                    self.showMessage("BACKUP ERROR")
-            self.showMessage("Good bye")
-            self.backupSettings()
-            workspace.saveWorkspace(self)
-            self.changeFocusText()
-            event.accept()
+        if settings.db['BSIDE_EXIT_CONFIRM'] == True:
+            result = QMessageBox.question(self, "Confirm Exit", "Are you sure you want to quit ?", QMessageBox.Yes | QMessageBox.No)
+            if result == QMessageBox.Yes:
+                self.doClose()
+                event.accept()
+            else:
+                self.showMessage("Welcome back")
+                event.ignore()
         else:
-            self.showMessage("Welcome back")
-            event.ignore()
+            self.doClose()
+            event.accept()
+
+#-------------------------------------------------------------------------------
+# doClose()
+#-------------------------------------------------------------------------------
+    def doClose(self):
+        self.timer.stop()
+        # Close project
+        if self.project is not None:
+            self.focusState = self.HAS_FOCUS
+            if self.previousFocusState == self.HAS_NOT_FOCUS:
+                self.timeNoFocus2 = time.time()
+                self.timeNoFocus = self.timeNoFocus + (self.timeNoFocus2 - self.timeNoFocus1)
+                self.previousFocusState = self.HAS_FOCUS
+            self.project.timeNoFocus = self.timeNoFocus
+            self.project.endSession()
+        # Close TODO database
+        self.curTODO.close()
+        self.dbTODO.close()
+        # Close SQL database
+        self.curSQLDatabase.close()
+        self.dbSQLDatabase.close()
+        # Check for modified files not saved
+        # Save the current files or project open
+        for i in reversed(range(self.tbwHighRight.count())):
+            tab = self.tbwHighRight.widget(i)
+            if isinstance(tab, editor.WEditor) or isinstance(tab, editor.WMarkdown):
+                self.saveTabFromIndex(i)
+        if self.isFullScreen():
+            self.showMaximized()
+        if settings.db['BACKUP_ENABLED'] == True:
+            try:
+                self.lastBackup = backup.backupRepository(self.lastBackup, self)
+            except:
+                self.showMessage("BACKUP ERROR")
+        self.showMessage("Good bye")
+        self.backupSettings()
+        workspace.saveWorkspace(self)
+        self.changeFocusText()
 
 #-------------------------------------------------------------------------------
 # openContextMenu()
@@ -950,13 +959,13 @@ class MainWindow(QMainWindow):
             tab = self.tbwHighRight.widget(i)
             if isinstance(tab, helpme.TabHelp):
                 foundTab = True
-                self.tbwHighRight.setCurrentIndex(i)                        
+                self.tbwHighRight.setCurrentIndex(i)
         if foundTab == False:
-            txtHelp = helpme.TabHelp(parent=self.tbwHighRight)        
+            txtHelp = helpme.TabHelp(parent=self.tbwHighRight)
             self.tbwHighRight.addTab(txtHelp, "About")
             idxTab = self.tbwHighRight.count() - 1
             self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/information.png")))
-            self.tbwHighRight.setCurrentIndex(idxTab)        
+            self.tbwHighRight.setCurrentIndex(idxTab)
         self.showMessage("About")
 
 #-------------------------------------------------------------------------------
@@ -968,13 +977,13 @@ class MainWindow(QMainWindow):
             tab = self.tbwHighRight.widget(i)
             if isinstance(tab, helpme.TabWelcome):
                 foundTab = True
-                self.tbwHighRight.setCurrentIndex(i)                        
+                self.tbwHighRight.setCurrentIndex(i)
         if foundTab == False:
-            txtWelcome = helpme.TabWelcome(parent=self.tbwHighRight)        
+            txtWelcome = helpme.TabWelcome(parent=self.tbwHighRight)
             self.tbwHighRight.addTab(txtWelcome, "Welcome")
             idxTab = self.tbwHighRight.count() - 1
             self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/drink.png")))
-            self.tbwHighRight.setCurrentIndex(idxTab)        
+            self.tbwHighRight.setCurrentIndex(idxTab)
         self.showMessage("Welcome")
 
 #-------------------------------------------------------------------------------
@@ -986,9 +995,9 @@ class MainWindow(QMainWindow):
             tab = self.tbwHighRight.widget(i)
             if isinstance(tab, settings.TabSettings):
                 foundTab = True
-                self.tbwHighRight.setCurrentIndex(i)                        
+                self.tbwHighRight.setCurrentIndex(i)
         if foundTab == False:
-            tabSettings = settings.TabSettings(parent=self.tbwHighRight)        
+            tabSettings = settings.TabSettings(parent=self.tbwHighRight)
             self.tbwHighRight.addTab(tabSettings, "Settings")
             idxTab = self.tbwHighRight.count() - 1
             self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/cog.png")))
@@ -1019,22 +1028,22 @@ class MainWindow(QMainWindow):
 # openFileFromName()
 #-------------------------------------------------------------------------------
     def openFileFromName(self, filename):
-        if filename != "":            
+        if filename != "":
             extension = os.path.splitext(filename.lower())[1]
             print(extension)
-            
+
             # TODO : Fix the type opening
-            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python")        
+            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python")
             name = os.path.basename(filename)
             self.tbwHighRight.addTab(tabEditor, name)
             idxTab = self.tbwHighRight.count() - 1
             self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/python2.5.png")))
-            self.tbwHighRight.setCurrentIndex(idxTab)               
-            
+            self.tbwHighRight.setCurrentIndex(idxTab)
+
             tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
-            self.showMessage("Opening %s" % filename)   
+            self.showMessage("Opening %s" % filename)
             tabEditor.txtEditor.setFocus()
-                        
+
             if extension == ".xml":
                 try:
                     xml = etree.parse(filename).getroot()
@@ -1050,14 +1059,14 @@ class MainWindow(QMainWindow):
 # newPythonFile()
 #-------------------------------------------------------------------------------
     def newPythonFile(self):
-        textBox = editor.WEditor(parent=self.tbwHighRight, window=self, filetype="python")        
+        textBox = editor.WEditor(parent=self.tbwHighRight, window=self, filetype="python")
         name = const.NEW_FILE % self.noname
         self.tbwHighRight.addTab(textBox, name)
         self.noname = self.noname + 1
         idxTab = self.tbwHighRight.count() - 1
         self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/text-x-python.png")))
-        self.tbwHighRight.setCurrentIndex(idxTab)               
-        
+        self.tbwHighRight.setCurrentIndex(idxTab)
+
         textBox.txtEditor.textChanged.connect(lambda x=textBox: self.textChange(x))
         self.showMessage("New file %s" % name)
 
@@ -1066,15 +1075,15 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
     def newPynter(self):
         if settings.db['CONSOLE_UI'] == "CONSOLE_QT":
-            pyBox = pynter.WInter(parent=self.tbwHighRight, window=self)        
-        else:            
+            pyBox = pynter.WInter(parent=self.tbwHighRight, window=self)
+        else:
             if platform.system() == 'Windows':    # Windows
-                # pyBox = pynter.WXInter(parent=self.tbwHighRight)        
+                # pyBox = pynter.WXInter(parent=self.tbwHighRight)
                 # WXInter is not working well, let's do it with WInter
-                pyBox = pynter.WInter(parent=self.tbwHighRight)        
+                pyBox = pynter.WInter(parent=self.tbwHighRight)
             else:                                 # linux variants
                 try:
-                    pyBox = pynter.LXInter(parent=self.tbwHighRight)         
+                    pyBox = pynter.LXInter(parent=self.tbwHighRight)
                 except:
                     pyBox = pynter.WInter(parent=self.tbwHighRight)
         name = "Python-%02d" % self.nopyth
@@ -1082,10 +1091,10 @@ class MainWindow(QMainWindow):
         self.nopyth = self.nopyth + 1
         idxTab = self.tbwHighRight.count() - 1
         self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/python2.5.png")))
-        self.tbwHighRight.setCurrentIndex(idxTab)               
+        self.tbwHighRight.setCurrentIndex(idxTab)
         # pyBox.consoleInput.setFocus()
         self.showMessage("New Python Interpreter")
-        
+
 #-------------------------------------------------------------------------------
 # newShell()
 #-------------------------------------------------------------------------------
@@ -1093,14 +1102,14 @@ class MainWindow(QMainWindow):
         if settings.db['SHELL_UI'] == "SHELL_QT":
             # shBox = shell.WShell(parent=self.tbwHighRight)
             shBox = shell.WShell(parent=self)
-        else:            
+        else:
             if platform.system() == 'Windows':    # Windows
-                # shBox = shell.WXShell(parent=self.tbwHighRight)        
+                # shBox = shell.WXShell(parent=self.tbwHighRight)
                 # WXShell is not working well, let's do it with WShell
-                shBox = shell.WShell(parent=self)        
+                shBox = shell.WShell(parent=self)
             else:                                 # linux variants
                 try:
-                    shBox = shell.LXShell(parent=self.tbwHighRight)         
+                    shBox = shell.LXShell(parent=self.tbwHighRight)
                 except:
                     shBox = shell.WShell(parent=self)
         name = "Shell-%02d" % self.noshell
@@ -1108,7 +1117,7 @@ class MainWindow(QMainWindow):
         self.noshell = self.noshell + 1
         idxTab = self.tbwHighRight.count() - 1
         self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/utilities-terminal-6.png")))
-        self.tbwHighRight.setCurrentIndex(idxTab)                       
+        self.tbwHighRight.setCurrentIndex(idxTab)
         # shBox.txtCommand.setFocus()
         self.showMessage("New Shell")
 
@@ -1119,7 +1128,7 @@ class MainWindow(QMainWindow):
         self.clearTableStructure()
         if hasattr(textBox, "codeStructure"):
             for i in textBox.codeStructure:
-                rowPosition = self.tblStructure.rowCount()                     
+                rowPosition = self.tblStructure.rowCount()
                 self.tblStructure.insertRow(rowPosition)
 
                 item = QTableWidgetItem("%d" % i[0])
@@ -1127,16 +1136,16 @@ class MainWindow(QMainWindow):
                 self.tblStructure.setItem(rowPosition , 0, item)   # Line
 
                 """
-                item = QTableWidgetItem("%s" % i[2])        
+                item = QTableWidgetItem("%s" % i[2])
                 if i[2] == "class":
                     font = QFont()
                     font.setBold(True)
-                    item.setFont(font)            
+                    item.setFont(font)
 
                 item.setTextAlignment(Qt.AlignRight)
                 """
-                item = QTableWidgetItem()    
-                item_hidden = QTableWidgetItem()    
+                item = QTableWidgetItem()
+                item_hidden = QTableWidgetItem()
                 item.setTextAlignment(Qt.AlignHCenter)
                 if i[2] == "class":
                     item.setIcon(QIcon(resource_path("pix/icons/class.png")))
@@ -1150,43 +1159,43 @@ class MainWindow(QMainWindow):
                 self.tblStructure.setItem(rowPosition , 3, item_hidden)   # Type
                 self.tblStructure.setItem(rowPosition , 1, item)   # Type
 
-                item = QTableWidgetItem("%s" % i[3])        
+                item = QTableWidgetItem("%s" % i[3])
                 item.setTextAlignment(Qt.AlignLeft)
                 if i[2] == "class":
                     font = QFont()
                     font.setBold(True)
-                    item.setFont(font)            
+                    item.setFont(font)
                 self.tblStructure.setItem(rowPosition , 2, item)   # Name
                 self.tblStructure.setRowHeight(rowPosition, 20)
         # self.tblStructure.horizontalHeader().setResizeMode(QHeaderView.Stretch)
         self.tblStructure.horizontalHeader().setStretchLastSection(True)
         lines = textBox.txtEditor.document().blockCount()
         self.lblStructureLines.setText("%d line%s" % (lines, "s" if lines > 1 else ""))
-                
+
         self.clearTableActions()
         if hasattr(textBox, "todo"):
             if len(textBox.todo) > 0:
                 for i in textBox.todo:
-                    rowPosition = self.tblActions.rowCount()                     
+                    rowPosition = self.tblActions.rowCount()
                     self.tblActions.insertRow(rowPosition)
 
                     item = QTableWidgetItem("%d" % i[0])
                     item.setTextAlignment(Qt.AlignHCenter)
                     self.tblActions.setItem(rowPosition , 0, item)   # Line
 
-                    item = QTableWidgetItem("%s" % i[1])        
+                    item = QTableWidgetItem("%s" % i[1])
                     item.setTextAlignment(Qt.AlignLeft)
                     self.tblActions.setItem(rowPosition , 1, item)   # Description
 
                     self.tblActions.setRowHeight(rowPosition, 20)
-        
+
         self.tblStructure.resizeColumnsToContents()
         self.tblActions.resizeColumnsToContents()
         self.tblStructure.horizontalHeader().setStretchLastSection(True)
         self.tblActions.horizontalHeader().setStretchLastSection(True)
         self.tblStructure.sortItems(0, Qt.AscendingOrder)
         self.tblActions.sortItems(0, Qt.AscendingOrder)
-            
+
 #-------------------------------------------------------------------------------
 # tabChange()
 #-------------------------------------------------------------------------------
@@ -1214,10 +1223,10 @@ class MainWindow(QMainWindow):
                     if hasattr(self, 'mdlProperties'):
                         self.mdlProperties.clear()
             else:
-                    self.actionRunScript.setEnabled(False)            
+                    self.actionRunScript.setEnabled(False)
         else:
-            self.actionRunScript.setEnabled(False)            
-                
+            self.actionRunScript.setEnabled(False)
+
 #-------------------------------------------------------------------------------
 # clearTableSearch()
 #-------------------------------------------------------------------------------
@@ -1261,7 +1270,7 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
     def closeFile(self):
         self.closeTabFromIndex(self.tbwHighRight.currentIndex())
-        
+
 #-------------------------------------------------------------------------------
 # closeAll()
 #-------------------------------------------------------------------------------
@@ -1285,7 +1294,7 @@ class MainWindow(QMainWindow):
     def saveWorkspace(self):
         for i in range(0, self.tbwHighRight.count()):
             self.closeTabFromIndex(i)
-    
+
 #-------------------------------------------------------------------------------
 # closeTabFromIndex()
 #-------------------------------------------------------------------------------
@@ -1296,7 +1305,7 @@ class MainWindow(QMainWindow):
         if force == False:
             if isinstance(tab, editor.WEditor):
                 if tab.dirtyFlag == True:
-                    result = QMessageBox.question(self,"Confirm close file","The following file\n%s\nhas been modified.\n\nDo you want to save it ?" % tab.filename,QMessageBox.Yes| QMessageBox.No | QMessageBox.Cancel)        
+                    result = QMessageBox.question(self,"Confirm close file","The following file\n%s\nhas been modified.\n\nDo you want to save it ?" % tab.filename,QMessageBox.Yes| QMessageBox.No | QMessageBox.Cancel)
                     if result == QMessageBox.Yes:
                         self.saveFile()
                         tab.deleteLater()
@@ -1316,7 +1325,7 @@ class MainWindow(QMainWindow):
                     self.tblStructure.clear()
                     self.showMessage("Close file")
             else:
-                    # tab.deleteLater()                
+                    # tab.deleteLater()
                     self.tbwHighRight.removeTab(index)
                     self.tblStructure.clear()
                     self.showMessage("Close tab")
@@ -1325,7 +1334,7 @@ class MainWindow(QMainWindow):
             self.tbwHighRight.removeTab(index)
             self.tblStructure.clear()
             self.showMessage("Close force")
-            
+
 #-------------------------------------------------------------------------------
 # saveTabFromIndex()
 #-------------------------------------------------------------------------------
@@ -1354,7 +1363,7 @@ class MainWindow(QMainWindow):
                         self.project.refreshStatus()
                     self.showMessage("File saved")
         self.tbwHighRight.setCurrentIndex(me)
-        
+
 #-------------------------------------------------------------------------------
 # clickedSearchLine()
 #-------------------------------------------------------------------------------
@@ -1374,7 +1383,7 @@ class MainWindow(QMainWindow):
             line = int(self.tblStructure.item(item.row(), 0).text())
             self.showDebug("Line = %s" % line)
             tab.gotoLine(line)
-            
+
 #-------------------------------------------------------------------------------
 # doSortByLine()
 #-------------------------------------------------------------------------------
@@ -1388,7 +1397,7 @@ class MainWindow(QMainWindow):
     def doSortByType(self):
         self.tblStructure.sortItems(3, Qt.AscendingOrder)
         self.showMessage("Sort structure by type")
-    
+
 #-------------------------------------------------------------------------------
 # doSortByAlpha()
 #-------------------------------------------------------------------------------
@@ -1433,7 +1442,7 @@ class MainWindow(QMainWindow):
             fileName = os.path.basename(filePath)
             # self.lblCurrentFile.setText(fileName)
             # self.txtMarkdown.setPlainText(open(filePath).read())
-                   
+
 #-------------------------------------------------------------------------------
 # doubleClickedTreeView()
 #-------------------------------------------------------------------------------
@@ -1451,7 +1460,7 @@ class MainWindow(QMainWindow):
         isDir = self.tvmProject.isDir(self.idxSelectedFile)
         if not isDir:
             self.doOpenAction()
-        
+
 #-------------------------------------------------------------------------------
 # menuContextTree()
 #-------------------------------------------------------------------------------
@@ -1460,18 +1469,18 @@ class MainWindow(QMainWindow):
         self.idxSelectedFile = index
         filePath = self.tvwModel.filePath(self.idxSelectedFile)
         isDir = self.tvwModel.isDir(self.idxSelectedFile)
-        isBinary = utils.isBinaryFile(filePath)       
-        
+        isBinary = utils.isBinaryFile(filePath)
+
         # p = vlc.MediaPlayer("resources/sounds/tone01.mp3")
-        # p.play()                
-              
+        # p.play()
+
         menu = QMenu()
         # Open
         openAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")),"Open")
         menu.addAction(openAction)
         openAction.triggered.connect(self.doOpenAction)
         openAction.setEnabled(not isDir)
-        
+
         # Open as Hexa
         openHexaAction = QAction(QIcon(resource_path("pix/16x16/Folder.png")),"Open as Hexa")
         menu.addAction(openHexaAction)
@@ -1533,7 +1542,7 @@ class MainWindow(QMainWindow):
         menu.addAction(editAction)
         editAction.triggered.connect(self.doEditAction)
         editAction.setEnabled(not isDir and not isBinary)
-        """    
+        """
         # Delete
         deleteAction = QAction(QIcon(resource_path("pix/16x16/Trash.png")),"Delete")
         menu.addAction(deleteAction)
@@ -1561,8 +1570,8 @@ class MainWindow(QMainWindow):
         propertiesAction = QAction(QIcon(resource_path("pix/16x16/Gear.png")),"Properties")
         menu.addAction(propertiesAction)
         propertiesAction.triggered.connect(self.doPropertiesAction)
-        
-        menu.exec_(self.tvwRepository.viewport().mapToGlobal(point))     
+
+        menu.exec_(self.tvwRepository.viewport().mapToGlobal(point))
 
 #-------------------------------------------------------------------------------
 # menuContextProject()
@@ -1573,10 +1582,10 @@ class MainWindow(QMainWindow):
             self.idxSelectedFile = index
             filePath = self.tvmProject.filePath(self.idxSelectedFile)
             isDir = self.tvmProject.isDir(self.idxSelectedFile)
-            isBinary = utils.isBinaryFile(filePath)       
+            isBinary = utils.isBinaryFile(filePath)
 
             # p = vlc.MediaPlayer("resources/sounds/tone01.mp3")
-            # p.play()                
+            # p.play()
 
             menu = QMenu()
             # Open
@@ -1635,7 +1644,7 @@ class MainWindow(QMainWindow):
             menu.addAction(editAction)
             editAction.triggered.connect(self.doEditAction)
             editAction.setEnabled(not isDir and not isBinary)
-            """    
+            """
             # Delete
             deleteAction = QAction(QIcon(resource_path("pix/16x16/Trash.png")),"Delete")
             menu.addAction(deleteAction)
@@ -1668,8 +1677,8 @@ class MainWindow(QMainWindow):
             menu.addAction(closeProjectAction)
             closeProjectAction.triggered.connect(self.closeProject)
 
-            menu.exec_(self.tvwProject.viewport().mapToGlobal(point))     
-    
+            menu.exec_(self.tvwProject.viewport().mapToGlobal(point))
+
 #-------------------------------------------------------------------------------
 # isFileOpen()
 #-------------------------------------------------------------------------------
@@ -1681,17 +1690,17 @@ class MainWindow(QMainWindow):
                 if os.path.normpath(tab.filename) == os.path.normpath(fname):
                     rc = (True, i)
                     break
-        return rc                    
-        
+        return rc
+
 #-------------------------------------------------------------------------------
 # doOpenAction()
 #-------------------------------------------------------------------------------
-    def doOpenAction(self):        
+    def doOpenAction(self):
         isDir = self.tvwModel.isDir(self.idxSelectedFile)
         if not isDir:
             filename = self.tvwModel.fileName(self.idxSelectedFile)
-            filepath = self.tvwModel.filePath(self.idxSelectedFile)                        
-            isBinary = utils.isBinaryFile(filepath)            
+            filepath = self.tvwModel.filePath(self.idxSelectedFile)
+            isBinary = utils.isBinaryFile(filepath)
             if not isBinary:
                 (rc, tab) = self.isFileOpen(filepath)
                 if not rc:
@@ -1706,7 +1715,7 @@ class MainWindow(QMainWindow):
                             self.tvwProject.setModel(self.tvmProject)
                             self.tvwProject.setAnimated(False)
                             self.tvwProject.setIndentation(10)
-                            self.tvwProject.setSortingEnabled(True)        
+                            self.tvwProject.setSortingEnabled(True)
                             for i in range(1, self.tvwProject.header().length()):
                                 self.tvwProject.hideColumn(i)
                             self.tvwProject.sortByColumn(0, Qt.AscendingOrder)
@@ -1750,107 +1759,107 @@ class MainWindow(QMainWindow):
                 extension = os.path.splitext(filename)[1]
                 if syntax == "guess":
                     if extension == ".md":
-                        tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self)        
+                        tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self)
                         if tabEditor != None:
                             name = os.path.basename(filename)
                             self.tbwHighRight.addTab(tabEditor, name)
                             idxTab = self.tbwHighRight.count() - 1
                             self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/markdown.png")))
-                            self.tbwHighRight.setCurrentIndex(idxTab)               
+                            self.tbwHighRight.setCurrentIndex(idxTab)
 
                             # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
                     else:
                         icon = None
                         if extension == ".py":
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python", encoding=encoding)                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="python", encoding=encoding)
                             icon = resource_path("pix/icons/text-x-python.png")
                         elif extension == ".xml":
                             tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml", encoding=encoding)
                             icon = resource_path("pix/icons/application-xml.png")
                         elif extension == ".html":
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="html", encoding=encoding)                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="html", encoding=encoding)
                             icon = resource_path("pix/icons/text-html.png")
                         elif extension == ".sql":
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="sql", encoding=encoding)                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="sql", encoding=encoding)
                             icon = resource_path("pix/icons/database.png")
                         else:
-                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="text", encoding=encoding)                    
+                            tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="text", encoding=encoding)
                             icon = resource_path("pix/icons/text-icon.png")
                         if tabEditor != None:
                             name = os.path.basename(filename)
                             self.tbwHighRight.addTab(tabEditor, name)
                             idxTab = self.tbwHighRight.count() - 1
                             self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                            self.tbwHighRight.setCurrentIndex(idxTab)               
+                            self.tbwHighRight.setCurrentIndex(idxTab)
 
                             # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
 
                 elif syntax == "binary":
-                    tabEditor = QHexEditor.QHexEditor(filename=filename, readonly=True)        
+                    tabEditor = QHexEditor.QHexEditor(filename=filename, readonly=True)
                     if tabEditor != None:
                         name = os.path.basename(filename)
                         self.tbwHighRight.addTab(tabEditor, name)
                         idxTab = self.tbwHighRight.count() - 1
                         self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/binary-icon.png")))
-                        self.tbwHighRight.setCurrentIndex(idxTab)               
+                        self.tbwHighRight.setCurrentIndex(idxTab)
 
                         # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
                 elif syntax == "markdown":
-                    tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self, encoding=encoding)        
+                    tabEditor = editor.WMarkdown(filename=filename, parent=self.tbwHighRight, window=self, encoding=encoding)
                     if tabEditor != None:
                         name = os.path.basename(filename)
                         self.tbwHighRight.addTab(tabEditor, name)
                         idxTab = self.tbwHighRight.count() - 1
                         self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/icons/markdown.png")))
-                        self.tbwHighRight.setCurrentIndex(idxTab)               
+                        self.tbwHighRight.setCurrentIndex(idxTab)
 
-                        # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))        
+                        # tabEditor.txtEditor.textChanged.connect(lambda x=tabEditor: self.textChange(x))
                 elif syntax == "python":
                     icon = resource_path("pix/icons/text-x-python.png")
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
                     self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                    self.tbwHighRight.setCurrentIndex(idxTab)               
+                    self.tbwHighRight.setCurrentIndex(idxTab)
                 elif syntax == "xml":
                     icon = resource_path("pix/icons/application-xml.png")
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml", encoding=encoding)                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype="xml", encoding=encoding)
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
                     self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                    self.tbwHighRight.setCurrentIndex(idxTab)               
+                    self.tbwHighRight.setCurrentIndex(idxTab)
                 elif syntax == "html":
                     icon = resource_path("pix/icons/text-html.png")
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
                     self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                    self.tbwHighRight.setCurrentIndex(idxTab)               
+                    self.tbwHighRight.setCurrentIndex(idxTab)
                 else:
                     icon = resource_path("pix/icons/text-icon.png")
-                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)                    
+                    tabEditor = editor.WEditor(filename=filename, parent=self.tbwHighRight, window=self, filetype=filetype, encoding=encoding)
                     name = os.path.basename(filename)
                     self.tbwHighRight.addTab(tabEditor, name)
                     idxTab = self.tbwHighRight.count() - 1
                     self.tbwHighRight.setTabIcon(idxTab, QIcon(icon))
-                    self.tbwHighRight.setCurrentIndex(idxTab)               
+                    self.tbwHighRight.setCurrentIndex(idxTab)
 
                 if tabEditor != None:
                     self.showMessage("Editing %s" % filename)
                 else:
                     self.showMessage("Can't open %s" % filename)
             else:
-                self.showMessage("File %s does not exist" % filename)        
+                self.showMessage("File %s does not exist" % filename)
         else:
             self.showMessage("File does not exist")
 
 #-------------------------------------------------------------------------------
 # doPromoteProjectAction()
 #-------------------------------------------------------------------------------
-    def doPromoteProjectAction(self, folder):  
+    def doPromoteProjectAction(self, folder):
         if self.project is not None:
             self.project.close()
         self.project = projects.Project(parent = self)
@@ -1859,15 +1868,15 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
 # doOpenHexaAction()
 #-------------------------------------------------------------------------------
-    def doOpenHexaAction(self):        
+    def doOpenHexaAction(self):
         isDir = self.tvwModel.isDir(self.idxSelectedFile)
         if not isDir:
             filename = self.tvwModel.fileName(self.idxSelectedFile)
-            filepath = self.tvwModel.filePath(self.idxSelectedFile)                        
+            filepath = self.tvwModel.filePath(self.idxSelectedFile)
             (rc, tab) = self.isFileOpen(filepath)
             if not rc:
-                # tabEditor = editor.WHexedit(filename=filepath, parent=self.tbwHighRight, window=self)        
-                hexEditor = QHexEditor.QHexEditor(filename=filepath, readonly=True)        
+                # tabEditor = editor.WHexedit(filename=filepath, parent=self.tbwHighRight, window=self)
+                hexEditor = QHexEditor.QHexEditor(filename=filepath, readonly=True)
                 name = os.path.basename(filename)
                 self.tbwHighRight.addTab(hexEditor, name)
                 self.tbwHighRight.setCurrentIndex(self.tbwHighRight.count() - 1)
@@ -1881,19 +1890,19 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
 # doNewAction()
 #-------------------------------------------------------------------------------
-    def doNewAction(self):        
+    def doNewAction(self):
         self.newPythonFile()
 
 #-------------------------------------------------------------------------------
 # doAddFileAction()
 #-------------------------------------------------------------------------------
-    def doAddFileAction(self):        
+    def doAddFileAction(self):
         self.newPythonFile()
-        
+
 #-------------------------------------------------------------------------------
 # doEditAction()
 #-------------------------------------------------------------------------------
-    def doEditAction(self):        
+    def doEditAction(self):
         isDir = self.tvwModel.isDir(self.idxSelectedFile)
         if not isDir:
             filePath = self.tvwModel.filePath(self.idxSelectedFile)
@@ -1904,24 +1913,24 @@ class MainWindow(QMainWindow):
                 self.txtMarkdown.setPlainText(open(filePath).read())
                 self.txtHTML.setText(markdown.markdown(self.txtMarkdown.toPlainText()))
                 self.showMessage("Editing %s" % fileName)
-       
+
 #-------------------------------------------------------------------------------
 # doDeleteAction()
 #-------------------------------------------------------------------------------
     def doDeleteAction(self):
-        if not self.idxSelectedFile is None:           
+        if not self.idxSelectedFile is None:
             isDir = self.tvwModel.isDir(self.idxSelectedFile)
             filePath = self.tvwModel.filePath(self.idxSelectedFile)
             if isDir:
                 msg = "Delete\n\n%s\n\nfolder ?" % os.path.basename(filePath)
             else:
                 msg = "Delete\n\n%s\n\nfile ?" % os.path.basename(filePath)
-            result = QMessageBox.question(self, "Delete an object", msg, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)        
+            result = QMessageBox.question(self, "Delete an object", msg, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
             if result == QMessageBox.Yes:
                 if isDir:
                     self.showDebug("Tabs %d" % self.tbwHighRight.count())
                     for i in reversed(range(self.tbwHighRight.count())):
-                        tab = self.tbwHighRight.widget(i) 
+                        tab = self.tbwHighRight.widget(i)
                         self.showDebug("Tab %d : %s" % (i, str(type(tab))))
                         if isinstance(tab, editor.WEditor) or isinstance(tab, editor.WMarkdown) or isinstance(tab, editor.WHexedit):
                             self.showDebug("%s vs %s" % (os.path.normpath(filePath), os.path.normpath(os.path.dirname(tab.filename))))
@@ -1946,9 +1955,9 @@ class MainWindow(QMainWindow):
 # doRenameAction()
 #-------------------------------------------------------------------------------
     def doRenameAction(self):
-        if not self.idxSelectedFile is None:           
-            filePath = self.tvwModel.filePath(self.idxSelectedFile)            
-            text, ok = QInputDialog.getText(self, 'Rename object', 'New name :', QLineEdit.Normal, os.path.basename(filePath))		
+        if not self.idxSelectedFile is None:
+            filePath = self.tvwModel.filePath(self.idxSelectedFile)
+            text, ok = QInputDialog.getText(self, 'Rename object', 'New name :', QLineEdit.Normal, os.path.basename(filePath))
             if ok:
                 try:
                     os.rename(filePath, os.path.join(os.path.dirname(filePath), text))
@@ -1957,26 +1966,26 @@ class MainWindow(QMainWindow):
                     self.showMessage("Unable to rename object")
         else:
             self.showMessage("No target folder selected")
-        
+
 #-------------------------------------------------------------------------------
 # doCutAction()
 #-------------------------------------------------------------------------------
     def doCutAction(self):
         # cdc.do_it()
         self.showMessage("Action = CUT")
-        
+
 #-------------------------------------------------------------------------------
 # doCopyAction()
 #-------------------------------------------------------------------------------
     def doCopyAction(self):
         self.showMessage("Action = COPY")
-        
+
 #-------------------------------------------------------------------------------
 # doPasteAction()
 #-------------------------------------------------------------------------------
     def doPasteAction(self):
         self.showMessage("Action = PASTE")
-        
+
 #-------------------------------------------------------------------------------
 # doPropertiesAction()
 #-------------------------------------------------------------------------------
@@ -1987,30 +1996,30 @@ class MainWindow(QMainWindow):
         fType = self.tvwModel.type(self.idxSelectedFile)
         fSize = self.tvwModel.size(self.idxSelectedFile)
         lastModified = self.tvwModel.lastModified(self.idxSelectedFile)
-        
+
         xml = "<properties>"
-        
+
         fileProps = {}
         fileProps.update({'Name': fileName})
         xml = xml + ("<name>%s</name>" % fileName)
-        
+
         fileProps.update({'Path': filePath})
         xml = xml + ("<path>%s</path>" % filePath)
-        
+
         # fileProps.update({'type': "Directory" if isDir == True else "File"})
         fileProps.update({'Type': fType})
         xml = xml + ("<type>%s</type>" % fType)
-        
+
         fileProps.update({'Size': "%d (%s)" % (fSize, utils.getHumanSize(fSize))})
         xml = xml + ("<size>%d</size>" % fSize)
-        
+
         fileProps.update({'Last modified': lastModified.toString(Qt.DefaultLocaleLongDate)})
         xml = xml + ("<modified>%s</modified>" % lastModified.toString(Qt.DefaultLocaleLongDate))
-        
+
         xml = xml + "</properties>"
-        
+
         self.displayXMLasTree(etree.fromstring(xml), self.tvwProperties)
-        
+
         dlg = dialog.DlgProperties(fileProps)
         dlg.exec()
 
@@ -2018,10 +2027,10 @@ class MainWindow(QMainWindow):
         self.showMessage("Show properties for %s" % fileName)
         for key in fileProps:
             self.outputMessage("%s : %s" % (key, fileProps[key]))
-        self.outputMessage("=" * 80)            
-        
-        
-            
+        self.outputMessage("=" * 80)
+
+
+
 #-------------------------------------------------------------------------------
 # doProjectPropertiesAction()
 #-------------------------------------------------------------------------------
@@ -2035,11 +2044,11 @@ class MainWindow(QMainWindow):
             self.showMessage("Show properties for %s" % fileName)
             for key in fileProps:
                 self.outputMessage("%s : %s" % (key, fileProps[key]))
-            self.outputMessage("=" * 80)            
+            self.outputMessage("=" * 80)
             """
         else:
             self.showMessage("No open project")
-            
+
 #-------------------------------------------------------------------------------
 # doExportProject()
 #-------------------------------------------------------------------------------
@@ -2048,7 +2057,7 @@ class MainWindow(QMainWindow):
             self.project.exportProject()
         else:
             self.showMessage("No open project")
-        
+
 #-------------------------------------------------------------------------------
 # doPackagesAction()
 #-------------------------------------------------------------------------------
@@ -2058,13 +2067,13 @@ class MainWindow(QMainWindow):
             tab = self.tbwHighRight.widget(i)
             if isinstance(tab, pynter.TabPIP):
                 foundTab = True
-                self.tbwHighRight.setCurrentIndex(i)                        
+                self.tbwHighRight.setCurrentIndex(i)
         if foundTab == False:
-            tabPackages = pynter.TabPIP(self)        
+            tabPackages = pynter.TabPIP(self)
             self.tbwHighRight.addTab(tabPackages, "Packages")
             idxTab = self.tbwHighRight.count() - 1
             self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/package.png")))
-            self.tbwHighRight.setCurrentIndex(idxTab)               
+            self.tbwHighRight.setCurrentIndex(idxTab)
         self.showMessage("Packages management")
 
 #-------------------------------------------------------------------------------
@@ -2089,14 +2098,14 @@ class MainWindow(QMainWindow):
             if self.txtMainFile.text() == "":
                 tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
                 if isinstance(tab, editor.WEditor):
-                    self.txtMainFile.setText(tab.filename)           
+                    self.txtMainFile.setText(tab.filename)
 
 #-------------------------------------------------------------------------------
 # doBuildEXE()
 #-------------------------------------------------------------------------------
     def doBuildEXE(self):
         pyinstall.buildEXE(self)
-        
+
 #-------------------------------------------------------------------------------
 # changeEvent()
 #-------------------------------------------------------------------------------
@@ -2128,7 +2137,7 @@ class MainWindow(QMainWindow):
         else:
             for i in range(0, tabWidget.count()):
                 tabWidget.setTabText(i, "")
-                
+
 #-------------------------------------------------------------------------------
 # colorBackgroundPicker()
 #-------------------------------------------------------------------------------
@@ -2138,7 +2147,7 @@ class MainWindow(QMainWindow):
             self.bgColor = color.name()
             self.txtBackgroundColor.setText(self.bgColor)
             self.lblColorPickerSample.setStyleSheet("QWidget { background-color: %s; color: %s}" % (self.bgColor, self.fgColor))
-    
+
 #-------------------------------------------------------------------------------
 # colorForegroundPicker()
 #-------------------------------------------------------------------------------
@@ -2158,14 +2167,14 @@ class MainWindow(QMainWindow):
         self.lblColorPickerSample.setStyleSheet("QWidget { background-color: %s; color: %s}" % (self.bgColor, self.fgColor))
         self.txtForegroundColor.setText(self.fgColor)
         self.lblColorPickerSample.setStyleSheet("QWidget { background-color: %s; color: %s}" % (self.bgColor, self.fgColor))
-    
+
 #-------------------------------------------------------------------------------
 # verboseOutputChanged()
 #-------------------------------------------------------------------------------
     def verboseOutputChanged(self, state):
         self.debug = (state == Qt.Checked)
         self.showMessage("Debug Mode %s" % str(self.debug))
-        
+
 #-------------------------------------------------------------------------------
 # outputExport()
 #-------------------------------------------------------------------------------
@@ -2175,17 +2184,17 @@ class MainWindow(QMainWindow):
         # fileName = QFileDialog.getOpenFileName(self,    tr("Open Image"), "/home/jana", tr("Image Files (*.png *.jpg *.bmp)"))
         if fileName[0]:
             with open(fileName[0], "w") as fOutput:
-                fOutput.write(self.txtOutput.toPlainText())    
+                fOutput.write(self.txtOutput.toPlainText())
                 self.showMessage("Exporting output to file %s" % fileName[0])
         else:
             self.showMessage("Cancelling export of output")
-                
+
 #-------------------------------------------------------------------------------
 # outputClear()
 #-------------------------------------------------------------------------------
     def outputClear(self):
         self.txtOutput.setPlainText("")
-    
+
 #-------------------------------------------------------------------------------
 # changeFocusText()
 #-------------------------------------------------------------------------------
@@ -2202,22 +2211,22 @@ class MainWindow(QMainWindow):
         name = scratch.createScratchFile(os.path.join(settings.db['BSIDE_REPOSITORY'], const.SCRATCH_FOLDER))
         idx = self.tvwModel.index(name)
         self.tvwRepository.scrollTo(idx)
-        self.tvwRepository.setCurrentIndex(idx)        
+        self.tvwRepository.setCurrentIndex(idx)
         self.showMessage("Creating scratch file %s" % name)
         self.openFileFromName(name)
-        
+
 #-------------------------------------------------------------------------------
 # runScript()
 #-------------------------------------------------------------------------------
     def runScript(self):
-        tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())       
+        tabEditor = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
         try:
             if tabEditor.filename is not None:
                 if settings.db['BSIDE_SAVE_BEFORE_RUN'] == True:
-                    # tabEditor.saveFile()     
+                    # tabEditor.saveFile()
                     self.saveAll()
                 pybin = sys.executable
-                script = tabEditor.filename    
+                script = tabEditor.filename
 
                 dlg = dialog.DlgRunScript(script)
                 dlg.exec()
@@ -2234,19 +2243,19 @@ class MainWindow(QMainWindow):
                         else:
                             os.system("gnome-terminal -e 'bash -c \"%s; echo; read -p Paused\"'" % cmd)
                         self.showMessage("End of running script %s" % script)
-                        self.showMessage("=" * 80)                
+                        self.showMessage("=" * 80)
                     else:
                         cmd = (pybin, "-u", script, dlg.params)
                         self.btnKillProcess.setEnabled(True)
                         self.tbwLowRight.setCurrentIndex(0)
-                        QGuiApplication.processEvents()                     
+                        QGuiApplication.processEvents()
                         # self.tCmd = shrealding.Shreald(self, "%s -u %s" % (pybin, script))
                         self.tCmd = shrealding.Shreald(self, cmd, os.path.dirname(script))
-                        self.tCmd.linePrinted.connect(self.handleLine)                    
+                        self.tCmd.linePrinted.connect(self.handleLine)
                 else:
-                    self.showMessage("Cancel running script %s" % script)   
+                    self.showMessage("Cancel running script %s" % script)
         except:
-            self.showMessage("Can't run this as a script")   
+            self.showMessage("Can't run this as a script")
 
 #-------------------------------------------------------------------------------
 # handleLine()
@@ -2260,11 +2269,11 @@ class MainWindow(QMainWindow):
                 self.showMessage("[ERR] %s " % line[1:].rstrip())
             elif line[0] == 'x':
                 self.killProcess()
-            
+
 #-------------------------------------------------------------------------------
 # killProcess()
 #-------------------------------------------------------------------------------
-    def killProcess(self):        
+    def killProcess(self):
         self.showMessage("Ending application with PID %s" % str(self.tCmd.process.pid))
         self.showMessage("End of script %s" % str(self.tCmd.cmd[2]))
         try:
@@ -2274,8 +2283,8 @@ class MainWindow(QMainWindow):
         self.btnKillProcess.setEnabled(False)
         if self.tCmd.returncode is not None:
             self.showMessage("Return Code : %d" % self.tCmd.returncode)
-        self.showMessage("=" * 80)                        
-        
+        self.showMessage("=" * 80)
+
 #-------------------------------------------------------------------------------
 # newProject()
 #-------------------------------------------------------------------------------
@@ -2295,7 +2304,7 @@ class MainWindow(QMainWindow):
         filename = QFileDialog.getOpenFileName(self, 'Open Project', home, filter='*.bsix', options = QFileDialog.DontUseNativeDialog)
         if filename[0]:
             self.openProjectByFilename(filename[0])
-    
+
 #-------------------------------------------------------------------------------
 # openProjectByFilename()
 #-------------------------------------------------------------------------------
@@ -2305,7 +2314,7 @@ class MainWindow(QMainWindow):
         self.tvwProject.setModel(self.tvmProject)
         self.tvwProject.setAnimated(False)
         self.tvwProject.setIndentation(10)
-        self.tvwProject.setSortingEnabled(True)        
+        self.tvwProject.setSortingEnabled(True)
         for i in range(1, self.tvwProject.header().length()):
             self.tvwProject.hideColumn(i)
         self.tvwProject.sortByColumn(0, Qt.AscendingOrder)
@@ -2314,32 +2323,32 @@ class MainWindow(QMainWindow):
         self.project = projects.Project(parent = self)
         self.project.set(projectName)
         self.project.open()
-    
+
 #-------------------------------------------------------------------------------
 # closeProject()
 #-------------------------------------------------------------------------------
     def closeProject(self):
         if self.project is not None:
             self.project.close()
-            # self.tvmProject.setRootPath(expanduser("~"))        
+            # self.tvmProject.setRootPath(expanduser("~"))
             # self.tvwProject.setRootIndex(self.tvmProject.index(expanduser("~")))
             self.tvwProject.setModel(None)
             self.tbwHighLeft.setCurrentIndex(0)
             self.lblProject.setText(const.PROJECT_NONE)
-            self.lblProjectName.setText(const.PROJECT_NONE)          
+            self.lblProjectName.setText(const.PROJECT_NONE)
             self.lblProjectStatus.setText("N/A")
             self.project = None
         else:
             self.showMessage("No open project")
 
-            
+
 #-------------------------------------------------------------------------------
 # switchFullScreen()
 #-------------------------------------------------------------------------------
     def switchFullScreen(self):
         """
         if self.isFullScreen() == False:
-            self.showFullScreen()            
+            self.showFullScreen()
         else:
             self.showNormal()
         """
@@ -2348,8 +2357,8 @@ class MainWindow(QMainWindow):
             self.showNormal()
         else:
             print("switch full screen")
-            self.showFullScreen()            
-            
+            self.showFullScreen()
+
 #-------------------------------------------------------------------------------
 # helpPython()
 #-------------------------------------------------------------------------------
@@ -2364,7 +2373,7 @@ class MainWindow(QMainWindow):
                 subprocess.call(('xdg-open', filepath))
         except:
             self.showMessage("Help file not found")
-                    
+
 """
 MARKDOWN
 
@@ -2376,7 +2385,7 @@ def textChanged(self):
         filePath = self.tvwMenuModel.filePath(self.idxSelectedFile)
         open(filePath, 'w').write(self.txtMarkdown.toPlainText())
         self.txtHTML.setText(markdown.markdown(self.txtMarkdown.toPlainText(), extensions=settings.db['EDITOR_MD_EXTENSIONS']))
-""" 
+"""
 
 #-------------------------------------------------------------------------------
 # Class IconProvider
@@ -2407,7 +2416,7 @@ class IconProvider(QFileIconProvider):
         if fileInfo.suffix() == "bsix":
             return QIcon(resource_path("pix/bside.png"))
         return QFileIconProvider.icon(self, fileInfo)
-    
+
     """
     html, chm, txt, ui, spec, pyc, tar, gz, gzip, rar, png, mp3, avi, pdf, exe
-    """        
+    """

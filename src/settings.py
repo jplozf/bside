@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #===============================================================================
-#                                                       ____      _     _      
-#                                                      | __ ) ___(_) __| | ___ 
+#                                                       ____      _     _
+#                                                      | __ ) ___(_) __| | ___
 #                                                      |  _ \/ __| |/ _` |/ _ \
 #                                                      | |_) \__ \ | (_| |  __/
 #                                                      |____/|___/_|\__,_|\___|
-#                         
+#
 #============================================================(C) JPL 2019=======
 
 from PyQt5.QtWidgets import QWidget, QGroupBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QScrollArea, QSpacerItem, QSizePolicy
@@ -20,8 +20,8 @@ import utils
 #-------------------------------------------------------------------------------
 # These are the default values
 #-------------------------------------------------------------------------------
-defaultValues = [ 
-    ['BSIDE_TIMER_STATUS', 3000, "Time delay for displaying message in status bar"],    
+defaultValues = [
+    ['BSIDE_TIMER_STATUS', 3000, "Time delay for displaying message in status bar"],
     ['EDITOR_CODEPAGE', "utf_8", "Default code page for opening files"],
     ['EDITOR_MD_EXTENSIONS', ['tables', 'fenced_code', 'codehilite', 'nl2br'], "Markdown extensions enabled"],
     ['EDITOR_FONT', "Courier", "Editor font's name"],
@@ -43,12 +43,13 @@ defaultValues = [
     ['CONSOLE_PS1', ">>>"],
     ['CONSOLE_PS2', "..."],
     ['CONSOLE_PACKAGE_INSTALLER', "pip"],
-    ['BSIDE_REPOSITORY', "/media/jpl/JPL004/Projets/Python"],    
+    ['BSIDE_REPOSITORY', "/media/jpl/JPL004/Projets/Python"],
     ['BSIDE_DISPLAY_WELCOME', True, "Display welcome screen on start"],
     ['BSIDE_OPEN_LAST_WORKSPACE', True, "Open the last workspace on start"],
     ['BSIDE_CLOCK_FORMAT', "%a %d/%m/%y %H:%M", "Clock format display"],
     ['BSIDE_PYTHON_HELP_FILE', "python370.chm", "Python help file location"],
     ['BSIDE_TAB_SPACES', 4],
+    ['BSIDE_EXIT_CONFIRM', True],
     ['BSIDE_THEME', "LIGHT"],
     ['BSIDE_SAVE_BEFORE_RUN', True],
     ['BSIDE_TIMER_INFO', 5000],
@@ -58,7 +59,7 @@ defaultValues = [
     ['BSIDE_BIG_DISPLAY_WIDTH', 25],
     ['BSIDE_BIG_DISPLAY_COLOR', "#ce5408"],
     ['BSIDE_MRU_PROJECTS', 5],
-    ['BSIDE_QTDESIGNER_PATH', "/usr/bin/designer"],    
+    ['BSIDE_QTDESIGNER_PATH', "/usr/bin/designer"],
     ['THEME_ALTERNATE', ["#efefef","#000000","#ffffff","#f7f7f7","#ffffdc","#000000","#000000","#efefef","#000000","#ffffff","#0000ff","#308cc6","#ffffff"]],
     ['TAB_LOW_LEFT_NAMES', True],
     ['TAB_LOW_RIGHT_NAMES', True],
@@ -150,12 +151,12 @@ db.sync()
 #-------------------------------------------------------------------------------
 def resetSettings():
     for x in defaultValues:
-            db[x[0]] = x[1]    
+            db[x[0]] = x[1]
 
 #-------------------------------------------------------------------------------
 # Class TabSettings
 #-------------------------------------------------------------------------------
-class TabSettings(QWidget):    
+class TabSettings(QWidget):
 #-------------------------------------------------------------------------------
 # setFields()
 #-------------------------------------------------------------------------------
@@ -169,7 +170,7 @@ class TabSettings(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.initUI()
-        
+
 #-------------------------------------------------------------------------------
 # initUI()
 #-------------------------------------------------------------------------------
@@ -177,16 +178,16 @@ class TabSettings(QWidget):
         self.vLayout = QVBoxLayout()
         self.central = QWidget()
         self.central.setLayout(self.vLayout)
-                     
+
         i = 0
-        fields = []        
+        fields = []
         self.layout = QFormLayout()
         prevKeyword = ""
-        
+
         self.formGroupBox = QGroupBox("Warning")
         self.formGroupBox.setStyleSheet("font-weight: bold;")
         self.fLayout = QHBoxLayout()
-        self.formGroupBox.setLayout(self.fLayout)        
+        self.formGroupBox.setLayout(self.fLayout)
         pixLabel = QLabel()
         pixLabel.setPixmap(QPixmap("pix/16x16/Exclamation.png"))
         self.fLayout.addWidget(pixLabel)
@@ -194,13 +195,13 @@ class TabSettings(QWidget):
         self.spaceItem = QSpacerItem(150, 10, QSizePolicy.Expanding)
         self.fLayout.addSpacerItem(self.spaceItem)
         self.vLayout.addWidget(self.formGroupBox)
-        
+
         for key, value in sorted(db.items(), key=lambda kv: kv[0]):
             if key in (i[0] for i in defaultValues):    # don't display obsolete settings removed from defaultValues array
                 thisKeyword = key.split('_')[0]
                 if thisKeyword != prevKeyword:
                     self.layout = QFormLayout()
-                    self.formGroupBox = QGroupBox(thisKeyword) 
+                    self.formGroupBox = QGroupBox(thisKeyword)
                     self.formGroupBox.setStyleSheet("font-weight: bold;")
                 sValue =  str(value)
                 fields.append(list([QLabel(key),QLineEdit(sValue)]))
@@ -212,37 +213,37 @@ class TabSettings(QWidget):
                 self.layout.addRow(fields[i][0], fields[i][1])
                 fields[i][1].textChanged.connect(lambda text, label=fields[i][0].text(), x=i: self.lineChanged(label, text, x))
                 i = i + 1
-                if thisKeyword != prevKeyword:                
-                    self.formGroupBox.setLayout(self.layout)        
+                if thisKeyword != prevKeyword:
+                    self.formGroupBox.setLayout(self.layout)
                     self.vLayout.addWidget(self.formGroupBox)
                     prevKeyword = thisKeyword
-                
+
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setWidget(self.central)
-        
+
         mainLayout = QVBoxLayout()
         mainLayout.addWidget(scroll)
-        self.setLayout(mainLayout)        
-        
+        self.setLayout(mainLayout)
+
 #-------------------------------------------------------------------------------
 # lineChanged()
 #-------------------------------------------------------------------------------
     def lineChanged(self, label, text, i):
-        if type(db[label]) is str:            
+        if type(db[label]) is str:
             db[label] = text
-        elif type(db[label]) is int:            
+        elif type(db[label]) is int:
             db[label] = int(text)
-        elif type(db[label]) is float:            
+        elif type(db[label]) is float:
             db[label] = float(text)
-        elif type(db[label]) is bool:            
+        elif type(db[label]) is bool:
             if text.lower() == "true":
                 db[label] = True
             else:
                 db[label] = False
-        else:            
+        else:
             db[label] = str(text)
-                   
+
 #-------------------------------------------------------------------------------
 # fontPicker()
 #-------------------------------------------------------------------------------
@@ -268,7 +269,7 @@ class TabSettings(QWidget):
             self.txtConsoleOut.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
             self.lblConsoleForegroundColor.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
             self.lblConsoleBackgroundColor.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
-    
+
 #-------------------------------------------------------------------------------
 # colorForegroundPicker()
 #-------------------------------------------------------------------------------
@@ -280,4 +281,3 @@ class TabSettings(QWidget):
             self.txtConsoleOut.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
             self.lblConsoleForegroundColor.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
             self.lblConsoleBackgroundColor.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
-    
