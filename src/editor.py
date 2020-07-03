@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #===============================================================================
-#                                                       ____      _     _      
-#                                                      | __ ) ___(_) __| | ___ 
+#                                                       ____      _     _
+#                                                      | __ ) ___(_) __| | ___
 #                                                      |  _ \/ __| |/ _` |/ _ \
 #                                                      | |_) \__ \ | (_| |  __/
 #                                                      |____/|___/_|\__,_|\___|
-#                         
+#
 #============================================================(C) JPL 2019=======
 
 #-------------------------------------------------------------------------------
@@ -31,12 +31,12 @@ import utils
 #-------------------------------------------------------------------------------
 # Class WEditor
 #-------------------------------------------------------------------------------
-class WEditor(QWidget):    
+class WEditor(QWidget):
     SYNTAX_TEXT = 0
     SYNTAX_PYTHON = 1
     SYNTAX_XML = 2
     SYNTAX_SQL = 3
-    
+
     OPEN_WITH_LOCAL = 0
     OPEN_WITH_BROWSER = 1
     OPEN_WITH_QTDESIGNER = 2
@@ -50,36 +50,36 @@ class WEditor(QWidget):
         self.filetype = filetype
         if encoding == None:
             encoding = settings.db['EDITOR_CODEPAGE']
-        self.txtEditor = QCodeEditor.QCodeEditor()     
-        
+        self.txtEditor = QCodeEditor.QCodeEditor()
+
         css = 'font: %dpt "%s"; background-color: %s;' % (settings.db['EDITOR_FONT_SIZE'],settings.db['EDITOR_FONT'],settings.db['EDITOR_COLOR_BACKGROUND'])
         self.txtEditor.setStyleSheet(css)
         # self.txtEditor.keyPressEvent = self.editorKeyPressEvent
 
-        self.lblRowCol = QLabel("00000 : 00000")
+        self.lblRowCol = QLabel("Line %d, Column %d")
         self.lblFileName = QLabel("*NONE")
         self.lblFileName.setTextFormat(Qt.RichText)
-        
+
         self.btnCopyName = QPushButton()
         self.btnCopyName.setIcon(QIcon(QPixmap("pix/16x16/Clipboard Paste.png")))
-        self.btnCopyName.clicked.connect(self.copyNameToClipboard)        
-        
+        self.btnCopyName.clicked.connect(self.copyNameToClipboard)
+
         self.lblSyntax = QLabel("Syntax")
         self.cbxSyntax = QComboBox()
         self.cbxSyntax.addItem("Text")
         self.cbxSyntax.addItem("Python")
-        self.cbxSyntax.addItem("XML")    
-        self.cbxSyntax.addItem("SQL")    
+        self.cbxSyntax.addItem("XML")
+        self.cbxSyntax.addItem("SQL")
         self.cbxSyntax.setCurrentIndex(self.SYNTAX_TEXT)
         self.cbxSyntax.currentIndexChanged.connect(self.doSyntaxChanged)
-        
+
         self.lblOpenWith = QLabel("Open with")
         self.cbxOpenWith = QComboBox()
         self.cbxOpenWith.addItem("Local")
         self.cbxOpenWith.addItem("Browser")
         self.cbxOpenWith.addItem("Qt Designer")
         self.cbxOpenWith.currentIndexChanged.connect(self.doOpenWith)
-        
+
         self.lblModified = QLabel("")
         self.lblCodePage= QLabel("Encoding : %s" % encoding)
         self.lblSize = QLabel("0")
@@ -89,7 +89,7 @@ class WEditor(QWidget):
         self.chkSearchProject = QCheckBox("Project")
         self.chkSearchRegex = QCheckBox("Regex")
         self.chkSearchCase = QCheckBox("Case")
-        
+
         h1Spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum)
         h2Spacer = QSpacerItem(20, 40, QSizePolicy.Expanding, QSizePolicy.Minimum)
         iSearch = QLabel()
@@ -98,21 +98,21 @@ class WEditor(QWidget):
         if filename is not None:
             self.lblFileName.setText("&#8227;&nbsp;" + os.path.normpath(filename))
         self.textColor = self.parent.tabBar().tabTextColor(0)
-                
+
         vLayout = QVBoxLayout(self)
 
         h1Layout = QHBoxLayout(self)
-        h1Layout.addWidget(self.btnCopyName)       
-        h1Layout.addWidget(self.lblFileName)        
+        h1Layout.addWidget(self.btnCopyName)
+        h1Layout.addWidget(self.lblFileName)
         h1Layout.addItem(h1Spacer)
-        h1Layout.addWidget(self.lblSyntax)        
-        h1Layout.addWidget(self.cbxSyntax)        
-        h1Layout.addWidget(self.lblOpenWith)        
-        h1Layout.addWidget(self.cbxOpenWith)        
-        
-        vLayout.addLayout(h1Layout)        
+        h1Layout.addWidget(self.lblSyntax)
+        h1Layout.addWidget(self.cbxSyntax)
+        h1Layout.addWidget(self.lblOpenWith)
+        h1Layout.addWidget(self.cbxOpenWith)
+
+        vLayout.addLayout(h1Layout)
         vLayout.addWidget(self.txtEditor)
-        
+
         h2Layout = QHBoxLayout(self)
         h2Layout.addWidget(self.lblRowCol)
         # h2Layout.addItem(hSpacer)
@@ -121,15 +121,15 @@ class WEditor(QWidget):
         h2Layout.addWidget(self.chkSearchCase)
         h2Layout.addWidget(self.chkSearchProject)
         h2Layout.addWidget(self.chkSearchRegex)
-        h2Layout.addWidget(QLabel("Match"))        
-        h2Layout.addWidget(self.lblGotoSearch)                
+        h2Layout.addWidget(QLabel("Match"))
+        h2Layout.addWidget(self.lblGotoSearch)
         h2Layout.addItem(h2Spacer)
-        
+
         h2Layout.addWidget(self.lblCodePage)
         h2Layout.addWidget(self.lblModified)
-        h2Layout.addWidget(self.lblSize)        
+        h2Layout.addWidget(self.lblSize)
         vLayout.addLayout(h2Layout)
-        
+
         self.dirtyFlag = False
         if filename is not None:
             if os.path.exists(filename):
@@ -146,14 +146,14 @@ class WEditor(QWidget):
                     self.txtEditor.setPlainText(str(pyFile.read()))
                     self.extractFuncs()
                     self.displaySize()
-        
+
         self.txtGotoSearch.returnPressed.connect(self.gotoSearch)
         self.txtEditor.textChanged.connect(self.changedText)
         self.txtEditor.selectionChanged.connect(self.handleSelectionChanged)
         self.txtEditor.cursorPositionChanged.connect(self.cursorPosition)
         self.txtEditor.setTabStopDistance(self.txtEditor.fontMetrics().width(' ') * 4)
-        self.cursorPosition()                
-        
+        self.cursorPosition()
+
 #-------------------------------------------------------------------------------
 # doSyntaxChanged()
 #-------------------------------------------------------------------------------
@@ -168,33 +168,33 @@ class WEditor(QWidget):
         else:
             self.highlight = syntax.TextHighlighter(self.txtEditor.document())
         self.txtEditor.blockSignals(False)
-        
+
 #-------------------------------------------------------------------------------
 # copyNameToClipboard()
 #-------------------------------------------------------------------------------
     def copyNameToClipboard(self):
         QApplication.clipboard().setText(self.filename)
         self.window.showMessage("Copy file name to clipboard")
-        
+
 #-------------------------------------------------------------------------------
 # doOpenWith()
 #-------------------------------------------------------------------------------
     def doOpenWith(self, i):
         if self.cbxOpenWith.currentIndex() == self.OPEN_WITH_BROWSER:
-            webbrowser.open(self.filename) 
+            webbrowser.open(self.filename)
             self.cbxOpenWith.setCurrentIndex(self.OPEN_WITH_LOCAL)
         elif self.cbxOpenWith.currentIndex() == self.OPEN_WITH_QTDESIGNER:
             subprocess.call([settings.db['BSIDE_QTDESIGNER_PATH'], self.filename])
             self.cbxOpenWith.setCurrentIndex(self.OPEN_WITH_LOCAL)
-        
+
 #-------------------------------------------------------------------------------
 # cursorPosition()
 #-------------------------------------------------------------------------------
     def cursorPosition(self):
         line = self.txtEditor.textCursor().blockNumber() + 1
         col = self.txtEditor.textCursor().columnNumber() + 1
-        self.lblRowCol.setText("%05d : %05d" % (line, col))
-        
+        self.lblRowCol.setText("Line %d, Column %d" % (line, col))
+
 #-------------------------------------------------------------------------------
 # saveFile()
 #-------------------------------------------------------------------------------
@@ -203,7 +203,7 @@ class WEditor(QWidget):
         s = self.txtEditor.toPlainText()
         s = s.replace("\t", settings.db['BSIDE_TAB_SPACES'] * ' ')
         self.txtEditor.setPlainText(s)
-        
+
         if self.filename is not None:
             with open(self.filename, "w") as pyFile:
                 pyFile.write(self.txtEditor.toPlainText())
@@ -212,7 +212,7 @@ class WEditor(QWidget):
                 self.parent.tabBar().setTabTextColor(self.parent.currentIndex(), self.textColor)
                 # self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon())
         else:
-            
+
             if self.filetype == "python":
                 filters = "Python sources (*.py);;All files (*.*)"
             elif self.filetype == "xml":
@@ -234,7 +234,7 @@ class WEditor(QWidget):
                     self.lblModified.setText("")
                     self.parent.tabBar().setTabTextColor(self.parent.currentIndex(), self.textColor)
                     self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon())
-                              
+
 #-------------------------------------------------------------------------------
 # changedText()
 #-------------------------------------------------------------------------------
@@ -246,7 +246,7 @@ class WEditor(QWidget):
             self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon("pix/silk/icons/bullet_red.png"))
         self.extractFuncs()
         self.displaySize()
-                              
+
 #-------------------------------------------------------------------------------
 # displaySize()
 #-------------------------------------------------------------------------------
@@ -268,7 +268,7 @@ class WEditor(QWidget):
             line = self.txtEditor.toPlainText().splitlines()[lineno-1]
             indent = self.getIndent(line)
             # print(lineno, indent, line)
-            self.codeStructure.append((lineno, indent, "class", m.group(2)))     
+            self.codeStructure.append((lineno, indent, "class", m.group(2)))
 
         # get the functions
         regexp = re.compile(r"(def)\s([a-zA-Z_]*)\s*\(.*\)")
@@ -279,7 +279,7 @@ class WEditor(QWidget):
             indent = self.getIndent(line)
             # print(lineno, indent, line)
             self.codeStructure.append((lineno, indent, "function", m.group(2)))
-                
+
         # get the vars
         """
         regexp = re.compile(r"(?<![\"'])(self.)?([a-zA-Z_]*)\s*(?<![=!])=(?!=)\s*.+(?![\"'])")
@@ -289,7 +289,7 @@ class WEditor(QWidget):
             line = self.txtEditor.toPlainText().splitlines()[lineno-1]
             indent = self.getIndent(line)
             # print(lineno, indent, line)
-            self.codeStructure.append((lineno, indent, "var", m.group(2)))     
+            self.codeStructure.append((lineno, indent, "var", m.group(2)))
         """
 
         # get the actions
@@ -297,18 +297,18 @@ class WEditor(QWidget):
         for m in regexp.finditer(self.txtEditor.toPlainText()):
             start = m.start()
             lineno = self.txtEditor.toPlainText().count("\n", 0, start) + 1
-            self.todo.append((lineno, m.group(2).strip()))     
+            self.todo.append((lineno, m.group(2).strip()))
 
         self.codeStructure.sort(key=lambda tup: tup[0])
-        
+
         """
         TODO :
         * Sort by class name (none = <root>)
         * Inside class name, sort by function name
         * getClassOfFunction(fName, lineno)
-        * get class name where 
+        * get class name where
         """
-            
+
 #-------------------------------------------------------------------------------
 # getIndent()
 #-------------------------------------------------------------------------------
@@ -329,7 +329,7 @@ class WEditor(QWidget):
             myCursor = self.txtEditor.textCursor()
             myCursor.clearSelection()
             self.txtEditor.setTextCursor(myCursor)
-            
+
             try:
                 # Is it a line number ?
                 # Goto Line Number
@@ -344,16 +344,16 @@ class WEditor(QWidget):
                 cursor.setCharFormat(QTextCharFormat())
                 cursor.clearSelection()
                 self.txtEditor.setTextCursor(cursor)
-                
+
                 # Search for this string
                 cursor = self.txtEditor.textCursor()
-                
+
                 # Setup the desired format for matches
                 format = QTextCharFormat()
-                format.setBackground(QBrush(QColor("yellow")))      
+                format.setBackground(QBrush(QColor("yellow")))
                 pattern = self.txtGotoSearch.text()
                 regex = QRegExp(pattern)
-                
+
                 # Process the displayed document
                 pos = 0
                 match = 0
@@ -367,21 +367,21 @@ class WEditor(QWidget):
                     # Move to the next match
                     pos = index + regex.matchedLength()
                     index = regex.indexIn(self.txtEditor.toPlainText(), pos)
-                    
-                    lineno = self.txtEditor.toPlainText().count('\n', 0, pos) + 1                    
-                    rowPosition = self.window.tblSearch.rowCount()                     
+
+                    lineno = self.txtEditor.toPlainText().count('\n', 0, pos) + 1
+                    rowPosition = self.window.tblSearch.rowCount()
                     self.window.tblSearch.insertRow(rowPosition)
 
                     item = QTableWidgetItem("%d" % lineno)
                     item.setTextAlignment(Qt.AlignHCenter)
                     self.window.tblSearch.setItem(rowPosition, 0, item)
-                    
+
                     self.window.tblSearch.setItem(rowPosition, 1, QTableWidgetItem("%s" % self.getNthLine(self.txtEditor.toPlainText(), lineno).strip()))
                     self.window.tblSearch.setRowHeight(rowPosition, 20)
                     self.window.tblSearch.resizeColumnsToContents()
-                    
+
                     match = match + 1
-                    
+
                 self.window.lblSearch.setText("%d : %s" % (match, pattern))
                 self.lblGotoSearch.setText("%d" % match)
                 self.txtEditor.setTextCursor(prevCursor)
@@ -397,24 +397,24 @@ class WEditor(QWidget):
         text = myCursor.selectedText()
         # myCursor.clearSelection()
         # self.txtEditor.setTextCursor(myCursor)
-        # self.txtGotoSearch.setText(text)          
+        # self.txtGotoSearch.setText(text)
         # self.gotoSearch()
-    
+
 #-------------------------------------------------------------------------------
 # gotoLine()
 #-------------------------------------------------------------------------------
     def gotoLine(self, nline):
         self.txtEditor.moveCursor(QTextCursor.End)
         cursor = QTextCursor(self.txtEditor.document().findBlockByLineNumber(nline - 1))
-        self.txtEditor.setTextCursor(cursor)   
+        self.txtEditor.setTextCursor(cursor)
         self.txtEditor.setFocus()
-        
+
 #-------------------------------------------------------------------------------
 # getNthLine()
 #-------------------------------------------------------------------------------
     def getNthLine(self, text, nline):
         return(text.split('\n')[nline - 1])
-        
+
 """
 for m in re.finditer(pattern, src):
 	start = m.start()
@@ -423,7 +423,7 @@ for m in re.finditer(pattern, src):
 	word = m.group(1)
 	print "2.htm(%s,%s): %s" % (lineno, offset, word)
 
-"""        
+"""
 
 #-------------------------------------------------------------------------------
 # Class WMarkdown
@@ -439,18 +439,18 @@ class WMarkdown(QWidget):
         if encoding == None:
             encoding = settings.db['EDITOR_CODEPAGE']
 
-        self.txtEditor = QCodeEditor.QCodeEditor()        
+        self.txtEditor = QCodeEditor.QCodeEditor()
         self.txtMarkdown = QTextEdit()
         self.txtMarkdown.setReadOnly(True)
-        
+
         self.btnResizeEditor = QPushButton("Editor")
         self.btnResizeMarkdown = QPushButton("Markdown")
         self.chkSynchroScroll = QCheckBox("Synchro Scrolling")
-        
+
         css = 'font: %dpt "%s"; background-color: %s;' % (settings.db['EDITOR_FONT_SIZE'],settings.db['EDITOR_FONT'],settings.db['EDITOR_COLOR_BACKGROUND'])
         self.txtEditor.setStyleSheet(css)
 
-        self.lblRowCol = QLabel("00000 : 00000")
+        self.lblRowCol = QLabel("Line %d, Column %d")
         self.lblModified = QLabel("")
         self.txtGotoSearch = QLineEdit()
         self.lblGotoSearch = QLabel("")
@@ -459,7 +459,7 @@ class WMarkdown(QWidget):
         iSearch.setPixmap(QPixmap("pix/16x16/Search.png"))
         self.filename = filename
         self.textColor = self.parent.tabBar().tabTextColor(0)
-        
+
         vLayout = QVBoxLayout(self)
 
         hLayout0 = QHBoxLayout(self)
@@ -467,7 +467,7 @@ class WMarkdown(QWidget):
         # hLayout0.addWidget(self.chkSynchroScroll)
         hLayout0.addWidget(self.btnResizeMarkdown)
         vLayout.addLayout(hLayout0)
-        
+
         hLayout1 = QHBoxLayout(self)
         hLayout1.addWidget(self.txtEditor)
         hLayout1.addWidget(self.txtMarkdown)
@@ -477,11 +477,11 @@ class WMarkdown(QWidget):
         # hLayout.addItem(hSpacer)
         hLayout.addWidget(iSearch)
         hLayout.addWidget(self.txtGotoSearch)
-        hLayout.addWidget(self.lblGotoSearch)        
+        hLayout.addWidget(self.lblGotoSearch)
         hLayout.addItem(hSpacer)
-        hLayout.addWidget(self.lblModified)        
+        hLayout.addWidget(self.lblModified)
         vLayout.addLayout(hLayout)
-        
+
         self.dirtyFlag = False
         if filename is not None:
             self.highlight = syntax.PythonHighlighter(self.txtEditor.document())
@@ -489,25 +489,25 @@ class WMarkdown(QWidget):
                 self.txtEditor.setPlainText(str(pyFile.read()))
             # os.chdir(os.path.dirname(filename))
             self.txtMarkdown.setText(markdown.markdown(self.txtEditor.toPlainText(), extensions=settings.db['EDITOR_MD_EXTENSIONS']))
-        
+
         self.txtGotoSearch.returnPressed.connect(self.gotoSearch)
         self.txtEditor.textChanged.connect(self.changedText)
         self.txtEditor.selectionChanged.connect(self.handleSelectionChanged)
         self.txtEditor.cursorPositionChanged.connect(self.cursorPosition)
         self.txtEditor.setTabStopWidth(self.txtEditor.fontMetrics().width(' ') * 4)
-        
+
         self.btnResizeEditor.clicked.connect(self.resizeEditor)
         self.btnResizeMarkdown.clicked.connect(self.resizeMarkdown)
-        self.cursorPosition()                
-        
+        self.cursorPosition()
+
 #-------------------------------------------------------------------------------
 # cursorPosition()
 #-------------------------------------------------------------------------------
     def cursorPosition(self):
         line = self.txtEditor.textCursor().blockNumber() + 1
         col = self.txtEditor.textCursor().columnNumber() + 1
-        self.lblRowCol.setText("%05d : %05d" % (line, col))
-        
+        self.lblRowCol.setText("Line %d, Column %d" % (line, col))
+
 #-------------------------------------------------------------------------------
 # saveFile()
 #-------------------------------------------------------------------------------
@@ -531,7 +531,7 @@ class WMarkdown(QWidget):
                     self.lblModified.setText("")
                     self.parent.tabBar().setTabTextColor(self.parent.currentIndex(), self.textColor)
                     self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon())
-                              
+
 #-------------------------------------------------------------------------------
 # changedText()
 #-------------------------------------------------------------------------------
@@ -542,7 +542,7 @@ class WMarkdown(QWidget):
         if settings.db['EDITOR_BULLET_CHANGED_FILE']!=0:
             self.parent.tabBar().setTabIcon(self.parent.currentIndex(), QIcon("pix/silk/icons/bullet_red.png"))
         self.txtMarkdown.setText(markdown.markdown(self.txtEditor.toPlainText(), extensions=settings.db['EDITOR_MD_EXTENSIONS']))
-            
+
 #-------------------------------------------------------------------------------
 # gotoSearch()
 #-------------------------------------------------------------------------------
@@ -553,7 +553,7 @@ class WMarkdown(QWidget):
             myCursor = self.txtEditor.textCursor()
             myCursor.clearSelection()
             self.txtEditor.setTextCursor(myCursor)
-            
+
             try:
                 # Goto Line Number
                 goto = int(self.txtGotoSearch.text())
@@ -566,16 +566,16 @@ class WMarkdown(QWidget):
                 cursor.setCharFormat(QTextCharFormat())
                 cursor.clearSelection()
                 self.txtEditor.setTextCursor(cursor)
-                
+
                 # Search for this string
                 cursor = self.txtEditor.textCursor()
-                
+
                 # Setup the desired format for matches
                 format = QTextCharFormat()
-                format.setBackground(QBrush(QColor("yellow")))      
+                format.setBackground(QBrush(QColor("yellow")))
                 pattern = self.txtGotoSearch.text()
                 regex = QRegExp(pattern)
-                
+
                 # Process the displayed document
                 pos = 0
                 match = 0
@@ -588,21 +588,21 @@ class WMarkdown(QWidget):
                     # Move to the next match
                     pos = index + regex.matchedLength()
                     index = regex.indexIn(self.txtEditor.toPlainText(), pos)
-                    
-                    lineno = self.txtEditor.toPlainText().count('\n', 0, pos) + 1                    
-                    rowPosition = self.window.tblSearch.rowCount()                     
+
+                    lineno = self.txtEditor.toPlainText().count('\n', 0, pos) + 1
+                    rowPosition = self.window.tblSearch.rowCount()
                     self.window.tblSearch.insertRow(rowPosition)
 
                     item = QTableWidgetItem("%d" % lineno)
                     item.setTextAlignment(Qt.AlignHCenter)
                     self.window.tblSearch.setItem(rowPosition, 0, item)
-                    
+
                     self.window.tblSearch.setItem(rowPosition, 1, QTableWidgetItem("%s" % self.getNthLine(self.txtEditor.toPlainText(), lineno).strip()))
                     self.window.tblSearch.setRowHeight(rowPosition, 20)
                     self.window.tblSearch.resizeColumnsToContents()
-                    
+
                     match = match + 1
-                    
+
                 self.window.lblSearch.setText("%d : %s" % (match, pattern))
                 self.lblGotoSearch.setText("Match : %d" % match)
                 self.txtEditor.setTextCursor(prevCursor)
@@ -617,23 +617,23 @@ class WMarkdown(QWidget):
         text = myCursor.selectedText()
         # myCursor.clearSelection()
         # self.txtEditor.setTextCursor(myCursor)
-        # self.txtGotoSearch.setText(text)          
-    
+        # self.txtGotoSearch.setText(text)
+
 #-------------------------------------------------------------------------------
 # gotoLine()
 #-------------------------------------------------------------------------------
     def gotoLine(self, nline):
         self.txtEditor.moveCursor(QTextCursor.End)
         cursor = QTextCursor(self.txtEditor.document().findBlockByLineNumber(nline - 1))
-        self.txtEditor.setTextCursor(cursor)   
+        self.txtEditor.setTextCursor(cursor)
         self.txtEditor.setFocus()
-        
+
 #-------------------------------------------------------------------------------
 # getNthLine()
 #-------------------------------------------------------------------------------
     def getNthLine(self, text, nline):
         return(text.split('\n')[nline - 1])
-            
+
 #-------------------------------------------------------------------------------
 # resizeEditor()
 #-------------------------------------------------------------------------------
@@ -642,8 +642,8 @@ class WMarkdown(QWidget):
             self.txtEditor.setVisible(True)
         else:
             if not self.txtMarkdown.isHidden() and not self.txtEditor.isHidden():
-                self.txtMarkdown.hide()            
-            
+                self.txtMarkdown.hide()
+
 #-------------------------------------------------------------------------------
 # resizeMarkdown()
 #-------------------------------------------------------------------------------
@@ -652,7 +652,7 @@ class WMarkdown(QWidget):
             self.txtMarkdown.setVisible(True)
         else:
             if not self.txtMarkdown.isHidden() and not self.txtEditor.isHidden():
-                self.txtEditor.hide()            
+                self.txtEditor.hide()
 
 
 #-------------------------------------------------------------------------------
@@ -675,12 +675,12 @@ class WHexedit(QWidget):
         QWidget.__init__(self, parent)
         self.parent = parent
         self.window = window
-        self.hexEditor = QHexEditor.QHexEditor()             
-        
+        self.hexEditor = QHexEditor.QHexEditor()
+
         css = 'font: %dpt "%s"; background-color: %s;' % (settings.db['EDITOR_FONT_SIZE'],settings.db['EDITOR_FONT'],settings.db['EDITOR_COLOR_BACKGROUND'])
         self.hexEditor.setStyleSheet(css)
 
-        self.lblRowCol = QLabel("00000 : 00000")
+        self.lblRowCol = QLabel("Line %d, Column %d")
         self.lblModified = QLabel("")
         self.txtGotoSearch = QLineEdit()
         self.lblGotoSearch = QLabel("")
@@ -689,9 +689,9 @@ class WHexedit(QWidget):
         iSearch.setPixmap(QPixmap("pix/16x16/Search.png"))
         self.filename = filename
         self.textColor = self.parent.tabBar().tabTextColor(0)
-        
+
         vLayout = QVBoxLayout(self)
-        
+
         hLayout1 = QHBoxLayout(self)
         hLayout1.addWidget(self.hexEditor)
         vLayout.addLayout(hLayout1)
@@ -700,29 +700,29 @@ class WHexedit(QWidget):
         # hLayout.addItem(hSpacer)
         hLayout.addWidget(iSearch)
         hLayout.addWidget(self.txtGotoSearch)
-        hLayout.addWidget(self.lblGotoSearch)        
+        hLayout.addWidget(self.lblGotoSearch)
         hLayout.addItem(hSpacer)
-        hLayout.addWidget(self.lblModified)        
+        hLayout.addWidget(self.lblModified)
         vLayout.addLayout(hLayout)
-        
+
         self.dirtyFlag = False
         if filename is not None:
             with open(filename, encoding=settings.db['EDITOR_CODEPAGE']) as hexFile:
                 # TODO : Format datas
                 self.hexEditor.setPlainText(str(hexFile.read()))
-        
+
         # self.txtGotoSearch.returnPressed.connect(self.gotoSearch)
         # self.hexEditor.textChanged.connect(self.changedText)
         # self.hexEditor.selectionChanged.connect(self.handleSelectionChanged)
         self.hexEditor.cursorPositionChanged.connect(self.cursorPosition)
         self.hexEditor.setTabStopWidth(self.hexEditor.fontMetrics().width(' ') * 4)
-        
-        self.cursorPosition()                
-        
+
+        self.cursorPosition()
+
 #-------------------------------------------------------------------------------
 # cursorPosition()
 #-------------------------------------------------------------------------------
     def cursorPosition(self):
         line = self.hexEditor.textCursor().blockNumber() + 1
         col = self.hexEditor.textCursor().columnNumber() + 1
-        self.lblRowCol.setText("%05d : %05d" % (line, col))
+        self.lblRowCol.setText("Line %d, Column %d" % (line, col))

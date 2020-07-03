@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Python Opcodes</title>
+<style>
+
+h1 {
+    color: #3366cc;
+    border: solid #3366cc 1px;
+    background-color: #e6f2ff;
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+}
+
+
+table {
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+tr:nth-child(even) {
+    background-color: #e6f2ff;
+}
+
+th {
+    border: solid #3366cc 1px;
+    background-color: #99caff;
+    color: black;
+}
+
+td {
+    border-collapse: collapse;    
+    border: solid #3366cc 1px;
+    padding: 5px;
+}
+
+table {
+    border-collapse: separate;    
+    border: solid #3366cc 1px;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+}
+
+.tdc {
+    text-align: center;
+}
+
+</style>
+</head>
+
+<body>
+<h1>Python Opcodes</h1>
+<table>
+
+<tr><th>Opcode</th><th>Mnemonic</th><th>Operand length</th><th>Description</th></tr>
+
+<tr>
+<td class="tdc">00h</td><td>STOP_CODE</td><td class="tdc">0</td><td>Indicates end-of-code to the compiler, not used by the interpreter. </td>
+</tr>
+
+<tr>
+<td class="tdc">01h</td><td>POP_TOP</td><td class="tdc">0</td><td>Removes the top-of-stack (TOS) item.</td>
+</tr>
+
+<tr>
+<td class="tdc">02h</td><td>ROT_TWO</td><td class="tdc">0</td><td>Swaps the two top-most stack items.</td>
+</tr>
+
+<tr>
+<td class="tdc">03h</td><td>ROT_THREE</td><td class="tdc">0</td><td>Lifts second and third stack item one position up, moves top down to position three.</td>
+</tr>
+
+<tr>
+<td class="tdc">04h</td><td>DUP_TOP</td><td class="tdc">0</td><td>Duplicates the reference on top of the stack.</td>
+</tr>
+
+<tr>
+<td class="tdc">05h</td><td>ROT_FOUR</td><td class="tdc">0</td><td>Lifts second, third and forth stack item one position up, moves top down to position four.</td>
+</tr>
+
+<tr>
+<td class="tdc">09h</td><td>NOP</td><td class="tdc">0</td><td>Do nothing code. Used as a placeholder by the bytecode optimizer.</td>
+</tr>
+
+<tr>
+<td class="tdc">0Ah</td><td>UNARY_POSITIVE</td><td class="tdc">0</td><td>Implements TOS = +TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">0Bh</td><td>UNARY_NEGATIVE</td><td class="tdc">0</td><td>Implements TOS = -TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">0Ch</td><td>UNARY_NOT</td><td class="tdc">0</td><td>Implements TOS = not TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">0Dh</td><td>UNARY_CONVERT</td><td class="tdc">0</td><td>Implements TOS = `TOS`.</td>
+</tr>
+
+<tr>
+<td class="tdc">0Fh</td><td>UNARY_INVERT</td><td class="tdc">0</td><td>Implements TOS = ~TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">12h</td><td>LIST_APPEND</td><td class="tdc">0</td><td>Calls list.append(TOS1, TOS). Used to implement list comprehensions.</td>
+</tr>
+
+<tr>
+<td class="tdc">13h</td><td>BINARY_POWER</td><td class="tdc">0</td><td>Implements TOS = TOS1 ** TOS. </td>
+</tr>
+
+<tr>
+<td class="tdc">14h</td><td>BINARY_MULTIPLY</td><td class="tdc">0</td><td>Implements TOS = TOS1 * TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">15h</td><td>BINARY_DIVIDE</td><td class="tdc">0</td><td>Implements TOS = TOS1 / TOS when from __future__ import division is not in effect.</td>
+</tr>
+
+<tr>
+<td class="tdc">16h</td><td>BINARY_MODULO</td><td class="tdc">0</td><td>Implements TOS = TOS1 % TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">17h</td><td>BINARY_ADD</td><td class="tdc">0</td><td>Implements TOS = TOS1 + TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">18h</td><td>BINARY_SUBTRACT</td><td class="tdc">0</td><td>Implements TOS = TOS1 - TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">19h</td><td>BINARY_SUBSCR</td><td class="tdc">0</td><td>Implements TOS = TOS1[TOS].</td>
+</tr>
+
+<tr>
+<td class="tdc">1Ah</td><td>BINARY_FLOOR_DIVIDE</td><td class="tdc">0</td><td>Implements TOS = TOS1 // TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">1Bh</td><td>BINARY_TRUE_DIVIDE</td><td class="tdc">0</td><td>Implements TOS = TOS1 / TOS when from __future__ import division is in effect.</td>
+</tr>
+
+<tr>
+<td class="tdc">1Ch</td><td>INPLACE_FLOOR_DIVIDE</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 // TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">1Dh</td><td>INPLACE_TRUE_DIVIDE</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 / TOS when from __future__ import division is in effect.</td>
+</tr>
+
+<tr>
+<td class="tdc">1Eh</td><td>SLICE</td><td class="tdc">0</td><td>Implements TOS = TOS[:].</td>
+</tr>
+
+<tr>
+<td class="tdc">1Fh</td><td>SLICE+1</td><td class="tdc">0</td><td>Implements TOS = TOS1[TOS:].</td>
+</tr>
+
+<tr>
+<td class="tdc">20h</td><td>SLICE+2</td><td class="tdc">0</td><td>Implements TOS = TOS1[:TOS].</td>
+</tr>
+
+<tr>
+<td class="tdc">21h</td><td>SLICE+3</td><td class="tdc">0</td><td>Implements TOS = TOS2[TOS1:TOS].</td>
+</tr>
+
+<tr>
+<td class="tdc">28h</td><td>STORE_SLICE</td><td class="tdc">0</td><td>Implements TOS[:] = TOS1.</td>
+</tr>
+
+<tr>
+<td class="tdc">29h</td><td>STORE_SLICE+1</td><td class="tdc">0</td><td>Implements TOS1[TOS:] = TOS2.</td>
+</tr>
+
+<tr>
+<td class="tdc">2Ah</td><td>STORE_SLICE+2</td><td class="tdc">0</td><td>Implements TOS1[:TOS] = TOS2.</td>
+</tr>
+
+<tr>
+<td class="tdc">2Bh</td><td>STORE_SLICE+3</td><td class="tdc">0</td><td>Implements TOS2[TOS1:TOS] = TOS3.</td>
+</tr>
+
+<tr>
+<td class="tdc">32h</td><td>DELETE_SLICE</td><td class="tdc">0</td><td>Implements del TOS[:].</td>
+</tr>
+
+<tr>
+<td class="tdc">33h</td><td>DELETE_SLICE+1</td><td class="tdc">0</td><td>Implements del TOS1[TOS:].</td>
+</tr>
+
+<tr>
+<td class="tdc">34h</td><td>DELETE_SLICE+2</td><td class="tdc">0</td><td>Implements del TOS1[:TOS].</td>
+</tr>
+
+<tr>
+<td class="tdc">35h</td><td>DELETE_SLICE+3</td><td class="tdc">0</td><td>Implements del TOS2[TOS1:TOS].</td>
+</tr>
+
+<tr>
+<td class="tdc">37h</td><td>INPLACE_ADD</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 + TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">38h</td><td>INPLACE_SUBTRACT</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 - TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">39h</td><td>INPLACE_MULTIPLY</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 * TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">3Ah</td><td>INPLACE_DIVIDE</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 / TOS when from __future__ import division is not in effect.</td>
+</tr>
+
+<tr>
+<td class="tdc">3Bh</td><td>INPLACE_MODULO</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 % TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">3Ch</td><td>STORE_SUBSCR</td><td class="tdc">0</td><td>Implements TOS1[TOS] = TOS2.</td>
+</tr>
+
+<tr>
+<td class="tdc">3Dh</td><td>DELETE_SUBSCR</td><td class="tdc">0</td><td>Implements del TOS1[TOS]. </td>
+</tr>
+
+<tr>
+<td class="tdc">3Eh</td><td>BINARY_LSHIFT</td><td class="tdc">0</td><td>Implements TOS = TOS1 &lt;&lt; TOS. </td>
+</tr>
+
+<tr>
+<td class="tdc">3Fh</td><td>BINARY_RSHIFT</td><td class="tdc">0</td><td>Implements TOS = TOS1 &gt;&gt; TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">40h</td><td>BINARY_AND</td><td class="tdc">0</td><td>Implements TOS = TOS1 &amp; TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">41h</td><td>BINARY_XOR</td><td class="tdc">0</td><td>Implements TOS = TOS1 ^ TOS. </td>
+</tr>
+
+<tr>
+<td class="tdc">42h</td><td>BINARY_OR</td><td class="tdc">0</td><td>Implements TOS = TOS1 | TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">43h</td><td>INPLACE_POWER</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 ** TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">44h</td><td>GET_ITER</td><td class="tdc">0</td><td>Implements TOS = iter(TOS).</td>
+</tr>
+
+<tr>
+<td class="tdc">46h</td><td>PRINT_EXPR</td><td class="tdc">0</td><td>Implements the expression statement for the interactive mode. TOS is removed from the stack and printed. In non-interactive mode, an expression statement is terminated with POP_STACK.</td>
+</tr>
+
+<tr>
+<td class="tdc">47h</td><td>PRINT_ITEM</td><td class="tdc">0</td><td>Prints TOS to the file-like object bound to sys.stdout. There is one such instruction for each item in the print statement.</td>
+</tr>
+
+<tr>
+<td class="tdc">48h</td><td>PRINT_NEWLINE</td><td class="tdc">0</td><td>Prints a new line on sys.stdout. This is generated as the last operation of a print statement, unless the statement ends with a comma.</td>
+</tr>
+
+<tr>
+<td class="tdc">49h</td><td>PRINT_ITEM_TO</td><td class="tdc">0</td><td>Like PRINT_ITEM, but prints the item second from TOS to the file-like object at TOS. This is used by the extended print statement.</td>
+</tr>
+
+<tr>
+<td class="tdc">4Ah</td><td>PRINT_NEWLINE_TO</td><td class="tdc">0</td><td>Like PRINT_NEWLINE, but prints the new line on the file-like object on the TOS. This is used by the extended print statement.</td>
+</tr>
+
+<tr>
+<td class="tdc">4Bh</td><td>INPLACE_LSHIFT</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 &lt;&lt; TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">4Ch</td><td>INPLACE_RSHIFT</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 &gt;&gt; TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">4Dh</td><td>INPLACE_AND</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 & TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">4Eh</td><td>INPLACE_XOR</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 ^ TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">4Fh</td><td>INPLACE_OR</td><td class="tdc">0</td><td>Implements in-place TOS = TOS1 | TOS. </td>
+</tr>
+
+<tr>
+<td class="tdc">50h</td><td>BREAK_LOOP</td><td class="tdc">0</td><td>Terminates a loop due to a break statement.</td>
+</tr>
+
+<tr>
+<td class="tdc">51h</td><td>WITH_CLEANUP</td><td class="tdc">0</td><td>???</td>
+</tr>
+
+<tr>
+<td class="tdc">52h</td><td>LOAD_LOCALS</td><td class="tdc">0</td><td>Pushes a reference to the locals of the current scope on the stack. This is used in the code for a class definition: After the class body is evaluated, the locals are passed to the class definition.</td>
+</tr>
+
+<tr>
+<td class="tdc">53h</td><td>RETURN_VALUE</td><td class="tdc">0</td><td>Returns with TOS to the caller of the function.</td>
+</tr>
+
+<tr>
+<td class="tdc">54h</td><td>IMPORT_STAR</td><td class="tdc">0</td><td>Loads all symbols not starting with "_" directly from the module TOS to the local namespace. The module is popped after loading all names. This opcode implements from module import *.</td>
+</tr>
+
+<tr>
+<td class="tdc">55h</td><td>EXEC_STMT</td><td class="tdc">0</td><td>Implements exec TOS2,TOS1,TOS. The compiler fills missing optional parameters with None.</td>
+</tr>
+
+<tr>
+<td class="tdc">56h</td><td>YIELD_VALUE</td><td class="tdc">0</td><td>Pops TOS and yields it from a generator.</td>
+</tr>
+
+<tr>
+<td class="tdc">57h</td><td>POP_BLOCK</td><td class="tdc">0</td><td>Removes one block from the block stack. Per frame, there is a stack of blocks, denoting nested loops, try statements, and such.</td>
+</tr>
+
+<tr>
+<td class="tdc">58h</td><td>END_FINALLY</td><td class="tdc">0</td><td>Terminates a finally clause. The interpreter recalls whether the exception has to be re-raised, or whether the function returns, and continues with the outer-next block.</td>
+</tr>
+
+<tr>
+<td class="tdc">59h</td><td>BUILD_CLASS</td><td class="tdc">0</td><td>Creates a new class object. TOS is the methods dictionary, TOS1 the tuple of the names of the base classes, and TOS2 the class name.</td>
+</tr>
+
+<tr>
+<td class="tdc">5Ah</td><td>STORE_NAME</td><td class="tdc">2</td><td>Implements name = TOS. /namei/ is the index of name in the attribute co_names of the code object. The compiler tries to use STORE_LOCAL or STORE_GLOBAL if possible.</td>
+</tr>
+
+<tr>
+<td class="tdc">5Bh</td><td>DELETE_NAME</td><td class="tdc">2</td><td>Implements del name, where /namei/ is the index into co_names attribute of the code object.</td>
+</tr>
+
+<tr>
+<td class="tdc">5Ch</td><td>UNPACK_SEQUENCE</td><td class="tdc">2</td><td>Unpacks TOS into /count/ individual values, which are put onto the stack right-to-left.</td>
+</tr>
+
+<tr>
+<td class="tdc">5Dh</td><td>FOR_ITER</td><td class="tdc">2</td><td>TOS is an iterator. Call its next() method. If this yields a new value, push it on the stack (leaving the iterator below it). If the iterator indicates it is exhausted TOS is popped, and the byte code counter is incremented by /delta/.</td>
+</tr>
+
+<tr>
+<td class="tdc">5Fh</td><td>STORE_ATTR</td><td class="tdc">2</td><td>Implements TOS.name = TOS1, where /namei/ is the index of name in co_names.</td>
+</tr>
+
+<tr>
+<td class="tdc">60h</td><td>DELETE_ATTR</td><td class="tdc">2</td><td>Implements del TOS.name, using /namei/ as index into co_names. </td>
+</tr>
+
+<tr>
+<td class="tdc">61h</td><td>STORE_GLOBAL</td><td class="tdc">2</td><td>Works as STORE_NAME(/namei/), but stores the name as a global.</td>
+</tr>
+
+<tr>
+<td class="tdc">62h</td><td>DELETE_GLOBAL</td><td class="tdc">2</td><td>Works as DELETE_NAME(/namei/), but deletes a global name.</td>
+</tr>
+
+<tr>
+<td class="tdc">63h</td><td>DUP_TOPX</td><td class="tdc">None</td><td>Duplicate /count/ items, keeping them in the same order. Due to implementation limits, count should be between 1 and 5 inclusive.</td>
+</tr>
+
+<tr>
+<td class="tdc">64h</td><td>LOAD_CONST</td><td class="tdc">2</td><td>Pushes "co_consts[/consti/]" onto the stack.</td>
+</tr>
+
+<tr>
+<td class="tdc">65h</td><td>LOAD_NAME</td><td class="tdc">2</td><td>Pushes the value associated with "co_names[/namei/]" onto the stack.</td>
+</tr>
+
+<tr>
+<td class="tdc">66h</td><td>BUILD_TUPLE</td><td class="tdc">2</td><td>Creates a tuple consuming /count/ items from the stack, and pushes the resulting tuple onto the stack.</td>
+</tr>
+
+<tr>
+<td class="tdc">67h</td><td>BUILD_LIST</td><td class="tdc">2</td><td>Works as BUILD_TUPLE(/count/), but creates a list.</td>
+</tr>
+
+<tr>
+<td class="tdc">68h</td><td>BUILD_MAP</td><td class="tdc">2</td><td>Pushes a new empty dictionary object onto the stack. The argument is ignored and set to /zero/ by the compiler.</td>
+</tr>
+
+<tr>
+<td class="tdc">69h</td><td>LOAD_ATTR</td><td class="tdc">2</td><td>Replaces TOS with getattr(TOS, co_names[/namei/]).</td>
+</tr>
+
+<tr>
+<td class="tdc">6Ah</td><td>COMPARE_OP</td><td class="tdc">2</td><td>Performs a Boolean operation. The operation name can be found in cmp_op[/opname/].</td>
+</tr>
+
+<tr>
+<td class="tdc">6Bh</td><td>IMPORT_NAME</td><td class="tdc">2</td><td>Imports the module co_names[/namei/]. The module object is pushed onto the stack. The current namespace is not affected: for a proper import statement, a subsequent STORE_FAST instruction modifies the namespace.</td>
+</tr>
+
+<tr>
+<td class="tdc">6Ch</td><td>IMPORT_FROM</td><td class="tdc">2</td><td>Loads the attribute co_names[/namei/] from the module found in TOS. The resulting object is pushed onto the stack, to be subsequently stored by a STORE_FAST instruction. </td>
+</tr>
+
+<tr>
+<td class="tdc">6Eh</td><td>JUMP_FORWARD</td><td class="tdc">2</td><td>Increments byte code counter by /delta/.</td>
+</tr>
+
+<tr>
+<td class="tdc">6Fh</td><td>JUMP_IF_FALSE</td><td class="tdc">2</td><td>If TOS is false, increment the byte code counter by /delta/. TOS is not changed.</td>
+</tr>
+
+<tr>
+<td class="tdc">70h</td><td>JUMP_IF_TRUE</td><td class="tdc">2</td><td>If TOS is true, increment the byte code counter by /delta/. TOS is left on the stack.</td>
+</tr>
+
+<tr>
+<td class="tdc">71h</td><td>JUMP_ABSOLUTE</td><td class="tdc">2</td><td>Set byte code counter to /target/.</td>
+</tr>
+
+<tr>
+<td class="tdc">74h</td><td>LOAD_GLOBAL</td><td class="tdc">2</td><td>Loads the global named co_names[/namei/] onto the stack. </td>
+</tr>
+
+<tr>
+<td class="tdc">77h</td><td>CONTINUE_LOOP</td><td class="tdc">2</td><td>Continues a loop due to a continue statement. /target/ is the address to jump to (which should be a FOR_ITER instruction).</td>
+</tr>
+
+<tr>
+<td class="tdc">78h</td><td>SETUP_LOOP</td><td class="tdc">2</td><td>Pushes a block for a loop onto the block stack. The block spans from the current instruction with a size of /delta/ bytes.</td>
+</tr>
+
+<tr>
+<td class="tdc">79h</td><td>SETUP_EXCEPT</td><td class="tdc">2</td><td>Pushes a try block from a try-except clause onto the block stack. /delta/ points to the first except block.</td>
+</tr>
+
+<tr>
+<td class="tdc">7Ah</td><td>SETUP_FINALLY</td><td class="tdc">2</td><td>Pushes a try block from a try-except clause onto the block stack. /delta/ points to the finally block.</td>
+</tr>
+
+<tr>
+<td class="tdc">7Ch</td><td>LOAD_FAST</td><td class="tdc">2</td><td>Pushes a reference to the local co_varnames[/var_num/] onto the stack.</td>
+</tr>
+
+<tr>
+<td class="tdc">7Dh</td><td>STORE_FAST</td><td class="tdc">2</td><td>Stores TOS into the local co_varnames[/var_num/].</td>
+</tr>
+
+<tr>
+<td class="tdc">7Eh</td><td>DELETE_FAST</td><td class="tdc">2</td><td>Deletes local co_varnames[/var_num/].</td>
+</tr>
+
+<tr>
+<td class="tdc">82h</td><td>RAISE_VARARGS</td><td class="tdc">2</td><td>Raises an exception. /argc/ indicates the number of parameters to the raise statement, ranging from 0 to 3. The handler will find the traceback as TOS2, the parameter as TOS1, and the exception as TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">83h</td><td>CALL_FUNCTION</td><td class="tdc">2</td><td>Calls a function. The low byte of /argc/ indicates the number of positional parameters, the high byte the number of keyword parameters. On the stack, the opcode finds the keyword parameters first. For each keyword argument, the value is on top of the key. Below the keyword parameters, the positional parameters are on the stack, with the right-most parameter on top. Below the parameters, the function object to call is on the stack. </td>
+</tr>
+
+<tr>
+<td class="tdc">84h</td><td>MAKE_FUNCTION</td><td class="tdc">2</td><td>Pushes a new function object on the stack. TOS is the code associated with the function. The function object is defined to have /argc/ default parameters, which are found below TOS.</td>
+</tr>
+
+<tr>
+<td class="tdc">85h</td><td>BUILD_SLICE</td><td class="tdc">2</td><td>Pushes a slice object on the stack. /argc/ must be 2 or 3. If it is 2, slice(TOS1, TOS) is pushed; if it is 3, slice(TOS2, TOS1, TOS) is pushed. See the slice() built-in function for more information.</td>
+</tr>
+
+<tr>
+<td class="tdc">86h</td><td>MAKE_CLOSURE</td><td class="tdc">2</td><td>Creates a new function object, sets its func_closure slot, and pushes it on the stack. TOS is the code associated with the function. If the code object has N free variables, the next N items on the stack are the cells for these variables. The function also has /argc/ default parameters, where are found before the cells.</td>
+</tr>
+
+<tr>
+<td class="tdc">87h</td><td>LOAD_CLOSURE</td><td class="tdc">2</td><td>Pushes a reference to the cell contained in slot /i/ of the cell and free variable storage. The name of the variable is co_cellvars[i] if i is less than the length of co_cellvars. Otherwise it is co_freevars[i - len(co_cellvars)].</td>
+</tr>
+
+<tr>
+<td class="tdc">88h</td><td>LOAD_DEREF</td><td class="tdc">2</td><td>Loads the cell contained in slot /i/ of the cell and free variable storage. Pushes a reference to the object the cell contains on the stack.</td>
+</tr>
+
+<tr>
+<td class="tdc">89h</td><td>STORE_DEREF</td><td class="tdc">2</td><td>Stores TOS into the cell contained in slot /i/ of the cell and free variable storage.</td>
+</tr>
+
+<tr>
+<td class="tdc">8Ch</td><td>CALL_FUNCTION_VAR</td><td class="tdc">2</td><td>Calls a function. /argc/ is interpreted as in CALL_FUNCTION. The top element on the stack contains the variable argument list, followed by keyword and positional arguments.</td>
+</tr>
+
+<tr>
+<td class="tdc">8Dh</td><td>CALL_FUNCTION_KW</td><td class="tdc">2</td><td>Calls a function. /argc/ is interpreted as in CALL_FUNCTION. The top element on the stack contains the keyword arguments dictionary, followed by explicit keyword and positional arguments.</td>
+</tr>
+
+<tr>
+<td class="tdc">8Eh</td><td>CALL_FUNCTION_VAR_KW</td><td class="tdc">2</td><td>Calls a function. /argc/ is interpreted as in CALL_FUNCTION. The top element on the stack contains the keyword arguments dictionary, followed by the variable-arguments tuple, followed by explicit keyword and positional arguments.</td>
+</tr>
+
+<tr>
+<td class="tdc">8Fh</td><td>EXTENDED_ARG</td><td class="tdc">2</td><td>Support for opargs more than 16 bits long.</td>
+</tr>
+
+</table></body></html>
+
+</body>
+</html>

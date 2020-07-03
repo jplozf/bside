@@ -52,6 +52,8 @@ import todomgr
 import lorem
 import toolsbase64
 import shrealding
+import disass
+import awele
 
 #-------------------------------------------------------------------------------
 # resource_path()
@@ -105,6 +107,7 @@ class MainWindow(QMainWindow):
     previousFocusState = HAS_FOCUS
     aAlarms = []
     mruProjects= []
+    runParams = []
 
 #-------------------------------------------------------------------------------
 # __init__()
@@ -209,6 +212,8 @@ class MainWindow(QMainWindow):
         pyinstall.initFormEXE(self)
         sqlinter.initFormSQL(self)
         toolsbase64.initBase64(self)
+        disass.initFormDisass(self)
+        awele.initFormAwele(self)
 
         self.setTabsText(self.tbwLowLeft, settings.db['TAB_LOW_LEFT_NAMES'])
         self.setTabsText(self.tbwLowRight, settings.db['TAB_LOW_RIGHT_NAMES'])
@@ -2099,6 +2104,14 @@ class MainWindow(QMainWindow):
                 tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
                 if isinstance(tab, editor.WEditor):
                     self.txtMainFile.setText(tab.filename)
+        #-----------------------------------------------------------------------
+        # Disassembler tab
+        #-----------------------------------------------------------------------
+        if index == 5:
+            if self.txtSourceFile.text() == "":
+                tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
+                if isinstance(tab, editor.WEditor):
+                    self.txtSourceFile.setText(tab.filename)
 
 #-------------------------------------------------------------------------------
 # doBuildEXE()
@@ -2228,7 +2241,7 @@ class MainWindow(QMainWindow):
                 pybin = sys.executable
                 script = tabEditor.filename
 
-                dlg = dialog.DlgRunScript(script)
+                dlg = dialog.DlgRunScript(script, self)
                 dlg.exec()
                 if dlg.result() != 0:
                     self.showMessage("=" * 80)

@@ -122,7 +122,12 @@ defaultValues = [
     ['SQLITE3_FONT_SIZE', 12],
     ['SQLITE3_COLOR_BACKGROUND', "#f9f0e1"],
     ['SQLITE3_COLOR_FOREGROUND', "#000000"],
-    ['SQLITE3_PROMPT', "> "]
+    ['SQLITE3_PROMPT', "> "],
+    ['AWELE_LEVEL_DEFAULT', 5],
+    ['AWELE_HUMAN_COLOR_BACKGROUND', "#49453e"],
+    ['AWELE_HUMAN_COLOR_FOREGROUND', "orange"],
+    ['AWELE_COMPUTER_COLOR_BACKGROUND', "#285179"],
+    ['AWELE_COMPUTER_COLOR_FOREGROUND', "#bed4d9"]
 ]
 
 #-------------------------------------------------------------------------------
