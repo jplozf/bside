@@ -123,11 +123,19 @@ defaultValues = [
     ['SQLITE3_COLOR_BACKGROUND', "#f9f0e1"],
     ['SQLITE3_COLOR_FOREGROUND', "#000000"],
     ['SQLITE3_PROMPT', "> "],
-    ['AWELE_LEVEL_DEFAULT', 5],
+    ['AWELE_LEVEL_DEFAULT', 3],
     ['AWELE_HUMAN_COLOR_BACKGROUND', "#49453e"],
     ['AWELE_HUMAN_COLOR_FOREGROUND', "orange"],
     ['AWELE_COMPUTER_COLOR_BACKGROUND', "#285179"],
-    ['AWELE_COMPUTER_COLOR_FOREGROUND', "#bed4d9"]
+    ['AWELE_COMPUTER_COLOR_FOREGROUND', "#bed4d9"],
+    ['AWELE_VERBOSE_MODE', False],
+    ['AWELE_LEVEL_SET_OPTIMIZED', True],
+    ['WEB_SERVER_PORT', 8086],
+    ['WEB_SERVER_ADDRESS', "127.0.0.1"],
+    ['WEB_SERVER_ENABLED', True],
+    ['WEB_SSL_ENABLED', False],
+    ['WEB_SSL_PRIVATE_KEY', "./privkey.pem"],
+    ['WEB_SSL_CERTIFICATE', "./certificate.pem"]
 ]
 
 #-------------------------------------------------------------------------------

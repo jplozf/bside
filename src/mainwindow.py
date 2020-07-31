@@ -54,6 +54,7 @@ import toolsbase64
 import shrealding
 import disass
 import awele
+import web
 
 #-------------------------------------------------------------------------------
 # resource_path()
@@ -377,6 +378,9 @@ class MainWindow(QMainWindow):
                 self.welcome()
             self.tbwHighRight.setCurrentIndex(0)
         self.bigDisplay("%s %s" % (const.APPLICATION_NAME, const.VERSION))
+        
+        if settings.db['WEB_SERVER_ENABLED'] == True:
+            web.startServer(self)
 
 #-------------------------------------------------------------------------------
 # parseXML()
@@ -709,13 +713,16 @@ class MainWindow(QMainWindow):
             tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
             if isinstance(tab, editor.WEditor):
                 tab.txtGotoSearch.setFocus()
-        if key == Qt.Key_F and event.modifiers() & Qt.ControlModifier:
+        elif key == Qt.Key_F and event.modifiers() & Qt.ControlModifier:
             tab = self.tbwHighRight.widget(self.tbwHighRight.currentIndex())
             if isinstance(tab, editor.WEditor):
                 tab.txtGotoSearch.setFocus()
         elif key == Qt.Key_F9:
             qApp.exit(MainWindow.EXIT_CODE_REBOOT)
+        elif key == Qt.Key_F5:
+            self.runScript()
         """
+        These keys are managed by main QMenu, so no more needed...
         elif key == Qt.Key_F2:
             self.saveFile()
         elif key == Qt.Key_F10:
@@ -908,12 +915,15 @@ class MainWindow(QMainWindow):
                 self.previousFocusState = self.HAS_FOCUS
             self.project.timeNoFocus = self.timeNoFocus
             self.project.endSession()
-        # Close TODO database
-        self.curTODO.close()
-        self.dbTODO.close()
-        # Close SQL database
-        self.curSQLDatabase.close()
-        self.dbSQLDatabase.close()
+        try:
+            # Close TODO database
+            self.curTODO.close()
+            self.dbTODO.close()
+            # Close SQL database
+            self.curSQLDatabase.close()
+            self.dbSQLDatabase.close()
+        except:
+            pass
         # Check for modified files not saved
         # Save the current files or project open
         for i in reversed(range(self.tbwHighRight.count())):

@@ -25,6 +25,7 @@ import subprocess
 import utils
 import settings
 import shrealding
+import web
 
 if platform.system() == 'Windows':
     import win32gui
@@ -98,6 +99,7 @@ class WShell(QWidget):
     CurrentOS = platform.system()
     CurrentDrive = os.path.splitdrive(os.path.realpath(__file__))[0]
     CurrentDir = os.path.splitdrive(os.path.dirname(os.path.realpath(__file__)))[1]
+    bsideMode = False
 
 #-------------------------------------------------------------------------------
 # __init__()
@@ -115,17 +117,18 @@ class WShell(QWidget):
         self.btnBreak.clicked.connect(self.killProcess)
         self.btnBreak.setEnabled(False)
         
-        css = "QWidget {border: 2px solid gray; border-radius: 6px; background-color: %s; color: %s; font-family: %s; font-size: %spx}" % (settings.db['SHELL_BACKGROUND'], settings.db['SHELL_FOREGROUND'], settings.db['SHELL_FONT_FAMILY'], settings.db['SHELL_FONT_SIZE'])
-        
+        css1 = "QWidget {border: 2px solid gray; border-radius: 6px; background-color: %s; color: %s; font-family: %s; font-size: %spx}" % (settings.db['SHELL_BACKGROUND'], settings.db['SHELL_FOREGROUND'], settings.db['SHELL_FONT_FAMILY'], settings.db['SHELL_FONT_SIZE'])
+        css2 = 'font: %dpt "%s";' % (settings.db['SHELL_FONT_SIZE'], settings.db['SHELL_FONT_FAMILY'])
+
         self.lblShellPrompt = QLabel(settings.db['SHELL_PROMPT'])
+        self.lblShellPrompt.setStyleSheet(css2)
         self.txtCommand = QLineEdit()
-        self.txtCommand.setStyleSheet(css)
+        self.txtCommand.setStyleSheet(css1)
         self.txtCommand.installEventFilter(self)
-        # self.txtCommand.setFont(QFont('Courier', 10))
         
         self.txtConsoleOut = QTextEdit()
         self.txtConsoleOut.setAcceptRichText(True)
-        self.txtConsoleOut.setStyleSheet(css)
+        self.txtConsoleOut.setStyleSheet(css1)
         self.txtConsoleOut.setReadOnly(True)
         
         self.lblTime = QLabel("0:00:00.00")
@@ -234,8 +237,18 @@ class WShell(QWidget):
         if command == "cls" or command == "clear":
             self.txtConsoleOut.setText("")            
             self.finalizeCommand()
-        elif command == "quit" or command == "exit":
+        elif (command == "quit" or command == "exit") and self.bsideMode == False:
             self.close()
+        elif command == "!bside+" or command == "!b+":
+            self.lblShellPrompt.setText("!!!>")
+            self.bsideMode = True
+            self.txtConsoleOut.append("Bside console activated, type \"help\" to see available commands.\n")
+            self.finalizeCommand()
+        elif command == "!bside-" or command == "!b-":
+            self.lblShellPrompt.setText(settings.db['SHELL_PROMPT'])
+            self.bsideMode = False
+            self.txtConsoleOut.append("End of Bside console.\n")
+            self.finalizeCommand()
         elif command[1:2] == ":":
             self.CurrentDrive = command[0:2].upper()
             self.CurrentDir = os.sep
@@ -249,14 +262,93 @@ class WShell(QWidget):
             self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
             self.finalizeCommand()
         else:
-            self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
-            self.btnBreak.setEnabled(True)
-            QGuiApplication.processEvents()                     
-            self.tCmd = shrealding.Shreald(self.parent, command, self.CurrentDir, shell=True)
-            self.tCmd.linePrinted.connect(self.handleLine)                    
-            self.lblTime.setText("---")
-            self.txtCommand.setEnabled(False)
+            if self.bsideMode == False:
+                self.txtConsoleOut.append("<b>%s %s</b>" % (settings.db['SHELL_PROMPT'], command))
+                self.btnBreak.setEnabled(True)
+                QGuiApplication.processEvents()                     
+                self.tCmd = shrealding.Shreald(self.parent, command, self.CurrentDir, shell=True)
+                self.tCmd.linePrinted.connect(self.handleLine)                    
+                self.lblTime.setText("---")
+                self.txtCommand.setEnabled(False)
+            else:
+                self.bsideCommand(command)
+                self.finalizeCommand()
 
+#-------------------------------------------------------------------------------
+# bsideCommand()
+#-------------------------------------------------------------------------------
+    def bsideCommand(self, command):
+        """
+        ================================================================
+        Emulated internal commands :
+        ================================================================
+        > help
+        > set <parameter> = <value>
+        > save repository
+        > quit IDE
+        > quit force IDE
+        > start web server
+        > stop web server
+        > send report
+        > check update
+        > export log IDE
+        > export log web
+        > export config
+        > open project
+        > export project as zip
+        > open log file
+        > edit file
+        > save file
+        > save project
+        > close project
+        > close tab
+        > add TODO note
+        > check TODO note
+        > add tool to menu
+        > open help file
+        > open URL
+        > shutdown computer
+        > set alarm
+        > start timer
+        > start stopwatch
+        """
+        self.txtConsoleOut.append("<b>%s %s</b>" % ("!!!>", command))
+        if command.lower() == "web start":
+            self.txtConsoleOut.append("%s" % web.startServer(self.parent))
+        elif command.lower() == "web stop":
+            self.txtConsoleOut.append("%s" % web.stopServer(self.parent))
+        elif command.lower() == "web status":
+            self.txtConsoleOut.append("%s" % web.statusServer(self.parent))
+        elif command.lower() == "web restart":
+            self.txtConsoleOut.append("%s" % web.restartServer(self.parent))
+        elif command.lower() == "help":
+            self.txtConsoleOut.append("%s" % self.bsideHelp())
+        else:
+            self.txtConsoleOut.append("%s" % "Error : Unknown Bside command.\nPlease type \"help\" to have the list of available commands.")
+        # self.txtConsoleOut.append("\n")
+        
+#-------------------------------------------------------------------------------
+# bsideHelp()
+#-------------------------------------------------------------------------------
+    def bsideHelp(self):
+        html = """
+<p>
+Bside console commands :
+<table>
+<tr><td>------------------------</b></td><td>&nbsp;</td></tr>
+<tr><td><b>help</b></td><td>Display this help</td></tr>
+<tr><td><b>web start</b></td><td>Start the embedded web server</td></tr>
+<tr><td><b>web stop</b></td><td>Stop the embedded web server</td></tr>
+<tr><td><b>web status</b></td><td>Display the status of the web server</td></tr>
+<tr><td><b>web restart</b></td><td>Stop and restart the web server</td></tr>
+<tr><td>------------------------</b></td><td>&nbsp;</td></tr>
+<tr><td><b>!bside+</b></td><td>Activate the Bside console</td></tr>
+<tr><td><b>!bside-</b></td><td>Go back to OS shell console</td></tr>
+</table>
+</p>
+        """
+        return html
+    
 #-------------------------------------------------------------------------------
 # handleLine()
 #-------------------------------------------------------------------------------
@@ -297,8 +389,10 @@ class WShell(QWidget):
         if platform.system() == 'Windows':
             self.lblCDR.setText(self.CurrentDrive)
         self.lblPWD.setText(self.CurrentDir)
-        if self.tCmd.returncode is not None:
-            self.lblRC.setText("RC=%d" % self.tCmd.returncode)
+        if hasattr(self, "tCmd"):
+            if self.tCmd.returncode is not None:
+                self.lblRC.setText("RC=%d" % self.tCmd.returncode)
+        self.txtConsoleOut.append("\n")
         self.txtCommand.setEnabled(True)
         self.txtCommand.selectAll()
         self.txtCommand.setFocus()

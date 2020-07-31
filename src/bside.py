@@ -58,7 +58,7 @@ def setTheme(theme):
 if __name__ == '__main__':
     currentExitCode = MainWindow.EXIT_CODE_REBOOT
     while currentExitCode == MainWindow.EXIT_CODE_REBOOT:
-        # create application     
+        # Create application     
         sys.argv.append("--disable-web-security")
         app = QApplication(sys.argv)
         app.setOrganizationName(const.ORGANIZATION_NAME)
@@ -74,7 +74,7 @@ if __name__ == '__main__':
         else:
             setTheme(const.THEME_LIGHT)
             
-        # set icon
+        # Set icon
         icon = QIcon("./pix/bside.png")
         app.setWindowIcon(icon)   
 
@@ -85,15 +85,15 @@ if __name__ == '__main__':
         splash.show()
         app.processEvents()
 
-        # Simulate something that takes time
+        # Take your time to enjoy this beautiful splash screen
         time.sleep(1)
 
-        # create main widget
+        # Create main widget
         w = MainWindow()
         w.setWindowTitle(const.APPLICATION_NAME)
         w.show()
         
-        # execute application
+        # Execute application
         splash.finish(w)
         currentExitCode = app.exec_()
         app = None

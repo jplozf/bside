@@ -11,7 +11,7 @@
 
 from PyQt5.QtCore import Qt, QRect, QSize
 from PyQt5.QtWidgets import QWidget, QPlainTextEdit, QTextEdit
-from PyQt5.QtGui import QColor, QPainter, QTextFormat, QPen, QFontMetricsF
+from PyQt5.QtGui import QColor, QPainter, QTextFormat, QPen, QFontMetricsF, QTextCursor
 
 import settings
 
@@ -46,6 +46,80 @@ class QCodeEditor(QPlainTextEdit):
         self.updateRequest.connect(self.updateLineNumberArea)
         self.cursorPositionChanged.connect(self.highlightCurrentLine)
         self.updateLineNumberAreaWidth(0)
+        self.tabPos = 0
+
+#-------------------------------------------------------------------------------
+# keyPressEvent()
+# TODO : To be continued asap !!!
+# https://gist.github.com/LegoStormtroopr/6146161
+#-------------------------------------------------------------------------------
+    def keyPressEvent(self, event):
+        KTAB = settings.db['BSIDE_TAB_SPACES']
+        cursor = self.textCursor()
+        if event.key() == Qt.Key_Backtab:
+            self.tabPos = self.tabPos - 1
+            if self.tabPos < 0:
+                self.tabPos = 0
+        elif event.key() == Qt.Key_Tab:
+            self.tabPos = self.tabPos + 1
+            cursor.insertText(KTAB * " ")
+        elif event.key() == Qt.Key_Enter or event.key() == Qt.Key_Return:
+            # TODO : Fix this !
+            here = self.textCursor().position()
+            cursor = self.textCursor()
+            cursor.movePosition(QTextCursor.StartOfLine)
+            print(self.tabsAtBeginningOfLine(self.toPlainText()[cursor.position():here], KTAB))
+            cursor.movePosition(QTextCursor.EndOfLine)
+            self.setTextCursor(cursor)
+            if self.toPlainText()[here-1:here] == ":":
+                print("MORE TAB")
+                self.tabPos = self.tabPos + 1
+            cursor.insertText("\n")
+            cursor.insertText(KTAB * " " * self.tabPos)
+        elif event.key() == Qt.Key_ParenLeft:
+            cursor.insertText("()")
+            cursor = self.textCursor()
+            rc = cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, 1)
+            self.setTextCursor(cursor)
+            print(rc)
+        elif event.key() == Qt.Key_BracketLeft:
+            cursor.insertText("[]")
+            cursor = self.textCursor()
+            rc = cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, 1)
+            self.setTextCursor(cursor)
+        elif event.key() == Qt.Key_BraceLeft:
+            cursor.insertText("{}")
+            cursor = self.textCursor()
+            rc = cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, 1)
+            self.setTextCursor(cursor)
+        elif event.key() == Qt.Key_Apostrophe:
+            cursor.insertText("''")
+            cursor = self.textCursor()
+            rc = cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, 1)
+            self.setTextCursor(cursor)
+        elif event.key() == Qt.Key_QuoteDbl:
+            cursor.insertText("\"\"")
+            cursor = self.textCursor()
+            rc = cursor.movePosition(QTextCursor.Left, QTextCursor.MoveAnchor, 1)
+            self.setTextCursor(cursor)
+        elif event.key() == Qt.Key_Backspace:
+            here = self.textCursor().position()
+            # Treat a tab made out of several spaces as a single TAB char
+            if here > KTAB:
+                if self.toPlainText()[here - KTAB:here] == (KTAB * " "):
+                    for i in range(KTAB):
+                        self.textCursor().deletePreviousChar()
+                    self.tabPos = self.tabPos - 1
+                else:
+                    return QPlainTextEdit.keyPressEvent(self, event)
+            else:
+                return QPlainTextEdit.keyPressEvent(self, event)
+        else:
+            return QPlainTextEdit.keyPressEvent(self, event)
+        print("TABS=%d" % self.tabPos)
+            
+    def tabsAtBeginningOfLine(self, line, KTAB):
+        return((len(line) - len(line.lstrip())) % KTAB)
 
 #-------------------------------------------------------------------------------
 # paintEvent()

@@ -1,7 +1,7 @@
 <project name="Bside">
   <bside>1.0.1</bside>
   <created>2020/05/23-18:52:58</created>
-  <modified>2020/06/15-13:53:49</modified>
+  <modified>2020/07/19-11:01:12</modified>
   <main>/media/jpl/JPL004/Projets/Python/Bside/src/bside.py</main>
   <encoding>utf_8</encoding>
   <sessions>
@@ -11,6 +11,10 @@
     <session start="2020/05/23-19:39:24" end="2020/05/23-19:39:33" focus="9"/>
     <session start="2020/05/23-21:03:04" end="2020/05/23-21:28:27" focus="-389"/>
     <session start="2020/05/23-21:29:46" end="2020/05/23-21:30:58" focus="49"/>
+    <session start="2020/07/19-11:01:01" end="2020/07/19-11:01:12" focus="11"/>
+    <session start="2020/07/19-10:56:51" end="2020/07/19-10:59:22" focus="131"/>
+    <session start="2020/06/28-21:01:11" end="2020/06/28-21:02:07" focus="56"/>
+    <session start="2020/06/27-20:43:34" end="2020/06/28-21:00:47" focus="257"/>
     <session start="2020/06/15-13:53:26" end="2020/06/15-13:53:49" focus="17"/>
     <session start="2020/06/15-12:04:46" end="2020/06/15-12:05:41" focus="33"/>
     <session start="2020/06/15-12:04:29" end="2020/06/15-12:04:53" focus="18"/>
