@@ -787,6 +787,11 @@
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="tab_5">
+             <attribute name="title">
+              <string>Internet</string>
+             </attribute>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -2190,8 +2195,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>302</width>
-                     <height>1105</height>
+                     <width>347</width>
+                     <height>1260</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_16">
@@ -2685,8 +2690,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>356</width>
-                     <height>406</height>
+                     <width>407</width>
+                     <height>498</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_18">
@@ -3157,7 +3162,7 @@
      <x>0</x>
      <y>0</y>
      <width>1005</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOptions">

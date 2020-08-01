@@ -1,0 +1,6 @@
+First time install :
+====================
+pip3 install python-dateutil
+pip3 install PyQtWebEngine
+pip3 install markdown
+
