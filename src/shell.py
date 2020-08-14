@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #===============================================================================
 #                                                       ____      _     _      
@@ -21,6 +21,7 @@ import socket
 import time
 import os
 import subprocess
+import re
 
 import utils
 import settings
@@ -282,13 +283,13 @@ class WShell(QWidget):
         ================================================================
         Emulated internal commands :
         ================================================================
-        > help
-        > set <parameter> = <value>
+        X help
+        X set <parameter> = <value>
         > save repository
         > quit IDE
         > quit force IDE
-        > start web server
-        > stop web server
+        X start web server
+        X stop web server
         > send report
         > check update
         > export log IDE
@@ -324,9 +325,52 @@ class WShell(QWidget):
         elif command.lower() == "help":
             self.txtConsoleOut.append("%s" % self.bsideHelp())
         else:
-            self.txtConsoleOut.append("%s" % "Error : Unknown Bside command.\nPlease type \"help\" to have the list of available commands.")
+            if not self.cmdSet(command):
+                self.txtConsoleOut.append("%s" % "Error : Unknown Bside command.\nPlease type \"help\" to have the list of available commands.")
         # self.txtConsoleOut.append("\n")
-        
+
+#-------------------------------------------------------------------------------
+# cmdSet()
+#-------------------------------------------------------------------------------
+    def cmdSet(self, cmd):
+        # set param = value
+        m = re.search('^set\s*([\w]+)\s*=\s*(.+)', cmd)
+        if m is not None:
+            param = m.group(1)
+            value = m.group(2)
+            self.txtConsoleOut.append("%s => %s" % (param, str(value)))
+
+            if type(settings.db[param]) is str:
+                settings.db[param] = value
+            elif type(settings.db[param]) is int:
+                settings.db[param] = int(value)
+            elif type(settings.db[param]) is float:
+                settings.db[param] = float(value)
+            elif type(settings.db[param]) is bool:
+                if value.lower() == "true":
+                    settings.db[param] = True
+                else:
+                    settings.db[param] = False
+            else:
+                settings.db[param] = str(value)
+
+            rc = True
+        else:
+            # set param
+            m = re.search('^set\s*([\w]*$)', cmd)
+            if m is not None:
+                param = m.group(1)
+                params = settings.getSet(param)
+                html = "<p><table>\n"
+                for key in sorted(params):
+                    html = html + "<tr><td><b>" + key + "</b></td><td>&nbsp;=>&nbsp;</td><td>" + str(params[key]) + "</td></tr>\n"
+                html = html + "</table></p>"
+                self.txtConsoleOut.append(html)
+                rc = True
+            else:
+                rc = False
+        return rc
+            
 #-------------------------------------------------------------------------------
 # bsideHelp()
 #-------------------------------------------------------------------------------
@@ -337,6 +381,8 @@ Bside console commands :
 <table>
 <tr><td>------------------------</b></td><td>&nbsp;</td></tr>
 <tr><td><b>help</b></td><td>Display this help</td></tr>
+<tr><td><b>set [param]</b></td><td>Display all the parameters starting with [param]</td></tr>
+<tr><td><b>set [param] = [value]</b></td><td>Set a parameter to the defined value</td></tr>
 <tr><td><b>web start</b></td><td>Start the embedded web server</td></tr>
 <tr><td><b>web stop</b></td><td>Stop the embedded web server</td></tr>
 <tr><td><b>web status</b></td><td>Display the status of the web server</td></tr>

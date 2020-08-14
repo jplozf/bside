@@ -116,6 +116,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="btnProjectProperties">
+              <property name="toolTip">
+               <string>Project's properties</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -127,6 +130,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="btnProjectClose">
+              <property name="toolTip">
+               <string>Close project</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -138,6 +144,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="btnProjectExport">
+              <property name="toolTip">
+               <string>Export project</string>
+              </property>
               <property name="text">
                <string/>
               </property>
@@ -305,7 +314,7 @@
          <enum>QTabWidget::Rounded</enum>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <property name="elideMode">
          <enum>Qt::ElideLeft</enum>
@@ -2195,8 +2204,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>347</width>
-                     <height>1260</height>
+                     <width>302</width>
+                     <height>1105</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_16">
@@ -2690,8 +2699,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>407</width>
-                     <height>498</height>
+                     <width>356</width>
+                     <height>406</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_18">
@@ -3162,7 +3171,7 @@
      <x>0</x>
      <y>0</y>
      <width>1005</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOptions">

@@ -8,6 +8,6 @@ Without this configuration present, some functionality in the IDE may be limited
 -->
     <python-data xmlns="http://nbpython.dev.java.net/ns/php-project/1">
         <main.file>bside.py</main.file>
-        <platform.active>Python_3.6.7</platform.active>
+        <platform.active>default</platform.active>
     </python-data>
 </project-shared-configuration>

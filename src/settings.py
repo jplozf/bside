@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #===============================================================================
 #                                                       ____      _     _
@@ -9,8 +9,9 @@
 #
 #============================================================(C) JPL 2019=======
 
-from PyQt5.QtWidgets import QWidget, QGroupBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QScrollArea, QSpacerItem, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QGroupBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QScrollArea, QSpacerItem, QSizePolicy, QFileDialog, QDialog
 from PyQt5.QtGui import QColor, QPixmap
+from PyQt5 import uic
 
 import shelve
 import const
@@ -141,9 +142,12 @@ defaultValues = [
 #-------------------------------------------------------------------------------
 # Open config file
 #-------------------------------------------------------------------------------
+firstTime = False
+
 appDir = os.path.join(os.path.expanduser("~"), const.APP_FOLDER)
-if not os.path.exists(appDir):
+if not os.path.exists(appDir):    
     os.makedirs(appDir)
+    firstTime = True
 dbFileName = os.path.join(os.path.join(appDir, const.CONFIG_FILE))
 db = shelve.open(dbFileName, writeback=True)
 
@@ -164,7 +168,27 @@ db.sync()
 #-------------------------------------------------------------------------------
 def resetSettings():
     for x in defaultValues:
-            db[x[0]] = x[1]
+        db[x[0]] = x[1]
+            
+#-------------------------------------------------------------------------------
+# getSet()
+#-------------------------------------------------------------------------------
+def getSet(param):
+    """
+    Return a dict of all parameters beginning by the provided string with their values
+    """
+    rc = {}
+    for x in db:
+        if x in (i[0] for i in defaultValues):
+            if x.startswith(param) or param == "":
+                rc.update({x:db[x]})
+    return rc        
+
+#-------------------------------------------------------------------------------
+# firstTimeSettings()
+#-------------------------------------------------------------------------------
+def firstTimeSettings():
+    pass
 
 #-------------------------------------------------------------------------------
 # Class TabSettings
@@ -294,3 +318,84 @@ class TabSettings(QWidget):
             self.txtConsoleOut.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
             self.lblConsoleForegroundColor.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
             self.lblConsoleBackgroundColor.setStyleSheet("QWidget { background-color: %s; color: %s}" % (settings.db['CONSOLE_BACKGROUND'], settings.db['CONSOLE_FOREGROUND']))
+
+#-------------------------------------------------------------------------------
+# resource_path()
+# Define function to import external files when using PyInstaller.
+# https://stackoverflow.com/questions/37888581/pyinstaller-ui-files-filenotfounderror-errno-2-no-such-file-or-directory
+#-------------------------------------------------------------------------------
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    rp = os.path.join(base_path, relative_path)
+    # print("RP=%s" % rp)
+    return rp
+
+#-------------------------------------------------------------------------------
+# class DlgFirstTimeSettings
+#-------------------------------------------------------------------------------
+class DlgFirstTimeSettings(QDialog):
+    
+    BROWSE_EXISTING_DIR = 0
+    BROWSE_EXISTING_DIR_OR_CREATE = 1
+    BROWSE_FILE = 2
+    
+#-------------------------------------------------------------------------------
+# __init__()
+#-------------------------------------------------------------------------------
+    def __init__(self, parent):
+        super().__init__(parent)
+        uic.loadUi(resource_path('firstTimeWizard.ui'), self)
+        
+        # Screen #1 User
+        self.txt_PROJECT_USER_NAME.setText(db['PROJECT_USER_NAME'])
+        self.txt_PROJECT_MAIL.setText(db['PROJECT_MAIL'])
+        self.txt_PROJECT_SITE.setText(db['PROJECT_SITE'])
+        self.txt_PROJECT_COMPANY.setText(db['PROJECT_COMPANY'])
+
+        # Screen #2 Paths
+        self.txt_BSIDE_REPOSITORY.setText(db['BSIDE_REPOSITORY'])
+        self.btn_BSIDE_REPOSITORY.clicked.connect(lambda state, browse=self.BROWSE_EXISTING_DIR_OR_CREATE, field=self.txt_BSIDE_REPOSITORY : self.browseFor(browse, field))
+        self.txt_BSIDE_PYTHON_HELP_FILE.setText(db['BSIDE_PYTHON_HELP_FILE'])
+        self.txt_BSIDE_QTDESIGNER_PATH.setText(db['BSIDE_QTDESIGNER_PATH'])
+        
+        # Screen #3 Backup
+        self.chk_BACKUP_ENABLED.setChecked(db['BACKUP_ENABLED'])
+        self.txt_BACKUP_PATH.setText(db['BACKUP_PATH'])
+        self.spn_BACKUP_RETAINS.setValue(db['BACKUP_RETAINS'])
+        
+        # Screen #4 Web server
+        self.chk_WEB_SERVER_ENABLED.setChecked(db['WEB_SERVER_ENABLED'])
+        self.txt_WEB_SERVER_ADDRESS.setText(db['WEB_SERVER_ADDRESS'])
+        self.spn_WEB_SERVER_PORT.setValue(db['WEB_SERVER_PORT'])
+        self.chk_WEB_SSL_ENABLED.setChecked(db['WEB_SSL_ENABLED'])
+        self.txt_WEB_SSL_PRIVATE_KEY.setText(db['WEB_SSL_PRIVATE_KEY'])
+        self.txt_WEB_SSL_CERTIFICATE.setText(db['WEB_SSL_CERTIFICATE'])
+        
+        # Screen #5 Media
+        self.txt_PLAYER_A_FOLDER.setText(db['PLAYER_A_FOLDER'])
+        self.txt_PLAYER_V_FOLDER.setText(db['PLAYER_V_FOLDER'])        
+    
+#-------------------------------------------------------------------------------
+# browseFor()
+#-------------------------------------------------------------------------------
+    def browseFor(self, browse, field, path=None, filter=None):
+        if path == None:
+            path = os.path.expanduser("~")
+        if browse == self.BROWSE_EXISTING_DIR:
+            fname = QFileDialog.getExistingDirectory(self, "Select Directory", path, QFileDialog.ShowDirsOnly)
+            if fname:
+                field.setText(fname)
+        elif browse == self.BROWSE_EXISTING_DIR_OR_CREATE:
+            fname = QFileDialog.getExistingDirectory(self, "Select Directory", path, QFileDialog.ShowDirsOnly)
+            if fname:
+                field.setText(fname)
+        elif browse == self.BROWSE_FILE:
+            fname = QFileDialog.getExistingDirectory(self, "Select Directory", path, QFileDialog.ShowDirsOnly)
+            if fname:
+                field.setText(fname)
+

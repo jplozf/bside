@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #===============================================================================
 #                                                       ____      _     _      
@@ -92,6 +92,13 @@ if __name__ == '__main__':
         w = MainWindow()
         w.setWindowTitle(const.APPLICATION_NAME)
         w.show()
+        
+        #-------------------------------------------------------------------------------
+        # Display the first time Wizard if needed
+        #-------------------------------------------------------------------------------
+        if settings.firstTime == True:
+            wiz = settings.DlgFirstTimeSettings(w)
+            wiz.show()
         
         # Execute application
         splash.finish(w)

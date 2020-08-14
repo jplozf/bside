@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #===============================================================================
 #                                                       ____      _     _
@@ -31,6 +31,7 @@ import sqlite3
 import time
 from lxml import etree
 
+# These imports are project specific
 import settings
 import const
 import helpme
@@ -381,7 +382,7 @@ class MainWindow(QMainWindow):
         
         if settings.db['WEB_SERVER_ENABLED'] == True:
             web.startServer(self)
-
+            
 #-------------------------------------------------------------------------------
 # parseXML()
 #-------------------------------------------------------------------------------
