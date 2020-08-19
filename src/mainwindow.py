@@ -383,6 +383,24 @@ class MainWindow(QMainWindow):
         if settings.db['WEB_SERVER_ENABLED'] == True:
             web.startServer(self)
             
+        # Set the window and tray icon to something
+        self.trayIcon = QSystemTrayIcon()
+        self.trayIcon.setIcon(QIcon("./pix/bside.png"))
+        self.setWindowIcon(QIcon("./pix/bside.png"))
+
+        # Restore the window when the tray icon is double clicked.
+        self.trayIcon.activated.connect(self.restoreWindow)            
+
+#-------------------------------------------------------------------------------
+# restoreWindow()
+#-------------------------------------------------------------------------------
+    def restoreWindow(self, reason):
+            if reason in (QSystemTrayIcon.Trigger, QSystemTrayIcon.DoubleClick):
+                self.trayIcon.hide()
+                # self.showNormal will restore the window even if it was
+                # minimized.
+                self.showNormal()            
+                
 #-------------------------------------------------------------------------------
 # parseXML()
 #-------------------------------------------------------------------------------
@@ -434,6 +452,7 @@ class MainWindow(QMainWindow):
         self.actionClose.triggered.connect(self.closeFile)
         self.actionCloseAll.triggered.connect(self.closeAll)
         self.actionSettings.triggered.connect(self.settings)
+        self.actionFirstTimeSettingsWizard.triggered.connect(self.firstTimeSettings)
         self.actionAbout.triggered.connect(self.about)
         self.actionNewProject.triggered.connect(self.newProject)
         self.actionOpenProject.triggered.connect(self.openProject)
@@ -1019,6 +1038,13 @@ class MainWindow(QMainWindow):
             self.tbwHighRight.setTabIcon(idxTab, QIcon(resource_path("pix/silk/icons/cog.png")))
             self.tbwHighRight.setCurrentIndex(idxTab)
         self.showMessage("Settings")
+        
+#-------------------------------------------------------------------------------
+# firstTimeSettings()
+#-------------------------------------------------------------------------------
+    def firstTimeSettings(self):
+        wiz = settings.DlgFirstTimeSettings(self)
+        wiz.show()
 
 #-------------------------------------------------------------------------------
 # saveFile()
@@ -2143,6 +2169,11 @@ class MainWindow(QMainWindow):
                         index = self.tbwLowRight.currentIndex()
                         if index == 2:
                             self.movieWidget.playForce()
+        if event.type() == QEvent.WindowStateChange:
+            if self.windowState() & Qt.WindowMinimized:
+                if settings.db['BSIDE_MINIMIZE_TO_SYSTEM_TRAY'] == True:
+                    self.trayIcon.show()
+                    self.hide()
 
 #-------------------------------------------------------------------------------
 # setTabsText()

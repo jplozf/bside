@@ -9,7 +9,7 @@
 #
 #============================================================(C) JPL 2019=======
 
-from PyQt5.QtWidgets import QWidget, QGroupBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QScrollArea, QSpacerItem, QSizePolicy, QFileDialog, QDialog
+from PyQt5.QtWidgets import QWidget, QGroupBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QScrollArea, QSpacerItem, QSizePolicy, QFileDialog, QDialog, QMessageBox
 from PyQt5.QtGui import QColor, QPixmap
 from PyQt5 import uic
 
@@ -61,6 +61,7 @@ defaultValues = [
     ['BSIDE_BIG_DISPLAY_COLOR', "#ce5408"],
     ['BSIDE_MRU_PROJECTS', 5],
     ['BSIDE_QTDESIGNER_PATH', "/usr/bin/designer"],
+    ['BSIDE_MINIMIZE_TO_SYSTEM_TRAY', False],
     ['THEME_ALTERNATE', ["#efefef","#000000","#ffffff","#f7f7f7","#ffffdc","#000000","#000000","#efefef","#000000","#ffffff","#0000ff","#308cc6","#ffffff"]],
     ['TAB_LOW_LEFT_NAMES', True],
     ['TAB_LOW_RIGHT_NAMES', True],
@@ -183,12 +184,6 @@ def getSet(param):
             if x.startswith(param) or param == "":
                 rc.update({x:db[x]})
     return rc        
-
-#-------------------------------------------------------------------------------
-# firstTimeSettings()
-#-------------------------------------------------------------------------------
-def firstTimeSettings():
-    pass
 
 #-------------------------------------------------------------------------------
 # Class TabSettings
@@ -340,9 +335,10 @@ def resource_path(relative_path):
 #-------------------------------------------------------------------------------
 class DlgFirstTimeSettings(QDialog):
     
-    BROWSE_EXISTING_DIR = 0
-    BROWSE_EXISTING_DIR_OR_CREATE = 1
-    BROWSE_FILE = 2
+    BROWSE_DIR = 0
+    BROWSE_FILE = 1
+    
+    allParametersSet = False
     
 #-------------------------------------------------------------------------------
 # __init__()
@@ -359,13 +355,16 @@ class DlgFirstTimeSettings(QDialog):
 
         # Screen #2 Paths
         self.txt_BSIDE_REPOSITORY.setText(db['BSIDE_REPOSITORY'])
-        self.btn_BSIDE_REPOSITORY.clicked.connect(lambda state, browse=self.BROWSE_EXISTING_DIR_OR_CREATE, field=self.txt_BSIDE_REPOSITORY : self.browseFor(browse, field))
+        self.btn_BSIDE_REPOSITORY.clicked.connect(lambda state, browse=self.BROWSE_DIR, field=self.txt_BSIDE_REPOSITORY : self.browseFor(browse, field))
         self.txt_BSIDE_PYTHON_HELP_FILE.setText(db['BSIDE_PYTHON_HELP_FILE'])
+        self.btn_BSIDE_PYTHON_HELP_FILE.clicked.connect(lambda state, browse=self.BROWSE_FILE, field=self.txt_BSIDE_PYTHON_HELP_FILE, filt="Help files (*.hlp *.chm *.html);;All files (*)" : self.browseFor(browse, field, None, filt))
         self.txt_BSIDE_QTDESIGNER_PATH.setText(db['BSIDE_QTDESIGNER_PATH'])
+        self.btn_BSIDE_QTDESIGNER_PATH.clicked.connect(lambda state, browse=self.BROWSE_FILE, field=self.txt_BSIDE_QTDESIGNER_PATH, filt="All files (*)" : self.browseFor(browse, field, None, filt))
         
         # Screen #3 Backup
-        self.chk_BACKUP_ENABLED.setChecked(db['BACKUP_ENABLED'])
+        self.chk_BACKUP_ENABLED.setChecked(db['BACKUP_ENABLED'])        
         self.txt_BACKUP_PATH.setText(db['BACKUP_PATH'])
+        self.btn_BACKUP_PATH.clicked.connect(lambda state, browse=self.BROWSE_DIR, field=self.txt_BACKUP_PATH : self.browseFor(browse, field))
         self.spn_BACKUP_RETAINS.setValue(db['BACKUP_RETAINS'])
         
         # Screen #4 Web server
@@ -374,28 +373,124 @@ class DlgFirstTimeSettings(QDialog):
         self.spn_WEB_SERVER_PORT.setValue(db['WEB_SERVER_PORT'])
         self.chk_WEB_SSL_ENABLED.setChecked(db['WEB_SSL_ENABLED'])
         self.txt_WEB_SSL_PRIVATE_KEY.setText(db['WEB_SSL_PRIVATE_KEY'])
+        self.btn_WEB_SSL_PRIVATE_KEY.clicked.connect(lambda state, browse=self.BROWSE_FILE, field=self.txt_WEB_SSL_PRIVATE_KEY, filt="Private keys (*.pem);;All files (*)" : self.browseFor(browse, field, None, filt))
         self.txt_WEB_SSL_CERTIFICATE.setText(db['WEB_SSL_CERTIFICATE'])
+        self.btn_WEB_SSL_CERTIFICATE.clicked.connect(lambda state, browse=self.BROWSE_FILE, field=self.txt_WEB_SSL_CERTIFICATE, filt="Certificates (*.pem);;All files (*)" : self.browseFor(browse, field, None, filt))
         
         # Screen #5 Media
         self.txt_PLAYER_A_FOLDER.setText(db['PLAYER_A_FOLDER'])
+        self.btn_PLAYER_A_FOLDER.clicked.connect(lambda state, browse=self.BROWSE_DIR, field=self.txt_PLAYER_A_FOLDER : self.browseFor(browse, field))
         self.txt_PLAYER_V_FOLDER.setText(db['PLAYER_V_FOLDER'])        
+        self.btn_PLAYER_V_FOLDER.clicked.connect(lambda state, browse=self.BROWSE_DIR, field=self.txt_PLAYER_V_FOLDER : self.browseFor(browse, field))
+        
+        # Navigation buttons
+        self.btnBack.clicked.connect(self.goBack)
+        self.btnNext.clicked.connect(self.goNext)
+        self.btnFinish.clicked.connect(self.goFinish)
+        self.btnCancel.clicked.connect(self.goCancel)
+        self.tabWidget.currentChanged.connect(self.onTabChange)
     
 #-------------------------------------------------------------------------------
 # browseFor()
 #-------------------------------------------------------------------------------
-    def browseFor(self, browse, field, path=None, filter=None):
+    def browseFor(self, browse, field, path=None, filt=None):
         if path == None:
             path = os.path.expanduser("~")
-        if browse == self.BROWSE_EXISTING_DIR:
-            fname = QFileDialog.getExistingDirectory(self, "Select Directory", path, QFileDialog.ShowDirsOnly)
-            if fname:
-                field.setText(fname)
-        elif browse == self.BROWSE_EXISTING_DIR_OR_CREATE:
+        if browse == self.BROWSE_DIR:
             fname = QFileDialog.getExistingDirectory(self, "Select Directory", path, QFileDialog.ShowDirsOnly)
             if fname:
                 field.setText(fname)
         elif browse == self.BROWSE_FILE:
-            fname = QFileDialog.getExistingDirectory(self, "Select Directory", path, QFileDialog.ShowDirsOnly)
+            fname = QFileDialog.getOpenFileName(self, "Select file", path, filt)
             if fname:
-                field.setText(fname)
+                field.setText(fname[0])
 
+#-------------------------------------------------------------------------------
+# goBack()
+#-------------------------------------------------------------------------------
+    def goBack(self):
+        i = self.tabWidget.currentIndex()
+        if i > 0:
+            self.tabWidget.setCurrentIndex(i - 1)
+
+#-------------------------------------------------------------------------------
+# goNext()
+#-------------------------------------------------------------------------------
+    def goNext(self):
+        i = self.tabWidget.currentIndex()
+        if i < 4:
+            self.tabWidget.setCurrentIndex(i + 1)
+
+#-------------------------------------------------------------------------------
+# goFinish()
+#-------------------------------------------------------------------------------
+    def goFinish(self):
+        self.close()
+
+#-------------------------------------------------------------------------------
+# goCancel()
+#-------------------------------------------------------------------------------
+    def goCancel(self):
+        self.close()
+    
+#-------------------------------------------------------------------------------
+# onTabChange()
+#-------------------------------------------------------------------------------
+    def onTabChange(self, i):
+        if i == 0:
+            self.btnBack.setEnabled(False)
+        else:
+            self.btnBack.setEnabled(True)
+        if i == 4:
+            self.btnNext.setEnabled(False)
+        else:
+            self.btnNext.setEnabled(True)            
+
+#-------------------------------------------------------------------------------
+# closeEvent()
+#-------------------------------------------------------------------------------
+    def closeEvent(self, evnt):
+        if self.allParametersSet:
+            super(DlgFirstTimeSettings, self).closeEvent(evnt)
+        else:
+            buttonReply = QMessageBox.question(self, 'First time settings', "All parameters are not set.\nDo you want to close this wizard ?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if buttonReply == QMessageBox.Yes:
+                self.validateSettings()
+                evnt.accept()
+            if buttonReply == QMessageBox.No:
+                evnt.ignore()
+
+#-------------------------------------------------------------------------------
+# validateSettings()
+#-------------------------------------------------------------------------------
+    def validateSettings(self):
+        # Screen #1 User
+        db['PROJECT_USER_NAME'] = self.txt_PROJECT_USER_NAME.text()
+        db['PROJECT_MAIL'] = self.txt_PROJECT_MAIL.text()
+        db['PROJECT_SITE'] = self.txt_PROJECT_SITE.text()
+        db['PROJECT_COMPANY'] = self.txt_PROJECT_COMPANY.text()
+
+        # Screen #2 Paths
+        db['BSIDE_REPOSITORY'] = self.txt_BSIDE_REPOSITORY.text()
+        db['BSIDE_PYTHON_HELP_FILE'] = self.txt_BSIDE_PYTHON_HELP_FILE.text()
+        db['BSIDE_QTDESIGNER_PATH'] = self.txt_BSIDE_QTDESIGNER_PATH.text()
+        
+        # Screen #3 Backup
+        db['BACKUP_ENABLED'] = self.chk_BACKUP_ENABLED.isChecked()
+        db['BACKUP_PATH'] = self.txt_BACKUP_PATH.text()
+        db['BACKUP_RETAINS'] = self.spn_BACKUP_RETAINS.value()
+        
+        # Screen #4 Web server
+        db['WEB_SERVER_ENABLED'] = self.chk_WEB_SERVER_ENABLED.isChecked()
+        db['WEB_SERVER_ADDRESS'] = self.txt_WEB_SERVER_ADDRESS.text()
+        db['WEB_SERVER_PORT'] = self.spn_WEB_SERVER_PORT.value()
+        db['WEB_SSL_ENABLED'] = self.chk_WEB_SSL_ENABLED.isChecked()
+        db['WEB_SSL_PRIVATE_KEY'] = self.txt_WEB_SSL_PRIVATE_KEY.text()
+        db['WEB_SSL_CERTIFICATE'] = self.txt_WEB_SSL_CERTIFICATE.text()
+        
+        # Screen #5 Media
+        db['PLAYER_A_FOLDER'] = self.txt_PLAYER_A_FOLDER.text()
+        db['PLAYER_V_FOLDER'] = self.txt_PLAYER_V_FOLDER.text()
+        
+        # Commit
+        db.sync()
