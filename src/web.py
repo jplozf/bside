@@ -78,7 +78,19 @@ def statusServer(mw):
         msg = "Web server is not running"
     mw.showMessage(msg)
     return msg
-        
+
+#-------------------------------------------------------------------------------
+# isRunning()
+#-------------------------------------------------------------------------------
+def isRunning():
+    rc = False
+    global webStarted
+    if webStarted == True:
+        rc = True
+    else:
+        rc = False
+    return rc
+               
 #-------------------------------------------------------------------------------
 # restartServer()
 #-------------------------------------------------------------------------------

@@ -383,23 +383,20 @@ class MainWindow(QMainWindow):
         if settings.db['WEB_SERVER_ENABLED'] == True:
             web.startServer(self)
             
-        # Set the window and tray icon to something
-        self.trayIcon = QSystemTrayIcon()
-        self.trayIcon.setIcon(QIcon("./pix/bside.png"))
-        self.setWindowIcon(QIcon("./pix/bside.png"))
-
-        # Restore the window when the tray icon is double clicked.
-        self.trayIcon.activated.connect(self.restoreWindow)            
-
 #-------------------------------------------------------------------------------
-# restoreWindow()
+# restoreFromTrayIcon()
 #-------------------------------------------------------------------------------
-    def restoreWindow(self, reason):
-            if reason in (QSystemTrayIcon.Trigger, QSystemTrayIcon.DoubleClick):
-                self.trayIcon.hide()
-                # self.showNormal will restore the window even if it was
-                # minimized.
-                self.showNormal()            
+    def restoreFromTrayIcon(self):
+        self.trayIcon.hide()
+        self.showNormal()            
+        
+#-------------------------------------------------------------------------------
+# closeFromTrayIcon()
+#-------------------------------------------------------------------------------
+    def closeFromTrayIcon(self):
+        self.trayIcon.hide()
+        self.showNormal()            
+        self.close()
                 
 #-------------------------------------------------------------------------------
 # parseXML()
@@ -2172,6 +2169,35 @@ class MainWindow(QMainWindow):
         if event.type() == QEvent.WindowStateChange:
             if self.windowState() & Qt.WindowMinimized:
                 if settings.db['BSIDE_MINIMIZE_TO_SYSTEM_TRAY'] == True:
+#-------------------------------------------------------------------------------
+# Tray icon settings
+#-------------------------------------------------------------------------------            
+                    # Set the window and tray icon to something
+                    self.trayIcon = QSystemTrayIcon()
+                    self.trayIcon.setIcon(QIcon("./pix/bside.png"))
+                    self.setWindowIcon(QIcon("./pix/bside.png"))
+
+                      # Build the tray icon menu        
+                    self.mnuTrayIcon = QMenu(self)
+                    
+                    if web.isRunning() == True:
+                        lblWebStatus = "Web server is running"
+                    else:
+                        lblWebStatus = "Web server is not running"                    
+                    actionTrayIconWeb = self.mnuTrayIcon.addAction(QIcon("./pix/16x16/Globe.png"), lblWebStatus)
+                    actionTrayIconWeb.setDisabled(True)
+                    
+                    self.mnuTrayIcon.addSeparator()
+
+                    actionTrayIconShow = self.mnuTrayIcon.addAction(QIcon("./pix/16x16/Fullscreen.png"), "Show")
+                    actionTrayIconShow.triggered.connect(self.restoreFromTrayIcon)
+
+                    actionTrayIconExit = self.mnuTrayIcon.addAction(QIcon("./pix/16x16/Shutdown.png"), "Exit")        
+                    actionTrayIconExit.triggered.connect(self.closeFromTrayIcon)       
+
+                    # Connect the tray icon menu
+                    self.trayIcon.setContextMenu(self.mnuTrayIcon)
+                    
                     self.trayIcon.show()
                     self.hide()
 
