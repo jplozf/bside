@@ -12,8 +12,9 @@
 from PyQt5.QtWidgets import QWidget, QGroupBox, QFormLayout, QLabel, QLineEdit, QVBoxLayout, QHBoxLayout, QScrollArea, QSpacerItem, QSizePolicy, QFileDialog, QDialog, QMessageBox
 from PyQt5.QtGui import QColor, QPixmap
 from PyQt5 import uic
-
 import shelve
+import copy
+
 import const
 import os
 import utils
@@ -163,6 +164,10 @@ for x in defaultValues:
 # Save config file
 #-------------------------------------------------------------------------------
 db.sync()
+
+cached_db = shelve.open(os.path.join(os.path.join(appDir, const.CACHED_CONFIG_FILE)))
+cached_db.update(copy.deepcopy(dict(db)))
+cached_db.close()
 
 #-------------------------------------------------------------------------------
 # resetSettings()

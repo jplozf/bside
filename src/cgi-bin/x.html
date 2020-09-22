@@ -1,0 +1,360 @@
+<!doctype html>
+<html>
+   <head>
+      <meta charset="UTF-8">
+      <title>BSide Repository</title>
+      <style type="text/css">
+         *, *:before, *:after {
+         box-sizing: border-box;
+         }
+         body {
+         margin: 5x;
+         font: 14px Sans-Serif;
+         background-color: #fff;
+         color: #fff;
+         }
+         h1, p {
+         margin: 0 0 1em 0;
+         }
+         
+         /* no grid support? */
+         .sidebar {
+         float: left;
+         width: 50%;
+         }
+         .content {
+         float: right;
+         width: 50%;
+         }
+         /* make a grid */
+         .wrapper {
+         max-width: 100%;
+         margin: 0 auto;
+         display: grid;
+         grid-template-columns: 1fr 1fr;
+         grid-gap: 2px;
+         }
+         .wrapper > * {
+         background-color: #E6E6E6;
+         color: #000000;
+         border-radius: 5px;
+         padding: 5px;
+         font-size: 100%;
+         /* needed for the floated layout*/
+         margin-bottom: 5px;
+         }
+         
+         .header, .footer {
+         grid-column: 1 / -1;
+         /* needed for the floated layout */
+         clear: both;
+         }		 
+		 a.header {
+         color: #663300;
+         text-decoration: none;
+         }
+         .footer {
+         text-align: right;
+         }
+         
+         /* We need to set the widths used on floated items back to auto, and remove the bottom margin as when we have grid we have gaps. */
+         @supports (display: grid) {
+         .wrapper > * {
+         width: auto;
+         margin: 0;
+         }
+         }
+         
+         /* File Explorer Table */
+         table.fex {
+         background-color: #F3F3F3;
+         border-collapse: collapse;
+         width: 100%;
+         margin: 0 0;
+         }
+         th.fex {
+         background-color: #3490C4;
+         color: #FFF;
+         cursor: pointer;
+         padding: 5px 10px;
+         }
+         th.fex small {
+         font-size: 9px; 
+         }
+         td.fex, th.fex {
+         text-align: left;
+         }
+         td.alright {
+         text-align: right;
+         }
+         a.fex {
+         text-decoration: none;
+         }
+         td.fex a {
+         color: #663300;
+         display: block;
+         padding: 5px 10px;
+         }
+         th.fex a {
+         padding-left: 0
+         }
+         td.fex:first-of-type a {
+         background: url(../pix/16x16/Folder.png) no-repeat 10px 50%;
+         padding-left: 35px;
+         }
+         th.fex:first-of-type {
+         padding-left: 35px;
+         }
+         td.fex:not(:first-of-type) a {
+         background-image: none !important;
+         }
+         tr.fex:nth-of-type(odd) {
+         background-color: #E6E6E6;
+         }
+         tr.fex:hover td {
+         background-color:#CACACA;
+         }
+         tr.fex:hover td a {
+         color: #000;
+         }      
+         
+         /* Browse Directory Menu */
+         ul {
+         border: 1px solid #e7e7e7;
+         background-color: #f3f3f3;
+         list-style-type: none;
+         margin: 0;
+         padding: 0;
+         overflow: hidden;
+         }
+         li a {
+         color: #666;
+         display: block;
+         text-align: center;
+         padding: 6px 16px;
+         text-decoration: none;
+         }
+         li a:hover {
+         background-color: #111;
+         color: #3490C4;
+         }
+         li {
+         border-right: 1px solid #bbb;
+         float: left;
+         }
+         .active {
+         background-color: #3490C4;
+         color: #FFF;
+         }          
+      </style>
+   </head>
+   <body>
+      <div class="wrapper">
+         <header class="header">
+            <table>
+               <tr>
+                  <td rowspan='4'><img src='../pix/bside.png'></td>
+                  <td valign='bottom'>
+                     <h1>BSIDE REPOSITORY</h1>
+                  </td>
+               </tr>
+               <tr>
+                  <td valign='top'><a class='header' href='mailto:jpl@ozf.fr'>J.-P. Liguori</a> for <a class='header' href='http://www.ozf.fr' target='_blank'>Open Zero Factory</a></td>
+               </tr>
+               <tr>
+                  <td valign='top'>&nbsp;</td>
+               </tr>
+               <tr>
+                  <td valign='top'>&nbsp;</td>
+               </tr>
+            </table>
+            <ul>
+               <li><a href="./index.py?t=/media/jpl/JPL004/Projets/Python">[REPOSITORY]</a></li>
+               <li><a href="./index.py?t=/media/jpl/JPL004/Projets/Python/Almanach">Almanach</a></li>
+               <li><a class="active" href="./index.py?t=/media/jpl/JPL004/Projets/Python/Almanach/dox">dox</a></li>
+            </ul>
+         </header>
+         <aside class="sidebar">
+            <table class="fex">
+               <thead class="fex">
+                  <tr class="fex">
+                     <th class="fex">Filename</th>
+                     <th class="fex">Type</th>
+                     <th class="fex">Size</th>
+                     <th class="fex">Date Modified</th>
+                  </tr>
+               </thead>
+               <tbody class="fex">
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Almanach'>Almanach</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Almanach'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Almanach'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Almanach'>2019/12/12 - 09:05:36</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Asciimatics'>Asciimatics</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Asciimatics'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Asciimatics'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Asciimatics'>2019/12/12 - 09:05:37</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/axono'>axono</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/axono'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/axono'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/axono'>2019/12/12 - 09:05:37</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Baggy'>Baggy</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Baggy'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Baggy'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Baggy'>2019/12/12 - 09:05:37</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Bside'>Bside</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Bside'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Bside'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Bside'>2020/06/12 - 13:53:26</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Bside.tar.bz2'>Bside.tar.bz2</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Bside.tar.bz2'>FILE</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Bside.tar.bz2'>395.2 MB</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Bside.tar.bz2'>2020/03/10 - 21:23:14</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/codec'>codec</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/codec'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/codec'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/codec'>2020/04/13 - 16:36:46</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Dixio'>Dixio</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Dixio'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Dixio'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Dixio'>2020/06/03 - 13:05:47</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Gosh'>Gosh</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Gosh'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Gosh'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Gosh'>2020/05/23 - 13:45:37</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Gosh_20190515.zip'>Gosh_20190515.zip</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Gosh_20190515.zip'>FILE</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Gosh_20190515.zip'>160.1 KB</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Gosh_20190515.zip'>2019/05/15 - 16:53:02</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/hello.sql'>hello.sql</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/hello.sql'>FILE</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/hello.sql'>181.0 B</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/hello.sql'>2020/04/19 - 18:39:55</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Hello42'>Hello42</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Hello42'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Hello42'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Hello42'>2020/05/22 - 13:44:04</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/minitetris.py'>minitetris.py</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/minitetris.py'>FILE</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/minitetris.py'>3.2 KB</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/minitetris.py'>2020/02/03 - 20:29:19</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Misc'>Misc</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Misc'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Misc'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Misc'>2019/12/12 - 09:07:39</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Piggy'>Piggy</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Piggy'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Piggy'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Piggy'>2020/05/06 - 17:30:33</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Planetary-Orbit-master'>Planetary-Orbit-master</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Planetary-Orbit-master'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Planetary-Orbit-master'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Planetary-Orbit-master'>2020/01/25 - 17:12:52</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyCam'>PyCam</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyCam'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyCam'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyCam'>2019/12/12 - 09:07:58</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyMeteo'>PyMeteo</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyMeteo'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyMeteo'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyMeteo'>2019/12/12 - 09:08:03</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Pyng'>Pyng</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Pyng'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Pyng'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Pyng'>2020/04/08 - 20:23:36</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyQt5App'>PyQt5App</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyQt5App'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyQt5App'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/PyQt5App'>2019/12/12 - 09:09:24</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/python-chess-game-GUI-master'>python-chess-game-GUI-master</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/python-chess-game-GUI-master'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/python-chess-game-GUI-master'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/python-chess-game-GUI-master'>2020/04/28 - 09:33:07</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/QSally'>QSally</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/QSally'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/QSally'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/QSally'>2020/09/08 - 20:12:04</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/QSally_20200825-170231.zip'>QSally_20200825-170231.zip</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/QSally_20200825-170231.zip'>FILE</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/QSally_20200825-170231.zip'>2.2 MB</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/QSally_20200825-170231.zip'>2020/08/25 - 17:02:40</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/RSA'>RSA</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/RSA'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/RSA'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/RSA'>2019/12/12 - 09:09:26</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/VBoxSysTray'>VBoxSysTray</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/VBoxSysTray'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/VBoxSysTray'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/VBoxSysTray'>2020/05/23 - 10:29:57</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Xflesh'>Xflesh</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Xflesh'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Xflesh'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/Xflesh'>2019/12/12 - 09:09:39</a></td>
+                  </tr>
+                  <tr class='fex'>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/_scratch_'>_scratch_</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/_scratch_'>DIR</a></td>
+                     <td class='fex alright'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/_scratch_'>-</a></td>
+                     <td class='fex'><a class='fex' href='./index.py?t=/media/jpl/JPL004/Projets/Python/_scratch_'>2020/07/26 - 20:09:04</a></td>
+                  </tr>
+               </tbody>
+            </table>
+         </aside>
+         <article class="content">
+            <h1>2 column, header and footer</h1>
+            <p>This example uses line-based positioning, to position the header and footer, stretching them across the grid.</p>
+         </article>
+         <footer class="footer"><i>Copyright 2019-2020, J.-P. Liguori</i></footer>
+      </div>
+   </body>
+</html>

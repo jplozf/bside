@@ -28,6 +28,7 @@ BLAHBLAH_03 = "BSide is written using Python 3.x and PyQt5."
 
 APP_FOLDER = ".bside"
 CONFIG_FILE = "config"
+CACHED_CONFIG_FILE = "cached"
 PROJECT_FILE_NAME = "project.bsix"
 HISTORY_FILE = "history"
 HISTORY_SQL = "sql"
