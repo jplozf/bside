@@ -1,5 +1,7 @@
 First time install :
 ====================
+sudo apt install python3-pip
+pip3 install pyqt5
 pip3 install python-dateutil
 pip3 install PyQtWebEngine
 pip3 install markdown
