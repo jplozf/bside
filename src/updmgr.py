@@ -1,6 +1,14 @@
-# To change this license header, choose License Headers in Project Properties.
-# To change this template file, choose Tools | Templates
-# and open the template in the editor.
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#===============================================================================
+#                                                       ____      _     _
+#                                                      | __ ) ___(_) __| | ___
+#                                                      |  _ \/ __| |/ _` |/ _ \
+#                                                      | |_) \__ \ | (_| |  __/
+#                                                      |____/|___/_|\__,_|\___|
+#
+#============================================================(C) JPL 2020=======
 
-if __name__ == "__main__":
-    print "Hello World"
+import const
+
+# send to GIT
