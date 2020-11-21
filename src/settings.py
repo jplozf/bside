@@ -350,7 +350,7 @@ class DlgFirstTimeSettings(QDialog):
 #-------------------------------------------------------------------------------
     def __init__(self, parent):
         super().__init__(parent)
-        uic.loadUi(resource_path('firstTimeWizard.ui'), self)
+        uic.loadUi(resource_path('ui/firstTimeWizard.ui'), self)
         
         # Screen #1 User
         self.txt_PROJECT_USER_NAME.setText(db['PROJECT_USER_NAME'])

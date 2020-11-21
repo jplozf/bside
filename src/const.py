@@ -17,6 +17,7 @@ COPYRIGHT = "Copyright 2019-2020, J.-P. Liguori"
 LICENSE   = "GPL"
 VERSION   = "0.9.a"
 EMAIL     = "jpl@ozf.fr"
+NVERSION  = 90 
 
 ORGANIZATION_NAME   = "Open Zero Factory"
 ORGANIZATION_DOMAIN = "www.ozf.fr/#bside"

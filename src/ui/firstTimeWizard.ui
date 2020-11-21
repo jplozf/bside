@@ -481,7 +481,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap>pix/bside_24x24.png</pixmap>
+        <pixmap>../pix/bside_24x24.png</pixmap>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

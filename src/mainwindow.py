@@ -116,7 +116,7 @@ class MainWindow(QMainWindow):
 #-------------------------------------------------------------------------------
     def __init__(self, parent = None):
         QMainWindow.__init__( self, parent )
-        uic.loadUi(resource_path('mainwindow.ui'), self)
+        uic.loadUi(resource_path('ui/mainwindow.ui'), self)
 
         self.appDir = os.path.join(os.path.expanduser("~"), const.APP_FOLDER)
         if not os.path.exists(self.appDir):

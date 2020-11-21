@@ -31,7 +31,7 @@
         <widget class="QWidget" name="tabRepository">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Document Text.png</normaloff>pix/16x16/Document Text.png</iconset>
+           <normaloff>../pix/16x16/Document Text.png</normaloff>../pix/16x16/Document Text.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Repository</string>
@@ -45,7 +45,7 @@
         <widget class="QWidget" name="tabProject">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Light.png</normaloff>pix/16x16/Light.png</iconset>
+           <normaloff>../pix/16x16/Light.png</normaloff>../pix/16x16/Light.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Project</string>
@@ -124,7 +124,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/16x16/Gear.png</normaloff>pix/16x16/Gear.png</iconset>
+                <normaloff>../pix/16x16/Gear.png</normaloff>../pix/16x16/Gear.png</iconset>
               </property>
              </widget>
             </item>
@@ -138,7 +138,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/16x16/Cancel.png</normaloff>pix/16x16/Cancel.png</iconset>
+                <normaloff>../pix/16x16/Cancel.png</normaloff>../pix/16x16/Cancel.png</iconset>
               </property>
              </widget>
             </item>
@@ -152,7 +152,18 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/16x16/Upload.png</normaloff>pix/16x16/Upload.png</iconset>
+                <normaloff>../pix/16x16/Upload.png</normaloff>../pix/16x16/Upload.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnProjectMail">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset>
+                <normaloff>../pix/16x16/Mail.png</normaloff>../pix/16x16/Mail.png</iconset>
               </property>
              </widget>
             </item>
@@ -168,7 +179,7 @@
         <widget class="QWidget" name="tabFunctions">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Recycle.png</normaloff>pix/16x16/Recycle.png</iconset>
+           <normaloff>../pix/16x16/Recycle.png</normaloff>../pix/16x16/Recycle.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Structure</string>
@@ -210,7 +221,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/icons/sort_number.png</normaloff>pix/icons/sort_number.png</iconset>
+                <normaloff>../pix/icons/sort_number.png</normaloff>../pix/icons/sort_number.png</iconset>
               </property>
              </widget>
             </item>
@@ -221,7 +232,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/icons/sort_type.png</normaloff>pix/icons/sort_type.png</iconset>
+                <normaloff>../pix/icons/sort_type.png</normaloff>../pix/icons/sort_type.png</iconset>
               </property>
              </widget>
             </item>
@@ -232,7 +243,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/icons/sort_alpha.png</normaloff>pix/icons/sort_alpha.png</iconset>
+                <normaloff>../pix/icons/sort_alpha.png</normaloff>../pix/icons/sort_alpha.png</iconset>
               </property>
              </widget>
             </item>
@@ -243,7 +254,7 @@
         <widget class="QWidget" name="tabActions">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Bug.png</normaloff>pix/16x16/Bug.png</iconset>
+           <normaloff>../pix/16x16/Bug.png</normaloff>../pix/16x16/Bug.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Actions</string>
@@ -257,7 +268,7 @@
         <widget class="QWidget" name="tabSearch">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Search.png</normaloff>pix/16x16/Search.png</iconset>
+           <normaloff>../pix/16x16/Search.png</normaloff>../pix/16x16/Search.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Search</string>
@@ -278,7 +289,7 @@
         <widget class="QWidget" name="tabProperties">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Gear.png</normaloff>pix/16x16/Gear.png</iconset>
+           <normaloff>../pix/16x16/Gear.png</normaloff>../pix/16x16/Gear.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Properties</string>
@@ -328,7 +339,7 @@
         <widget class="QWidget" name="tabOutput">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Computer.png</normaloff>pix/16x16/Computer.png</iconset>
+           <normaloff>../pix/16x16/Computer.png</normaloff>../pix/16x16/Computer.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Output</string>
@@ -350,7 +361,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/16x16/Upload.png</normaloff>pix/16x16/Upload.png</iconset>
+                <normaloff>../pix/16x16/Upload.png</normaloff>../pix/16x16/Upload.png</iconset>
               </property>
              </widget>
             </item>
@@ -361,7 +372,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/16x16/Trash.png</normaloff>pix/16x16/Trash.png</iconset>
+                <normaloff>../pix/16x16/Trash.png</normaloff>../pix/16x16/Trash.png</iconset>
               </property>
              </widget>
             </item>
@@ -372,7 +383,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/16x16/Player Stop.png</normaloff>pix/16x16/Player Stop.png</iconset>
+                <normaloff>../pix/16x16/Player Stop.png</normaloff>../pix/16x16/Player Stop.png</iconset>
               </property>
              </widget>
             </item>
@@ -399,7 +410,7 @@
         <widget class="QWidget" name="tabSearchbox">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Search.png</normaloff>pix/16x16/Search.png</iconset>
+           <normaloff>../pix/16x16/Search.png</normaloff>../pix/16x16/Search.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Search</string>
@@ -808,7 +819,7 @@
         <widget class="QWidget" name="tabVideo">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Target.png</normaloff>pix/16x16/Target.png</iconset>
+           <normaloff>../pix/16x16/Target.png</normaloff>../pix/16x16/Target.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Focus</string>
@@ -859,7 +870,7 @@
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>pix/16x16/Plus.png</normaloff>pix/16x16/Plus.png</iconset>
+                       <normaloff>../pix/16x16/Plus.png</normaloff>../pix/16x16/Plus.png</iconset>
                      </property>
                     </widget>
                    </item>
@@ -870,7 +881,7 @@
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>pix/16x16/Minus.png</normaloff>pix/16x16/Minus.png</iconset>
+                       <normaloff>../pix/16x16/Minus.png</normaloff>../pix/16x16/Minus.png</iconset>
                      </property>
                     </widget>
                    </item>
@@ -881,7 +892,7 @@
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>pix/16x16/Arrow - Up.png</normaloff>pix/16x16/Arrow - Up.png</iconset>
+                       <normaloff>../pix/16x16/Arrow - Up.png</normaloff>../pix/16x16/Arrow - Up.png</iconset>
                      </property>
                     </widget>
                    </item>
@@ -892,7 +903,7 @@
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>pix/16x16/Arrow - Down.png</normaloff>pix/16x16/Arrow - Down.png</iconset>
+                       <normaloff>../pix/16x16/Arrow - Down.png</normaloff>../pix/16x16/Arrow - Down.png</iconset>
                      </property>
                     </widget>
                    </item>
@@ -1390,7 +1401,7 @@
         <widget class="QWidget" name="tabTools">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Attach.png</normaloff>pix/16x16/Attach.png</iconset>
+           <normaloff>../pix/16x16/Attach.png</normaloff>../pix/16x16/Attach.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Tools</string>
@@ -1647,7 +1658,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/icons/database.png</normaloff>pix/icons/database.png</iconset>
+                      <normaloff>../pix/icons/database.png</normaloff>../pix/icons/database.png</iconset>
                     </property>
                     <property name="checkable">
                      <bool>false</bool>
@@ -1667,7 +1678,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/16x16/Cancel.png</normaloff>pix/16x16/Cancel.png</iconset>
+                      <normaloff>../pix/16x16/Cancel.png</normaloff>../pix/16x16/Cancel.png</iconset>
                     </property>
                     <property name="flat">
                      <bool>false</bool>
@@ -1691,7 +1702,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/16x16/Player Play.png</normaloff>pix/16x16/Player Play.png</iconset>
+                      <normaloff>../pix/16x16/Player Play.png</normaloff>../pix/16x16/Player Play.png</iconset>
                     </property>
                    </widget>
                   </item>
@@ -1702,7 +1713,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/16x16/Clipboard Paste.png</normaloff>pix/16x16/Clipboard Paste.png</iconset>
+                      <normaloff>../pix/16x16/Clipboard Paste.png</normaloff>../pix/16x16/Clipboard Paste.png</iconset>
                     </property>
                    </widget>
                   </item>
@@ -1792,7 +1803,7 @@
                       </property>
                       <property name="icon">
                        <iconset>
-                        <normaloff>pix/16x16/Clipboard Paste.png</normaloff>pix/16x16/Clipboard Paste.png</iconset>
+                        <normaloff>../pix/16x16/Clipboard Paste.png</normaloff>../pix/16x16/Clipboard Paste.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -1840,7 +1851,7 @@
                       </property>
                       <property name="icon">
                        <iconset>
-                        <normaloff>pix/16x16/Clipboard Copy.png</normaloff>pix/16x16/Clipboard Copy.png</iconset>
+                        <normaloff>../pix/16x16/Clipboard Copy.png</normaloff>../pix/16x16/Clipboard Copy.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -1851,7 +1862,7 @@
                       </property>
                       <property name="icon">
                        <iconset>
-                        <normaloff>pix/16x16/Clipboard Paste.png</normaloff>pix/16x16/Clipboard Paste.png</iconset>
+                        <normaloff>../pix/16x16/Clipboard Paste.png</normaloff>../pix/16x16/Clipboard Paste.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -1862,7 +1873,7 @@
                       </property>
                       <property name="icon">
                        <iconset>
-                        <normaloff>pix/16x16/Trash.png</normaloff>pix/16x16/Trash.png</iconset>
+                        <normaloff>../pix/16x16/Trash.png</normaloff>../pix/16x16/Trash.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -1908,7 +1919,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/16x16/Arrow - Right.png</normaloff>pix/16x16/Arrow - Right.png</iconset>
+                      <normaloff>../pix/16x16/Arrow - Right.png</normaloff>../pix/16x16/Arrow - Right.png</iconset>
                     </property>
                    </widget>
                   </item>
@@ -1919,7 +1930,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/16x16/Arrow - Right.png</normaloff>pix/16x16/Arrow - Right.png</iconset>
+                      <normaloff>../pix/16x16/Arrow - Right.png</normaloff>../pix/16x16/Arrow - Right.png</iconset>
                     </property>
                    </widget>
                   </item>
@@ -1930,7 +1941,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/16x16/Arrow - Left.png</normaloff>pix/16x16/Arrow - Left.png</iconset>
+                      <normaloff>../pix/16x16/Arrow - Left.png</normaloff>../pix/16x16/Arrow - Left.png</iconset>
                     </property>
                    </widget>
                   </item>
@@ -1941,7 +1952,7 @@
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>pix/16x16/Arrow - Left.png</normaloff>pix/16x16/Arrow - Left.png</iconset>
+                      <normaloff>../pix/16x16/Arrow - Left.png</normaloff>../pix/16x16/Arrow - Left.png</iconset>
                     </property>
                    </widget>
                   </item>
@@ -1980,7 +1991,7 @@
                       </property>
                       <property name="icon">
                        <iconset>
-                        <normaloff>pix/16x16/Clipboard Copy.png</normaloff>pix/16x16/Clipboard Copy.png</iconset>
+                        <normaloff>../pix/16x16/Clipboard Copy.png</normaloff>../pix/16x16/Clipboard Copy.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -1991,7 +2002,7 @@
                       </property>
                       <property name="icon">
                        <iconset>
-                        <normaloff>pix/16x16/Clipboard Paste.png</normaloff>pix/16x16/Clipboard Paste.png</iconset>
+                        <normaloff>../pix/16x16/Clipboard Paste.png</normaloff>../pix/16x16/Clipboard Paste.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -2002,7 +2013,7 @@
                       </property>
                       <property name="icon">
                        <iconset>
-                        <normaloff>pix/16x16/Trash.png</normaloff>pix/16x16/Trash.png</iconset>
+                        <normaloff>../pix/16x16/Trash.png</normaloff>../pix/16x16/Trash.png</iconset>
                       </property>
                      </widget>
                     </item>
@@ -2047,7 +2058,7 @@
         <widget class="QWidget" name="tabPyInstaller">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Construction.png</normaloff>pix/16x16/Construction.png</iconset>
+           <normaloff>../pix/16x16/Construction.png</normaloff>../pix/16x16/Construction.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Build</string>
@@ -2072,7 +2083,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/16x16/Player Play.png</normaloff>pix/16x16/Player Play.png</iconset>
+                <normaloff>../pix/16x16/Player Play.png</normaloff>../pix/16x16/Player Play.png</iconset>
               </property>
              </widget>
             </item>
@@ -2083,7 +2094,7 @@
               </property>
               <property name="icon">
                <iconset>
-                <normaloff>pix/16x16/Player Stop.png</normaloff>pix/16x16/Player Stop.png</iconset>
+                <normaloff>../pix/16x16/Player Stop.png</normaloff>../pix/16x16/Player Stop.png</iconset>
               </property>
              </widget>
             </item>
@@ -2142,7 +2153,7 @@
                <string/>
               </property>
               <property name="pixmap">
-               <pixmap>pix/icons/led_green.png</pixmap>
+               <pixmap>../pix/icons/led_green.png</pixmap>
               </property>
              </widget>
             </item>
@@ -2204,8 +2215,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>302</width>
-                     <height>1105</height>
+                     <width>347</width>
+                     <height>1290</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_16">
@@ -2699,8 +2710,8 @@
                     <rect>
                      <x>0</x>
                      <y>0</y>
-                     <width>356</width>
-                     <height>406</height>
+                     <width>407</width>
+                     <height>499</height>
                     </rect>
                    </property>
                    <layout class="QGridLayout" name="gridLayout_18">
@@ -2996,7 +3007,7 @@
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap>pix/icons/pyinstaller_24.png</pixmap>
+                 <pixmap>../pix/icons/pyinstaller_24.png</pixmap>
                 </property>
                </widget>
               </item>
@@ -3031,7 +3042,7 @@
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>pix/16x16/Folder.png</normaloff>pix/16x16/Folder.png</iconset>
+                  <normaloff>../pix/16x16/Folder.png</normaloff>../pix/16x16/Folder.png</iconset>
                 </property>
                </widget>
               </item>
@@ -3062,7 +3073,7 @@
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>pix/16x16/Construction.png</normaloff>pix/16x16/Construction.png</iconset>
+                  <normaloff>../pix/16x16/Construction.png</normaloff>../pix/16x16/Construction.png</iconset>
                 </property>
                </widget>
               </item>
@@ -3075,7 +3086,7 @@
         <widget class="QWidget" name="tab_4">
          <attribute name="icon">
           <iconset>
-           <normaloff>pix/16x16/Recycle.png</normaloff>pix/16x16/Recycle.png</iconset>
+           <normaloff>../pix/16x16/Recycle.png</normaloff>../pix/16x16/Recycle.png</iconset>
          </attribute>
          <attribute name="title">
           <string>Disassemble</string>
@@ -3102,7 +3113,7 @@
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>pix/16x16/Folder.png</normaloff>pix/16x16/Folder.png</iconset>
+                  <normaloff>../pix/16x16/Folder.png</normaloff>../pix/16x16/Folder.png</iconset>
                 </property>
                </widget>
               </item>
@@ -3113,7 +3124,7 @@
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>pix/16x16/Player Play.png</normaloff>pix/16x16/Player Play.png</iconset>
+                  <normaloff>../pix/16x16/Player Play.png</normaloff>../pix/16x16/Player Play.png</iconset>
                 </property>
                </widget>
               </item>
@@ -3137,7 +3148,7 @@
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>pix/16x16/Clipboard Paste.png</normaloff>pix/16x16/Clipboard Paste.png</iconset>
+                  <normaloff>../pix/16x16/Clipboard Paste.png</normaloff>../pix/16x16/Clipboard Paste.png</iconset>
                 </property>
                </widget>
               </item>
@@ -3171,7 +3182,7 @@
      <x>0</x>
      <y>0</y>
      <width>1005</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOptions">
@@ -3217,7 +3228,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>pix/bside.png</normaloff>pix/bside.png</iconset>
+       <normaloff>../pix/bside.png</normaloff>../pix/bside.png</iconset>
      </property>
     </widget>
     <addaction name="actionNewProject"/>
@@ -3286,7 +3297,7 @@
   <action name="actionQuit">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Cancel.png</normaloff>pix/16x16/Cancel.png</iconset>
+     <normaloff>../pix/16x16/Cancel.png</normaloff>../pix/16x16/Cancel.png</iconset>
    </property>
    <property name="text">
     <string>Quit</string>
@@ -3301,7 +3312,7 @@
   <action name="actionOpenFile">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Folder.png</normaloff>pix/16x16/Folder.png</iconset>
+     <normaloff>../pix/16x16/Folder.png</normaloff>../pix/16x16/Folder.png</iconset>
    </property>
    <property name="text">
     <string>Open</string>
@@ -3313,7 +3324,7 @@
   <action name="actionNewPythonFile">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Document Text.png</normaloff>pix/16x16/Document Text.png</iconset>
+     <normaloff>../pix/16x16/Document Text.png</normaloff>../pix/16x16/Document Text.png</iconset>
    </property>
    <property name="text">
     <string>New Python File</string>
@@ -3325,7 +3336,7 @@
   <action name="actionNewAnonymousFile">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Document.png</normaloff>pix/16x16/Document.png</iconset>
+     <normaloff>../pix/16x16/Document.png</normaloff>../pix/16x16/Document.png</iconset>
    </property>
    <property name="text">
     <string>New Anonymous File</string>
@@ -3334,7 +3345,7 @@
   <action name="actionSave">
    <property name="icon">
     <iconset>
-     <normaloff>pix/silk/icons/disk.png</normaloff>pix/silk/icons/disk.png</iconset>
+     <normaloff>../pix/silk/icons/disk.png</normaloff>../pix/silk/icons/disk.png</iconset>
    </property>
    <property name="text">
     <string>Save</string>
@@ -3356,7 +3367,7 @@
   <action name="actionNewProject">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/My Documents.png</normaloff>pix/16x16/My Documents.png</iconset>
+     <normaloff>../pix/16x16/My Documents.png</normaloff>../pix/16x16/My Documents.png</iconset>
    </property>
    <property name="text">
     <string>New Project</string>
@@ -3365,7 +3376,7 @@
   <action name="actionOpenProject">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Folder Open.png</normaloff>pix/16x16/Folder Open.png</iconset>
+     <normaloff>../pix/16x16/Folder Open.png</normaloff>../pix/16x16/Folder Open.png</iconset>
    </property>
    <property name="text">
     <string>Open Project</string>
@@ -3374,7 +3385,7 @@
   <action name="actionCloseProject">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Folder Up.png</normaloff>pix/16x16/Folder Up.png</iconset>
+     <normaloff>../pix/16x16/Folder Up.png</normaloff>../pix/16x16/Folder Up.png</iconset>
    </property>
    <property name="text">
     <string>Close Project</string>
@@ -3388,7 +3399,7 @@
   <action name="actionSettings">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Gear.png</normaloff>pix/16x16/Gear.png</iconset>
+     <normaloff>../pix/16x16/Gear.png</normaloff>../pix/16x16/Gear.png</iconset>
    </property>
    <property name="text">
     <string>Settings</string>
@@ -3397,7 +3408,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Info2.png</normaloff>pix/16x16/Info2.png</iconset>
+     <normaloff>../pix/16x16/Info2.png</normaloff>../pix/16x16/Info2.png</iconset>
    </property>
    <property name="text">
     <string>About</string>
@@ -3444,7 +3455,7 @@
   <action name="actionPythonHelp">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Question.png</normaloff>pix/16x16/Question.png</iconset>
+     <normaloff>../pix/16x16/Question.png</normaloff>../pix/16x16/Question.png</iconset>
    </property>
    <property name="text">
     <string>Python Help</string>
@@ -3461,7 +3472,7 @@
   <action name="actionPythonConsole">
    <property name="icon">
     <iconset>
-     <normaloff>pix/icons/python2.5.png</normaloff>pix/icons/python2.5.png</iconset>
+     <normaloff>../pix/icons/python2.5.png</normaloff>../pix/icons/python2.5.png</iconset>
    </property>
    <property name="text">
     <string>Python Console</string>
@@ -3473,7 +3484,7 @@
   <action name="actionShell">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Computer.png</normaloff>pix/16x16/Computer.png</iconset>
+     <normaloff>../pix/16x16/Computer.png</normaloff>../pix/16x16/Computer.png</iconset>
    </property>
    <property name="text">
     <string>Shell</string>
@@ -3485,7 +3496,7 @@
   <action name="actionRunScript">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Player Play.png</normaloff>pix/16x16/Player Play.png</iconset>
+     <normaloff>../pix/16x16/Player Play.png</normaloff>../pix/16x16/Player Play.png</iconset>
    </property>
    <property name="text">
     <string>Run Script</string>
@@ -3497,7 +3508,7 @@
   <action name="actionScratchFile">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Document Graph.png</normaloff>pix/16x16/Document Graph.png</iconset>
+     <normaloff>../pix/16x16/Document Graph.png</normaloff>../pix/16x16/Document Graph.png</iconset>
    </property>
    <property name="text">
     <string>Scratch File</string>
@@ -3509,7 +3520,7 @@
   <action name="actionPackages">
    <property name="icon">
     <iconset>
-     <normaloff>pix/silk/icons/package.png</normaloff>pix/silk/icons/package.png</iconset>
+     <normaloff>../pix/silk/icons/package.png</normaloff>../pix/silk/icons/package.png</iconset>
    </property>
    <property name="text">
     <string>Packages</string>
@@ -3518,7 +3529,7 @@
   <action name="actionWelcome">
    <property name="icon">
     <iconset>
-     <normaloff>pix/silk/icons/drink.png</normaloff>pix/silk/icons/drink.png</iconset>
+     <normaloff>../pix/silk/icons/drink.png</normaloff>../pix/silk/icons/drink.png</iconset>
    </property>
    <property name="text">
     <string>Welcome</string>
@@ -3527,7 +3538,7 @@
   <action name="actionAddTools">
    <property name="icon">
     <iconset>
-     <normaloff>pix/16x16/Gears.png</normaloff>pix/16x16/Gears.png</iconset>
+     <normaloff>../pix/16x16/Gears.png</normaloff>../pix/16x16/Gears.png</iconset>
    </property>
    <property name="text">
     <string>Manage tools</string>
@@ -3536,7 +3547,7 @@
   <action name="actionBside">
    <property name="icon">
     <iconset>
-     <normaloff>pix/bside.png</normaloff>pix/bside.png</iconset>
+     <normaloff>../pix/bside.png</normaloff>../pix/bside.png</iconset>
    </property>
    <property name="text">
     <string>Bside</string>
@@ -3545,7 +3556,7 @@
   <action name="actionSplitVertical">
    <property name="icon">
     <iconset>
-     <normaloff>pix/silk/icons/application_tile_horizontal.png</normaloff>pix/silk/icons/application_tile_horizontal.png</iconset>
+     <normaloff>../pix/silk/icons/application_tile_horizontal.png</normaloff>../pix/silk/icons/application_tile_horizontal.png</iconset>
    </property>
    <property name="text">
     <string>Split Vertical</string>
@@ -3554,7 +3565,7 @@
   <action name="actionSplitHorizontal">
    <property name="icon">
     <iconset>
-     <normaloff>pix/silk/icons/application_split.png</normaloff>pix/silk/icons/application_split.png</iconset>
+     <normaloff>../pix/silk/icons/application_split.png</normaloff>../pix/silk/icons/application_split.png</iconset>
    </property>
    <property name="text">
     <string>Split Horizontal</string>
@@ -3563,7 +3574,7 @@
   <action name="actionSaveAll">
    <property name="icon">
     <iconset>
-     <normaloff>pix/silk/icons/disk_multiple.png</normaloff>pix/silk/icons/disk_multiple.png</iconset>
+     <normaloff>../pix/silk/icons/disk_multiple.png</normaloff>../pix/silk/icons/disk_multiple.png</iconset>
    </property>
    <property name="text">
     <string>Save all</string>
@@ -3572,7 +3583,7 @@
   <action name="actionFirstTimeSettingsWizard">
    <property name="icon">
     <iconset>
-     <normaloff>pix/silk/icons/wand.png</normaloff>pix/silk/icons/wand.png</iconset>
+     <normaloff>../pix/silk/icons/wand.png</normaloff>../pix/silk/icons/wand.png</iconset>
    </property>
    <property name="text">
     <string>First time settings wizard</string>

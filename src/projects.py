@@ -636,36 +636,39 @@ class Project():
 #-------------------------------------------------------------------------------
 # endSession()
 #-------------------------------------------------------------------------------
-    def endSession(self):
+    def endSession(self):                
         filename = os.path.join(self.path, const.PROJECT_FILE_NAME)
-        parser = lxml.etree.XMLParser(remove_blank_text=True)
-        tree = lxml.etree.parse(filename, parser)
-        root = tree.getroot()
-        # Modify the <modified> tag
-        modified = root.find('modified')
-        modified.text = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
-        # Targeting <SESSIONS> tag
-        sessions = root.find('.//sessions')
-        if sessions is None:
-            # Creating <SESSIONS> tag if it not exists
-            sessions = lxml.etree.SubElement(root, 'sessions')
-        # Creating the current <SESSION> tag
-        session = lxml.etree.SubElement(sessions, 'session')
-        endSession = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
-        session.set("start", self.session)
-        session.set("end", endSession)
-        d = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
-        d1 = datetime.strptime(self.session, "%Y/%m/%d-%H:%M:%S")
-        d2 = datetime.strptime(endSession, "%Y/%m/%d-%H:%M:%S")
-        # Sum the full time of sessions
-        d = d + (d2 - d1)
-        timeFocus = d.total_seconds() - self.timeNoFocus        
-        # session.set("focus", str(timedelta(seconds=timeFocus)))
-        session.set("focus", str(int(timeFocus)))
-        # Appending the <SESSION> tag to the <SESSIONS>
-        sessions.insert(root.index(sessions) + 1, session)
-        # Writing all
-        tree.write(filename, pretty_print=True)
+        if os.path.exists(filename):
+            parser = lxml.etree.XMLParser(remove_blank_text=True)
+            tree = lxml.etree.parse(filename, parser)
+            root = tree.getroot()
+            # Modify the <modified> tag
+            modified = root.find('modified')
+            modified.text = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+            # Targeting <SESSIONS> tag
+            sessions = root.find('.//sessions')
+            if sessions is None:
+                # Creating <SESSIONS> tag if it not exists
+                sessions = lxml.etree.SubElement(root, 'sessions')
+            # Creating the current <SESSION> tag
+            session = lxml.etree.SubElement(sessions, 'session')
+            endSession = datetime.now().strftime("%Y/%m/%d-%H:%M:%S")
+            session.set("start", self.session)
+            session.set("end", endSession)
+            d = timedelta(days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0)
+            d1 = datetime.strptime(self.session, "%Y/%m/%d-%H:%M:%S")
+            d2 = datetime.strptime(endSession, "%Y/%m/%d-%H:%M:%S")
+            # Sum the full time of sessions
+            d = d + (d2 - d1)
+            timeFocus = d.total_seconds() - self.timeNoFocus        
+            # session.set("focus", str(timedelta(seconds=timeFocus)))
+            session.set("focus", str(int(timeFocus)))
+            # Appending the <SESSION> tag to the <SESSIONS>
+            sessions.insert(root.index(sessions) + 1, session)
+            # Writing all
+            tree.write(filename, pretty_print=True)
+        else:
+            self.parent.showMessage("Can't find project %s" % filename)
 
 #-------------------------------------------------------------------------------
 # getTimeProject()

@@ -73,6 +73,7 @@ def header(cached_db):
          grid-column: 1 / -1;
          /* needed for the floated layout */
          clear: both;
+         color: #3490C4;
          }}		 
 	 a.header {{
          color: #663300;
